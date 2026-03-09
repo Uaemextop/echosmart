@@ -1,0 +1,143 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: echosmart
+      POSTGRES_PASSWORD: echosmart
+      POSTGRES_DB: echosmart
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./database/postgres/schema.sql:/docker-entrypoint-initdb.d/01_schema.sql
+      - ./database/postgres/rls_policies.sql:/docker-entrypoint-initdb.d/02_rls_policies.sql
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U echosmart -d echosmart"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    command: redis-server --appendonly yes
+    volumes:
+      - redis-data:/data
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  influxdb:
+    image: influxdb:2.7-alpine
+    environment:
+      DOCKER_INFLUXDB_INIT_MODE: setup
+      DOCKER_INFLUXDB_INIT_USERNAME: echosmart
+      DOCKER_INFLUXDB_INIT_PASSWORD: echosmart123
+      DOCKER_INFLUXDB_INIT_ORG: echosmart
+      DOCKER_INFLUXDB_INIT_BUCKET: sensors
+      DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: echosmart-influx-token
+    volumes:
+      - influxdb-data:/var/lib/influxdb2
+    ports:
+      - "8086:8086"
+    healthcheck:
+      test: ["CMD", "influx", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  mosquitto:
+    image: eclipse-mosquitto:2.0
+    volumes:
+      - ./mosquitto/config/mosquitto.conf:/mosquitto/config/mosquitto.conf
+      - mosquitto-data:/mosquitto/data
+      - mosquitto-logs:/mosquitto/log
+    ports:
+      - "1883:1883"
+    healthcheck:
+      test: ["CMD-SHELL", "mosquitto_pub -h localhost -t health -m ok || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  gateway:
+    build:
+      context: ./gateway
+      dockerfile: Dockerfile
+    environment:
+      CLOUD_BACKEND_URL: http://backend:3000
+      GATEWAY_ID: gateway-001
+      MQTT_BROKER_HOST: mosquitto
+      MQTT_BROKER_PORT: "1883"
+    volumes:
+      - gateway-data:/app/data
+    ports:
+      - "8000:8000"
+    depends_on:
+      mosquitto:
+        condition: service_healthy
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    environment:
+      DATABASE_URL: postgresql://echosmart:echosmart@postgres:5432/echosmart
+      REDIS_URL: redis://redis:6379
+      INFLUXDB_URL: http://influxdb:8086
+      MQTT_BROKER: mqtt://mosquitto:1883
+      JWT_SECRET: changeme-in-production  # MUST be overridden in production via secrets
+      JWT_REFRESH_SECRET: changeme-refresh-in-production  # MUST be overridden in production via secrets
+      SENDGRID_API_KEY: your-sendgrid-key
+      TWILIO_ACCOUNT_SID: your-twilio-sid
+      TWILIO_AUTH_TOKEN: your-twilio-token
+      PORT: "3000"
+      NODE_ENV: production
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      mosquitto:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres-data:
+  redis-data:
+  influxdb-data:
+  mosquitto-data:
+  mosquitto-logs:
+  gateway-data:
