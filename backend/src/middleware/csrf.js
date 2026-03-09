@@ -12,12 +12,12 @@ const SAFE_METHODS = new Set(['GET', 'HEAD', 'OPTIONS']);
  * On every GET, a random CSRF token is set as a non-httpOnly cookie so the
  * frontend JavaScript can read it.  On every state-mutating request the
  * middleware verifies that the submitted X-CSRF-Token header matches the
- * cookie value (constant-time comparison to prevent timing attacks).
+ * cookie value (double-submit cookie pattern).
  */
 function csrfProtection(req, res, next) {
-  // Refresh (or seed) the CSRF token on safe requests
+  // Seed or refresh the CSRF token cookie on safe requests
   if (SAFE_METHODS.has(req.method)) {
-    if (!req.cookies[CSRF_COOKIE]) {
+    if (!req.cookies || !req.cookies[CSRF_COOKIE]) {
       const token = crypto.randomBytes(32).toString('hex');
       res.cookie(CSRF_COOKIE, token, {
         httpOnly: false,   // must be readable by JS
@@ -36,18 +36,8 @@ function csrfProtection(req, res, next) {
   const cookieToken = req.cookies[CSRF_COOKIE];
   const headerToken = req.get(CSRF_HEADER);
 
-  if (!cookieToken || !headerToken) {
-    return res.status(403).json({ error: 'CSRF token missing' });
-  }
-
-  // Constant-time comparison to prevent timing attacks
-  const cookieBuf = Buffer.from(cookieToken);
-  const headerBuf = Buffer.from(headerToken);
-  if (
-    cookieBuf.length !== headerBuf.length ||
-    !crypto.timingSafeEqual(cookieBuf, headerBuf)
-  ) {
-    return res.status(403).json({ error: 'CSRF token invalid' });
+  if (!cookieToken || !headerToken || cookieToken !== headerToken) {
+    return res.status(403).json({ error: 'CSRF token invalid or missing' });
   }
 
   return next();
