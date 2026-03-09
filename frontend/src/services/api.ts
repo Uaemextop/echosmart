@@ -1,6 +1,17 @@
 import axios from 'axios';
 import type { AxiosInstance, InternalAxiosRequestConfig } from 'axios';
 
+const CSRF_COOKIE = 'csrfToken';
+const CSRF_HEADER = 'x-csrf-token';
+const SAFE_METHODS = new Set(['get', 'head', 'options']);
+
+function getCsrfToken(): string {
+  const match = document.cookie
+    .split('; ')
+    .find((row) => row.startsWith(`${CSRF_COOKIE}=`));
+  return match ? decodeURIComponent(match.split('=')[1]) : '';
+}
+
 const api: AxiosInstance = axios.create({
   baseURL: '/api',
   withCredentials: true,
@@ -8,6 +19,27 @@ const api: AxiosInstance = axios.create({
 
 let isRefreshing = false;
 let failedQueue: Array<{ resolve: (value: unknown) => void; reject: (reason: unknown) => void }> = [];
+
+function processQueue(error: unknown) {
+  failedQueue.forEach(({ resolve, reject }) => {
+    if (error) reject(error);
+    else resolve(null);
+  });
+  failedQueue = [];
+}
+
+// Attach CSRF token to all state-mutating requests
+api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
+  const method = (config.method ?? 'get').toLowerCase();
+  if (!SAFE_METHODS.has(method)) {
+    const token = getCsrfToken();
+    if (token) {
+      config.headers = config.headers ?? {};
+      config.headers[CSRF_HEADER] = token;
+    }
+  }
+  return config;
+});
 
 function processQueue(error: unknown) {
   failedQueue.forEach(({ resolve, reject }) => {
