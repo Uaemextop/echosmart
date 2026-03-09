@@ -1,0 +1,18 @@
+# Asignación de revisores automáticos por área de código
+
+# Documentación
+/docs/ @Uaemextop
+
+# Backend
+/backend/ @Uaemextop
+
+# Frontend
+/frontend/ @Uaemextop
+
+# Gateway
+/gateway/ @Uaemextop
+
+# Infraestructura
+/infra/ @Uaemextop
+/.github/ @Uaemextop
+docker-compose*.yml @Uaemextop

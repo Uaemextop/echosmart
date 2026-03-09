@@ -2,8 +2,9 @@
 
 **Plataforma IoT de agricultura de precisión para monitoreo ambiental inteligente en invernaderos.**
 
+[![CI](https://github.com/Uaemextop/echosmart/actions/workflows/ci.yml/badge.svg)](https://github.com/Uaemextop/echosmart/actions/workflows/ci.yml)
 [![Documentación](https://img.shields.io/badge/docs-disponible-blue)](/docs/README.md)
-[![Licencia](https://img.shields.io/badge/licencia-MIT-green)](#licencia)
+[![Licencia](https://img.shields.io/badge/licencia-MIT-green)](LICENSE)
 
 ---
 
@@ -19,6 +20,8 @@ EchoSmart es una solución empresarial de monitoreo ambiental que integra una ar
 - **Reportes automatizados** — Generación asincrónica de reportes PDF y Excel con gráficas embebidas.
 - **Multi-tenancy** — Aislamiento completo de datos, branding personalizado y control de acceso basado en roles (RBAC).
 - **Edge computing** — El gateway opera de forma autónoma con caché local, garantizando continuidad ante pérdida de conectividad.
+- **Control de actuadores** — Encendido/apagado remoto de riego, ventilación e iluminación (roadmap).
+- **Analítica predictiva** — Modelos de ML para predicción de temperatura y detección de anomalías (roadmap).
 
 ---
 
@@ -30,6 +33,7 @@ EchoSmart es una solución empresarial de monitoreo ambiental que integra una ar
 | **Backend (Cloud)** | FastAPI · PostgreSQL 14+ · InfluxDB 2.7+ · Redis 7+ · Docker |
 | **Frontend (Web)** | React 18+ · Redux Toolkit · Recharts · Material-UI / Tailwind CSS |
 | **Móvil** | React Native (Expo) · iOS y Android |
+| **CI/CD** | GitHub Actions · Docker · Kubernetes |
 
 ---
 
@@ -68,30 +72,7 @@ Para instrucciones detalladas, consultar la guía de [Primeros Pasos](docs/getti
 | Soil Moisture | Humedad de suelo | ADC (ADS1115) | Analógico 0–1023 |
 | MHZ-19C | CO₂ | UART | 0–5000 ppm |
 
----
-
-## Documentación
-
-La documentación completa del proyecto se encuentra en el directorio [`docs/`](docs/README.md).
-
-| Documento | Descripción |
-|-----------|-------------|
-| [Índice de Documentación](docs/README.md) | Punto de entrada y navegación de toda la documentación |
-| [Primeros Pasos](docs/getting-started.md) | Instalación y configuración del entorno de desarrollo |
-| [Funcionalidad de la Aplicación](docs/app-functionality.md) | Descripción detallada de todas las funciones del sistema |
-| [Arquitectura de Software](docs/architecture.md) | Diseño de la arquitectura de 3 capas |
-| [Protocolos de Comunicación](docs/communication-protocols.md) | MQTT, 1-Wire, I2C, UART, HTTP REST y WebSocket |
-| [Roadmap Ejecutivo](docs/roadmap.md) | Fases de implementación, milestones y KPIs |
-| [Integración Backend](docs/backend-integration.md) | Esquemas de base de datos, flujos E2E |
-| [Funciones del Backend](docs/backend-functions.md) | Servicios y funciones del backend (FastAPI) |
-| [API, Testing y DevOps](docs/api-testing-devops.md) | Especificación REST API, testing y CI/CD |
-| [Frontend React](docs/frontend.md) | Componentes, Redux, hooks y testing |
-| [Configuración de Raspberry Pi OS](docs/raspberry-pi-setup.md) | Instalación del SO, red, interfaces de hardware y servicios |
-| [Gateway y Edge Computing](docs/gateway-edge-computing.md) | Arquitectura del gateway, HAL y drivers |
-| [Sensores y Hardware](docs/sensors-hardware.md) | Catálogo de sensores, conexión y calibración |
-| [Despliegue](docs/deployment.md) | Docker, Kubernetes y producción |
-| [Seguridad](docs/security.md) | Autenticación, autorización y protección de datos |
-| [Contribución](docs/contributing.md) | Cómo contribuir al proyecto |
+Consultar el [Roadmap de Features](docs/features-roadmap.md) para los sensores futuros (BME280, pH, EC, caudal, etc.).
 
 ---
 
@@ -112,6 +93,80 @@ La documentación completa del proyecto se encuentra en el directorio [`docs/`](
                                                         │   WebSocket      │
                                                         └──────────────────┘
 ```
+
+---
+
+## Estructura del Proyecto
+
+```
+echosmart/
+├── backend/          # API FastAPI, servicios, modelos
+├── frontend/         # Aplicación web React
+├── gateway/          # Software del gateway Raspberry Pi
+├── mobile/           # App móvil React Native (Expo)
+├── infra/            # Docker, Kubernetes, Nginx, scripts
+├── docs/             # Documentación técnica (21 documentos)
+├── .github/          # Workflows CI/CD, templates de issues/PR
+├── docker-compose.yml
+├── LICENSE
+├── CHANGELOG.md
+└── README.md
+```
+
+Para la estructura detallada de cada capa, consultar [Estructura del Proyecto](docs/project-structure.md).
+
+---
+
+## Documentación
+
+La documentación completa del proyecto se encuentra en el directorio [`docs/`](docs/README.md).
+
+### Inicio y Funcionalidad
+
+| Documento | Descripción |
+|-----------|-------------|
+| [Índice de Documentación](docs/README.md) | Punto de entrada y navegación |
+| [Primeros Pasos](docs/getting-started.md) | Instalación y configuración |
+| [Funcionalidad de la Aplicación](docs/app-functionality.md) | Funciones del sistema |
+| [Estructura del Proyecto](docs/project-structure.md) | Carpetas, módulos y dependencias |
+| [Funcionalidades y Roadmap de Features](docs/features-roadmap.md) | Features actuales y futuras |
+
+### Arquitectura y Diseño
+
+| Documento | Descripción |
+|-----------|-------------|
+| [Arquitectura de Software](docs/architecture.md) | Diseño de la arquitectura de 3 capas |
+| [Protocolos de Comunicación](docs/communication-protocols.md) | MQTT, 1-Wire, I2C, UART, HTTP, WebSocket |
+| [Esquema de Base de Datos](docs/database-schema.md) | PostgreSQL, InfluxDB, Redis, SQLite |
+| [Roadmap Ejecutivo](docs/roadmap.md) | Fases, milestones y KPIs |
+
+### Backend y API
+
+| Documento | Descripción |
+|-----------|-------------|
+| [Integración Backend](docs/backend-integration.md) | Flujos de datos E2E |
+| [Funciones del Backend](docs/backend-functions.md) | Servicios y funciones (FastAPI) |
+| [API, Testing y DevOps](docs/api-testing-devops.md) | REST API, testing y CI/CD |
+
+### Gateway y Hardware
+
+| Documento | Descripción |
+|-----------|-------------|
+| [Configuración de Raspberry Pi OS](docs/raspberry-pi-setup.md) | Instalación del SO, red, interfaces y servicios |
+| [Gateway y Edge Computing](docs/gateway-edge-computing.md) | HAL, drivers y sincronización |
+| [Sensores y Hardware](docs/sensors-hardware.md) | Sensores, conexión y calibración |
+| [Frontend React](docs/frontend.md) | Componentes, Redux, hooks y testing |
+
+### Operaciones y Seguridad
+
+| Documento | Descripción |
+|-----------|-------------|
+| [Despliegue en la Nube](docs/cloud-deployment.md) | AWS, DigitalOcean y Raspberry Pi en producción |
+| [Despliegue General](docs/deployment.md) | Docker, Kubernetes y desarrollo local |
+| [Variables de Entorno](docs/environment-variables.md) | Referencia completa por componente |
+| [Seguridad](docs/security.md) | Autenticación, autorización y protección de datos |
+| [Resolución de Problemas](docs/troubleshooting.md) | Diagnóstico y soluciones |
+| [Contribución](docs/contributing.md) | Cómo contribuir al proyecto |
 
 ---
 
