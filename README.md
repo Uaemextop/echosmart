@@ -80,15 +80,18 @@ La documentación completa del proyecto se encuentra en el directorio [`docs/`](
 | [Primeros Pasos](docs/getting-started.md) | Instalación y configuración del entorno de desarrollo |
 | [Funcionalidad de la Aplicación](docs/app-functionality.md) | Descripción detallada de todas las funciones del sistema |
 | [Arquitectura de Software](docs/architecture.md) | Diseño de la arquitectura de 3 capas |
+| [Protocolos de Comunicación](docs/communication-protocols.md) | MQTT, 1-Wire, I2C, UART, HTTP REST y WebSocket |
 | [Roadmap Ejecutivo](docs/roadmap.md) | Fases de implementación, milestones y KPIs |
 | [Integración Backend](docs/backend-integration.md) | Esquemas de base de datos, flujos E2E |
 | [Funciones del Backend](docs/backend-functions.md) | Servicios y funciones del backend (FastAPI) |
 | [API, Testing y DevOps](docs/api-testing-devops.md) | Especificación REST API, testing y CI/CD |
 | [Frontend React](docs/frontend.md) | Componentes, Redux, hooks y testing |
+| [Configuración de Raspberry Pi OS](docs/raspberry-pi-setup.md) | Instalación del SO, red, interfaces de hardware y servicios |
 | [Gateway y Edge Computing](docs/gateway-edge-computing.md) | Arquitectura del gateway, HAL y drivers |
 | [Sensores y Hardware](docs/sensors-hardware.md) | Catálogo de sensores, conexión y calibración |
 | [Despliegue](docs/deployment.md) | Docker, Kubernetes y producción |
 | [Seguridad](docs/security.md) | Autenticación, autorización y protección de datos |
+| [Contribución](docs/contributing.md) | Cómo contribuir al proyecto |
 
 ---
 
@@ -109,6 +112,12 @@ La documentación completa del proyecto se encuentra en el directorio [`docs/`](
                                                         │   WebSocket      │
                                                         └──────────────────┘
 ```
+
+---
+
+## Contribuir
+
+¿Quieres colaborar? Consulta la [Guía de Contribución](docs/contributing.md) para conocer las convenciones de código, el flujo de trabajo y cómo agregar nuevos sensores o endpoints.
 
 ---
 

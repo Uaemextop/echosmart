@@ -18,6 +18,7 @@ Bienvenido a la documentación técnica de **EchoSmart**, la plataforma IoT de a
 | Documento | Descripción |
 |-----------|-------------|
 | [Arquitectura de Software](architecture.md) | Visión general de la arquitectura de 3 capas (Edge, Cloud, Frontend) |
+| [Protocolos de Comunicación](communication-protocols.md) | MQTT, 1-Wire, I2C, UART, HTTP REST y WebSocket |
 | [Roadmap Ejecutivo](roadmap.md) | Fases de implementación, milestones y KPIs |
 
 ---
@@ -44,7 +45,8 @@ Bienvenido a la documentación técnica de **EchoSmart**, la plataforma IoT de a
 
 | Documento | Descripción |
 |-----------|-------------|
-| [Gateway y Edge Computing](gateway-edge-computing.md) | Arquitectura del gateway Raspberry Pi, HAL, drivers y sincronización |
+| [Configuración de Raspberry Pi OS](raspberry-pi-setup.md) | Instalación del SO, configuración de red, interfaces de hardware y servicios del sistema |
+| [Gateway y Edge Computing](gateway-edge-computing.md) | Arquitectura del gateway, HAL, drivers y sincronización |
 | [Sensores y Hardware](sensors-hardware.md) | Catálogo de 5 sensores soportados, conexión, código Python y calibración |
 
 ---
@@ -55,6 +57,14 @@ Bienvenido a la documentación técnica de **EchoSmart**, la plataforma IoT de a
 |-----------|-------------|
 | [Despliegue](deployment.md) | Guía de despliegue con Docker, Kubernetes y configuración de producción |
 | [Seguridad](security.md) | Autenticación, autorización, protección de datos y auditoría |
+
+---
+
+## Comunidad
+
+| Documento | Descripción |
+|-----------|-------------|
+| [Contribución al Proyecto](contributing.md) | Cómo contribuir, convenciones de código y flujo de trabajo |
 
 ---
 
@@ -75,8 +85,10 @@ Bienvenido a la documentación técnica de **EchoSmart**, la plataforma IoT de a
 2. [API, Testing y DevOps](api-testing-devops.md)
 
 ### Ingenieros de Hardware / Gateway
-1. [Sensores y Hardware](sensors-hardware.md)
-2. [Gateway y Edge Computing](gateway-edge-computing.md)
+1. [Configuración de Raspberry Pi OS](raspberry-pi-setup.md)
+2. [Sensores y Hardware](sensors-hardware.md)
+3. [Gateway y Edge Computing](gateway-edge-computing.md)
+4. [Protocolos de Comunicación](communication-protocols.md)
 
 ### DevOps / Operaciones
 1. [Despliegue](deployment.md)
@@ -89,9 +101,10 @@ Bienvenido a la documentación técnica de **EchoSmart**, la plataforma IoT de a
 
 | Métrica | Valor |
 |---------|-------|
-| Total de documentos | 12 |
+| Total de documentos | 16 |
 | Endpoints API documentados | 30+ |
 | Sensores documentados | 5 tipos |
+| Protocolos documentados | 7 (MQTT, 1-Wire, I2C, UART, GPIO, HTTP, WebSocket) |
 | Ejemplos de código | 100+ |
 | Test cases | 50+ |
 
@@ -104,6 +117,7 @@ Bienvenido a la documentación técnica de **EchoSmart**, la plataforma IoT de a
 - [React](https://react.dev/)
 - [PostgreSQL](https://www.postgresql.org/docs/)
 - [InfluxDB](https://docs.influxdata.com/)
+- [Mosquitto MQTT](https://mosquitto.org/documentation/)
 
 ---
 

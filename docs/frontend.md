@@ -462,7 +462,7 @@ function MyComponent() {
  * Carga tema dinámico basado en configuración del tenant
  */
 
-function useTenatTheme(tenant) {
+function useTenantTheme(tenant) {
   return {
     colors: {
       primary: tenant.branding?.primary_color || '#1E3A8A',
