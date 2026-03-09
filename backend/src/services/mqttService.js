@@ -7,11 +7,16 @@ let client = null;
 
 function connect() {
   const brokerUrl = process.env.MQTT_BROKER || 'mqtt://mosquitto:1883';
-  client = mqtt.connect(brokerUrl, {
+  const connectOptions = {
     clientId: `backend-${Date.now()}`,
     clean: true,
     reconnectPeriod: 5000,
-  });
+  };
+  if (process.env.MQTT_USERNAME) {
+    connectOptions.username = process.env.MQTT_USERNAME;
+    connectOptions.password = process.env.MQTT_PASSWORD;
+  }
+  client = mqtt.connect(brokerUrl, connectOptions);
 
   client.on('connect', () => {
     console.log('MQTT connected to', brokerUrl);

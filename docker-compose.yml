@@ -21,13 +21,13 @@ services:
 
   redis:
     image: redis:7-alpine
-    command: redis-server --appendonly yes
+    command: redis-server --appendonly yes --requirepass "${REDIS_PASSWORD:-redispass123}"
     volumes:
       - redis-data:/data
     ports:
       - "6379:6379"
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-redispass123}", "ping"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -52,15 +52,21 @@ services:
       retries: 5
 
   mosquitto:
-    image: eclipse-mosquitto:2.0
+    build:
+      context: ./mosquitto
+      dockerfile: Dockerfile
+    environment:
+      MQTT_USER: "${MQTT_USER:-echosmart}"
+      MQTT_PASSWORD: "${MQTT_PASSWORD:-echosmart123}"
+      MQTT_GATEWAY_USER: "${MQTT_GATEWAY_USER:-gateway}"
+      MQTT_GATEWAY_PASSWORD: "${MQTT_GATEWAY_PASSWORD:-gateway123}"
     volumes:
-      - ./mosquitto/config/mosquitto.conf:/mosquitto/config/mosquitto.conf
       - mosquitto-data:/mosquitto/data
       - mosquitto-logs:/mosquitto/log
     ports:
       - "1883:1883"
     healthcheck:
-      test: ["CMD-SHELL", "mosquitto_pub -h localhost -t health -m ok || exit 1"]
+      test: ["CMD-SHELL", "mosquitto_pub -h localhost -u $${MQTT_USER:-echosmart} -P $${MQTT_PASSWORD:-echosmart123} -t health -m ok || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -74,6 +80,8 @@ services:
       GATEWAY_ID: gateway-001
       MQTT_BROKER_HOST: mosquitto
       MQTT_BROKER_PORT: "1883"
+      MQTT_USERNAME: "${MQTT_GATEWAY_USER:-gateway}"
+      MQTT_PASSWORD: "${MQTT_GATEWAY_PASSWORD:-gateway123}"
     volumes:
       - gateway-data:/app/data
     ports:
@@ -95,9 +103,11 @@ services:
       dockerfile: Dockerfile
     environment:
       DATABASE_URL: postgresql://echosmart:echosmart@postgres:5432/echosmart
-      REDIS_URL: redis://redis:6379
+      REDIS_URL: redis://:${REDIS_PASSWORD:-redispass123}@redis:6379
       INFLUXDB_URL: http://influxdb:8086
       MQTT_BROKER: mqtt://mosquitto:1883
+      MQTT_USERNAME: "${MQTT_USER:-echosmart}"
+      MQTT_PASSWORD: "${MQTT_PASSWORD:-echosmart123}"
       JWT_SECRET: changeme-in-production  # MUST be overridden in production via secrets
       JWT_REFRESH_SECRET: changeme-refresh-in-production  # MUST be overridden in production via secrets
       SENDGRID_API_KEY: your-sendgrid-key

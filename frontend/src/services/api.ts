@@ -41,14 +41,6 @@ api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   return config;
 });
 
-function processQueue(error: unknown) {
-  failedQueue.forEach(({ resolve, reject }) => {
-    if (error) reject(error);
-    else resolve(null);
-  });
-  failedQueue = [];
-}
-
 api.interceptors.response.use(
   (response) => response,
   async (error) => {

@@ -23,7 +23,7 @@ interface Metric {
 
 export default function SystemHealth() {
   const [metrics, setMetrics] = useState<Metric[]>([]);
-  const [logs, setLogs] = useState<LogEntry[]>(mockLogs);
+  const [logs] = useState<LogEntry[]>(mockLogs);
   const [tick, setTick] = useState(0);
 
   useEffect(() => {
