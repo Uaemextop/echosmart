@@ -15,7 +15,7 @@ async function sendViaSendGrid(msg) {
   await sgMail.send(msg);
 }
 
-async function sendViaWhatsApp(phoneNumber: string, body: string) {
+async function sendViaWhatsApp(phoneNumber, body) {
   // `phoneNumber` must be in E.164 format, e.g. "+14155001234"
   const accountSid = process.env.TWILIO_ACCOUNT_SID;
   const authToken = process.env.TWILIO_AUTH_TOKEN;

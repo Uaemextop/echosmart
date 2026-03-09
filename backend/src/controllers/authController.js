@@ -50,12 +50,13 @@ async function login(req, res) {
 
   const { rows } = await query('SELECT * FROM users WHERE email = $1 AND is_active = true', [email]);
   const user = rows[0];
-  if (!user) {
-    return res.status(401).json({ error: 'Invalid credentials' });
-  }
 
-  const valid = await bcrypt.compare(password, user.password_hash);
-  if (!valid) {
+  // Always run bcrypt.compare to prevent timing-based user enumeration.
+  // Use a dummy hash when user is not found so the comparison takes constant time.
+  const DUMMY_HASH = '$2b$12$invalidhashvaluethatcannotmatchanypassword000000000000000';
+  const valid = await bcrypt.compare(password, user ? user.password_hash : DUMMY_HASH);
+
+  if (!user || !valid) {
     return res.status(401).json({ error: 'Invalid credentials' });
   }
 

@@ -43,9 +43,17 @@ class SSDPDiscovery:
 
     async def start_discovery(self) -> None:
         loop = asyncio.get_event_loop()
-        await loop.run_in_executor(None, self._run_ssdp_discovery)
+        # Collect raw responses in a thread (blocking I/O), then process them on the event loop
+        responses = await loop.run_in_executor(None, self._run_ssdp_discovery)
+        for response, addr in responses:
+            try:
+                self._handle_discovery_response(response, addr)
+            except Exception as exc:
+                logger.error("Error processing SSDP response from %s: %s", addr, exc)
 
-    def _run_ssdp_discovery(self) -> None:
+    def _run_ssdp_discovery(self) -> list:
+        """Blocking UDP socket operations — runs in a thread pool executor."""
+        collected: list = []
         try:
             sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
             sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -71,15 +79,16 @@ class SSDPDiscovery:
                 try:
                     data, addr = sock.recvfrom(4096)
                     response = data.decode("utf-8", errors="replace")
-                    asyncio.run(self.handle_discovery_response(response, addr))
+                    collected.append((response, addr))
                 except socket.timeout:
                     break
         except Exception as exc:
             logger.error("SSDP discovery error: %s", exc)
         finally:
             sock.close()
+        return collected
 
-    async def handle_discovery_response(self, response: str, addr: tuple) -> None:
+    def _handle_discovery_response(self, response: str, addr: tuple) -> None:
         headers = _parse_ssdp_response(response)
         uuid: Optional[str] = headers.get("USN") or headers.get("UUID")
         sensor_type: Optional[str] = headers.get("SENSOR-TYPE")
@@ -122,9 +131,7 @@ class SSDPDiscovery:
                 existing.port = port
                 existing.status = "online"
                 existing.last_seen = datetime.now(timezone.utc)
-                # preserve pending flag if already set; don't reset to False prematurely
-                if not existing.pending_cloud_sync:
-                    pass  # already synced – leave as-is
+                # preserve pending flag; only clear after confirmed cloud sync
                 logger.info("Updated existing sensor %s", uuid)
             session.commit()
 

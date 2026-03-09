@@ -67,7 +67,7 @@ export default function SensorHeatmap({ sensors }: Props) {
           }}
         />
         <span>Hot</span>
-        <span className="ml-2">(&lt;15°C → &gt;30°C)</span>
+        <span className="ml-2">({'<'}15°C → {'>'}30°C)</span>
       </div>
     </div>
   );
