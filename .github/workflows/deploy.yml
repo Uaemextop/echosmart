@@ -7,6 +7,9 @@ on:
       - "docs/**"
       - "*.md"
 
+permissions:
+  contents: read
+
 jobs:
   build-backend:
     name: Build Backend Image
