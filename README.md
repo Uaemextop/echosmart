@@ -1,27 +1,51 @@
-# EchoSmart
+# 🌱 EchoSmart — Invernadero Inteligente
 
-**Plataforma IoT de agricultura de precisión para monitoreo ambiental inteligente en invernaderos.**
+**Plataforma IoT para invernaderos inteligentes con monitoreo ambiental en tiempo real.**
 
 [![CI](https://github.com/Uaemextop/echosmart/actions/workflows/ci.yml/badge.svg)](https://github.com/Uaemextop/echosmart/actions/workflows/ci.yml)
 [![Documentación](https://img.shields.io/badge/docs-disponible-blue)](/docs/README.md)
 [![Licencia](https://img.shields.io/badge/licencia-MIT-green)](LICENSE)
+[![Web](https://img.shields.io/badge/web-landing%20page-green)](web/index.html)
+
+<p align="center">
+  <img src="assets/logo/echosmart-logo-full.png" alt="EchoSmart Logo" width="500">
+</p>
 
 ---
 
 ## Descripción
 
-EchoSmart es una solución empresarial de monitoreo ambiental que integra una arquitectura **edge-to-cloud** de tres capas: Gateway (Raspberry Pi), Backend Cloud (FastAPI) y Frontend (React). Diseñada para invernaderos de agricultura de precisión, la plataforma recopila datos de múltiples sensores, genera alertas en tiempo real y produce reportes automatizados, todo con soporte multi-tenant.
+EchoSmart es un **sistema de invernadero inteligente** que permite monitorear y controlar las condiciones ambientales de cultivos en ambientes protegidos. Mediante una arquitectura **edge-to-cloud** de tres capas — Gateway (Raspberry Pi), Backend Cloud (FastAPI) y Frontend (React) — la plataforma recopila datos de múltiples sensores, genera alertas en tiempo real, produce reportes automatizados y permite el control remoto de actuadores (riego, ventilación, iluminación), todo con soporte multi-tenant.
+
+### ¿Para quién es EchoSmart?
+
+- 🌿 **Agrónomos** que necesitan monitorear condiciones del invernadero en tiempo real.
+- 🏭 **Operadores** que gestionan sistemas de riego, ventilación e iluminación.
+- 📊 **Investigadores** que analizan datos históricos para optimizar cultivos.
+- 🏢 **Empresas agrícolas** que requieren gestión multi-invernadero con trazabilidad.
 
 ### Características Principales
 
-- **Monitoreo en tiempo real** — Lectura continua de temperatura, humedad, luminosidad, humedad de suelo y CO₂ con actualización instantánea vía WebSocket.
-- **Hot-plug de sensores** — Los dispositivos se auto-descubren y configuran al conectarse al gateway mediante SSDP.
-- **Alertas configurables** — Reglas flexibles con evaluación local en el gateway y redundancia en la nube; notificaciones por email, SMS, push y webhooks.
-- **Reportes automatizados** — Generación asincrónica de reportes PDF y Excel con gráficas embebidas.
-- **Multi-tenancy** — Aislamiento completo de datos, branding personalizado y control de acceso basado en roles (RBAC).
-- **Edge computing** — El gateway opera de forma autónoma con caché local, garantizando continuidad ante pérdida de conectividad.
-- **Control de actuadores** — Encendido/apagado remoto de riego, ventilación e iluminación (roadmap).
-- **Analítica predictiva** — Modelos de ML para predicción de temperatura y detección de anomalías (roadmap).
+- **🌡️ Monitoreo en tiempo real** — Lectura continua de temperatura, humedad, luminosidad, humedad de suelo y CO₂ con actualización instantánea vía WebSocket.
+- **🔌 Hot-plug de sensores** — Los dispositivos se auto-descubren y configuran al conectarse al gateway mediante SSDP.
+- **🚨 Alertas configurables** — Reglas flexibles con evaluación local en el gateway y redundancia en la nube; notificaciones por email, SMS, push y webhooks.
+- **📄 Reportes automatizados** — Generación asincrónica de reportes PDF y Excel con gráficas embebidas.
+- **🏢 Multi-tenancy** — Aislamiento completo de datos, branding personalizado y RBAC.
+- **⚡ Edge computing** — El gateway opera de forma autónoma con caché local, garantizando continuidad ante pérdida de conectividad.
+- **💧 Control de actuadores** — Encendido/apagado remoto de riego, ventilación e iluminación (roadmap).
+- **🤖 Analítica predictiva** — Modelos de ML para predicción de temperatura y detección de anomalías (roadmap).
+
+---
+
+## Rangos Óptimos para Invernadero
+
+| Variable | Rango Óptimo | Alerta Baja | Alerta Alta | Fuente |
+|----------|-------------|-------------|-------------|--------|
+| Temperatura | 18°C – 28°C | < 10°C | > 35°C | FAO / SAGARPA |
+| Humedad Relativa | 60% – 80% | < 40% | > 90% | FAO |
+| Luminosidad | 10,000 – 30,000 lux | < 5,000 lux | > 50,000 lux | FAO |
+| CO₂ | 400 – 1,000 ppm | < 300 ppm | > 1,500 ppm | ASHRAE |
+| Humedad del Suelo | 50% – 80% | < 30% | > 95% | INIFAP |
 
 ---
 
@@ -100,12 +124,16 @@ Consultar el [Roadmap de Features](docs/features-roadmap.md) para los sensores f
 
 ```
 echosmart/
+├── web/              # Página web (landing page + dashboard)
 ├── backend/          # API FastAPI, servicios, modelos
 ├── frontend/         # Aplicación web React
 ├── gateway/          # Software del gateway Raspberry Pi
 ├── mobile/           # App móvil React Native (Expo)
 ├── infra/            # Docker, Kubernetes, Nginx, scripts
-├── docs/             # Documentación técnica (21 documentos)
+├── assets/           # Logo, iconos, favicon y branding
+├── docs/             # Documentación técnica (26 documentos)
+│   ├── bocetos/      # Wireframes de las páginas (PNG)
+│   └── *.md          # Documentación en Markdown
 ├── .github/          # Workflows CI/CD, templates de issues/PR
 ├── docker-compose.yml
 ├── LICENSE
@@ -136,6 +164,7 @@ La documentación completa del proyecto se encuentra en el directorio [`docs/`](
 | Documento | Descripción |
 |-----------|-------------|
 | [Arquitectura de Software](docs/architecture.md) | Diseño de la arquitectura de 3 capas |
+| [Diagramas, Bocetos y Esquemas](docs/diagramas-esquemas.md) | Diagramas Mermaid: arquitectura, ER, flujos, MQTT, gateway |
 | [Protocolos de Comunicación](docs/communication-protocols.md) | MQTT, 1-Wire, I2C, UART, HTTP, WebSocket |
 | [Esquema de Base de Datos](docs/database-schema.md) | PostgreSQL, InfluxDB, Redis, SQLite |
 | [Roadmap Ejecutivo](docs/roadmap.md) | Fases, milestones y KPIs |
@@ -157,6 +186,13 @@ La documentación completa del proyecto se encuentra en el directorio [`docs/`](
 | [Sensores y Hardware](docs/sensors-hardware.md) | Sensores, conexión y calibración |
 | [Frontend React](docs/frontend.md) | Componentes, Redux, hooks y testing |
 
+### Normativas y Directivas
+
+| Documento | Descripción |
+|-----------|-------------|
+| [Normas y Estándares](docs/normas-estandares.md) | NOM mexicanas, ISO/IEC, estándares IoT y agrícolas |
+| [Directivas del Proyecto](docs/directivas-proyecto.md) | Gobernanza, calidad, seguridad y operación |
+
 ### Operaciones y Seguridad
 
 | Documento | Descripción |
@@ -167,6 +203,13 @@ La documentación completa del proyecto se encuentra en el directorio [`docs/`](
 | [Seguridad](docs/security.md) | Autenticación, autorización y protección de datos |
 | [Resolución de Problemas](docs/troubleshooting.md) | Diagnóstico y soluciones |
 | [Contribución](docs/contributing.md) | Cómo contribuir al proyecto |
+
+### Guías de Usuario
+
+| Documento | Descripción |
+|-----------|-------------|
+| [Manual de Usuario](docs/manual-usuario.md) | Guía completa para usuarios finales |
+| [Glosario Técnico](docs/glosario.md) | Definiciones de términos técnicos |
 
 ---
 
