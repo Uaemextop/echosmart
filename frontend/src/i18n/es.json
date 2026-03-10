@@ -44,6 +44,9 @@
     "forgot_password": "¿Olvidaste tu contraseña?",
     "invalid_credentials": "Credenciales inválidas"
   },
+  "admin": {
+    "users": "Usuarios"
+  },
   "common": {
     "save": "Guardar",
     "cancel": "Cancelar",

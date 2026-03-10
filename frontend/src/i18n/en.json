@@ -44,6 +44,9 @@
     "forgot_password": "Forgot your password?",
     "invalid_credentials": "Invalid credentials"
   },
+  "admin": {
+    "users": "Users"
+  },
   "common": {
     "save": "Save",
     "cancel": "Cancel",

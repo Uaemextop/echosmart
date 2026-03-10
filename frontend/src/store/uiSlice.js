@@ -1,5 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 
+let nextNotificationId = 1;
+
 const initialState = {
   theme: 'light',
   sidebarOpen: true,
@@ -18,7 +20,7 @@ const uiSlice = createSlice({
     },
     addNotification(state, action) {
       state.notifications.push({
-        id: Date.now(),
+        id: nextNotificationId++,
         ...action.payload,
       });
     },

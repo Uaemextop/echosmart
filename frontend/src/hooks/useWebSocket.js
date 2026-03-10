@@ -4,7 +4,7 @@ import { addReading } from '../store/readingsSlice';
 import { addAlert } from '../store/alertsSlice';
 
 const WS_URL = import.meta.env.VITE_WS_URL || 'ws://localhost:8080/ws';
-const MAX_RECONNECT_DELAY = 30000;
+const MAX_RECONNECT_DELAY_MS = 30000;
 
 export const useWebSocket = (sensorIds = []) => {
   const dispatch = useDispatch();
@@ -44,7 +44,7 @@ export const useWebSocket = (sensorIds = []) => {
         setConnected(false);
         const delay = Math.min(
           1000 * Math.pow(2, reconnectAttemptRef.current),
-          MAX_RECONNECT_DELAY
+          MAX_RECONNECT_DELAY_MS
         );
         reconnectAttemptRef.current += 1;
         reconnectTimeoutRef.current = setTimeout(connect, delay);

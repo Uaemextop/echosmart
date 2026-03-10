@@ -10,7 +10,7 @@ const navItems = [
 ];
 
 const adminItems = [
-  { path: '/admin/users', icon: '👥', label: 'Users' },
+  { path: '/admin/users', icon: '👥', labelKey: 'admin.users' },
   { path: '/admin/gateways', icon: '🌐', labelKey: 'dashboard.gateways' },
 ];
 
@@ -84,7 +84,7 @@ function Sidebar() {
                 style={({ isActive }) => linkStyle(isActive)}
               >
                 <span>{item.icon}</span>
-                <span>{item.label || t(item.labelKey)}</span>
+                <span>{t(item.labelKey)}</span>
               </NavLink>
             ))}
           </>
