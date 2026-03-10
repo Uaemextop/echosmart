@@ -19,6 +19,7 @@ Bienvenido a la documentación técnica de **EchoSmart**, la plataforma IoT de a
 | Documento | Descripción |
 |-----------|-------------|
 | [Arquitectura de Software](architecture.md) | Visión general de la arquitectura de 3 capas (Edge, Cloud, Frontend) |
+| [Diagramas, Bocetos y Esquemas](diagramas-esquemas.md) | Diagramas Mermaid: arquitectura, ER, flujos E2E, alertas, JWT, gateway, MQTT, frontend, despliegue y roadmap |
 | [Protocolos de Comunicación](communication-protocols.md) | MQTT, 1-Wire, I2C, UART, HTTP REST y WebSocket |
 | [Esquema de Base de Datos](database-schema.md) | PostgreSQL, InfluxDB, Redis y SQLite |
 | [Roadmap Ejecutivo](roadmap.md) | Fases de implementación, milestones y KPIs |
@@ -79,8 +80,9 @@ Bienvenido a la documentación técnica de **EchoSmart**, la plataforma IoT de a
 ### Arquitectos / Tomadores de Decisión
 1. [Roadmap Ejecutivo](roadmap.md)
 2. [Arquitectura de Software](architecture.md)
-3. [Funcionalidad de la Aplicación](app-functionality.md)
-4. [Funcionalidades y Roadmap de Features](features-roadmap.md)
+3. [Diagramas, Bocetos y Esquemas](diagramas-esquemas.md)
+4. [Funcionalidad de la Aplicación](app-functionality.md)
+5. [Funcionalidades y Roadmap de Features](features-roadmap.md)
 
 ### Ingenieros Backend
 1. [Estructura del Proyecto](project-structure.md)
@@ -115,7 +117,7 @@ Bienvenido a la documentación técnica de **EchoSmart**, la plataforma IoT de a
 
 | Métrica | Valor |
 |---------|-------|
-| Total de documentos | 21 |
+| Total de documentos | 22 |
 | Endpoints API documentados | 30+ |
 | Sensores documentados | 5 tipos (+8 futuros) |
 | Protocolos documentados | 7 (MQTT, 1-Wire, I2C, UART, GPIO, HTTP, WebSocket) |
