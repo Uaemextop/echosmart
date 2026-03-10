@@ -1,0 +1,57 @@
+{
+  "app": {
+    "title": "EchoSmart",
+    "subtitle": "Monitoreo Ambiental Inteligente"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "sensors_online": "Sensores en línea",
+    "active_alerts": "Alertas activas",
+    "total_sensors": "Total sensores",
+    "gateways": "Gateways"
+  },
+  "sensors": {
+    "title": "Sensores",
+    "name": "Nombre",
+    "type": "Tipo",
+    "status": "Estado",
+    "location": "Ubicación",
+    "create": "Crear Sensor",
+    "edit": "Editar Sensor",
+    "delete": "Eliminar",
+    "last_reading": "Última lectura"
+  },
+  "alerts": {
+    "title": "Alertas",
+    "critical": "Crítica",
+    "high": "Alta",
+    "medium": "Media",
+    "low": "Baja",
+    "acknowledge": "Reconocer",
+    "no_alerts": "Sin alertas activas"
+  },
+  "reports": {
+    "title": "Reportes",
+    "generate": "Generar Reporte",
+    "status": "Estado",
+    "format": "Formato"
+  },
+  "auth": {
+    "login": "Iniciar Sesión",
+    "logout": "Cerrar Sesión",
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "forgot_password": "¿Olvidaste tu contraseña?",
+    "invalid_credentials": "Credenciales inválidas"
+  },
+  "common": {
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "loading": "Cargando...",
+    "error": "Error",
+    "success": "Éxito",
+    "search": "Buscar",
+    "filter": "Filtrar"
+  }
+}

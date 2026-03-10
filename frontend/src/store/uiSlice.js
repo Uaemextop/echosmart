@@ -1,0 +1,35 @@
+import { createSlice } from '@reduxjs/toolkit';
+
+const initialState = {
+  theme: 'light',
+  sidebarOpen: true,
+  notifications: [],
+};
+
+const uiSlice = createSlice({
+  name: 'ui',
+  initialState,
+  reducers: {
+    toggleTheme(state) {
+      state.theme = state.theme === 'light' ? 'dark' : 'light';
+    },
+    toggleSidebar(state) {
+      state.sidebarOpen = !state.sidebarOpen;
+    },
+    addNotification(state, action) {
+      state.notifications.push({
+        id: Date.now(),
+        ...action.payload,
+      });
+    },
+    removeNotification(state, action) {
+      state.notifications = state.notifications.filter(
+        (n) => n.id !== action.payload
+      );
+    },
+  },
+});
+
+export const { toggleTheme, toggleSidebar, addNotification, removeNotification } =
+  uiSlice.actions;
+export default uiSlice.reducer;
