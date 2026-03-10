@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard — EchoSmart Invernadero Inteligente</title>
+  <meta name="description" content="Dashboard de monitoreo en tiempo real del invernadero inteligente EchoSmart.">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/favicon/favicon-32x32.png">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <div class="dashboard-layout">
+    <!-- ========== SIDEBAR ========== -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <span class="brand-text">
+          <span class="echo" style="color:#4CAF50;">Echo</span><span class="smart" style="color:#42A5F5;font-weight:300;">Smart</span>
+        </span>
+        <div style="font-size:0.7rem;color:#9E9E9E;margin-top:2px;">Invernadero Inteligente</div>
+      </div>
+      <ul class="sidebar-nav">
+        <li><a href="#" class="active"><span class="nav-icon">📊</span> Dashboard</a></li>
+        <li><a href="#"><span class="nav-icon">🌡️</span> Sensores</a></li>
+        <li><a href="#"><span class="nav-icon">🚨</span> Alertas</a></li>
+        <li><a href="#"><span class="nav-icon">📄</span> Reportes</a></li>
+        <li><a href="#"><span class="nav-icon">🔧</span> Gateway</a></li>
+        <li><a href="#"><span class="nav-icon">💧</span> Riego</a></li>
+        <li><a href="#"><span class="nav-icon">🌀</span> Ventilación</a></li>
+        <li><a href="#"><span class="nav-icon">💡</span> Iluminación</a></li>
+        <li style="margin-top:24px;"><a href="#"><span class="nav-icon">⚙️</span> Configuración</a></li>
+        <li><a href="#"><span class="nav-icon">👥</span> Usuarios</a></li>
+      </ul>
+      <div style="position:absolute;bottom:16px;left:16px;right:16px;padding:12px;border-top:1px solid rgba(255,255,255,0.08);">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="width:32px;height:32px;background:#2E7D32;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:0.8rem;font-weight:700;">A</div>
+          <div>
+            <div style="font-size:0.8rem;color:#E0E0E0;">Administrador</div>
+            <div style="font-size:0.7rem;color:#9E9E9E;">admin@echosmart.io</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ========== MAIN CONTENT ========== -->
+    <main class="main-content">
+      <!-- Top Bar -->
+      <div class="topbar">
+        <div>
+          <h1>📊 Dashboard del Invernadero</h1>
+          <div class="topbar-subtitle"><span class="live-dot"></span>Datos en tiempo real · Gateway: echosmart-gw-001 · Última actualización: <span id="lastUpdate">--:--:--</span></div>
+        </div>
+        <div class="topbar-actions">
+          <button class="topbar-btn" id="btnRefresh">🔄 Actualizar</button>
+          <button class="topbar-btn">📥 Exportar</button>
+          <button class="topbar-btn" onclick="window.location.href='index.html'">🏠 Inicio</button>
+        </div>
+      </div>
+
+      <div class="dashboard-content">
+        <!-- ===== STATS CARDS ===== -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-card-header">
+              <span class="stat-label">🌡️ Temperatura</span>
+              <div class="stat-icon green">🌡️</div>
+            </div>
+            <div class="stat-value" id="tempValue">25.3°C</div>
+            <div class="stat-delta up" id="tempDelta">▲ 1.2° vs ayer</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-header">
+              <span class="stat-label">💧 Humedad Relativa</span>
+              <div class="stat-icon blue">💧</div>
+            </div>
+            <div class="stat-value" id="humValue">68.5%</div>
+            <div class="stat-delta down" id="humDelta">▼ 2.3% vs ayer</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-header">
+              <span class="stat-label">☀️ Luminosidad</span>
+              <div class="stat-icon orange">☀️</div>
+            </div>
+            <div class="stat-value" id="luxValue">12,450 lx</div>
+            <div class="stat-delta up" id="luxDelta">▲ 800 lx vs ayer</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-header">
+              <span class="stat-label">🚨 Alertas Activas</span>
+              <div class="stat-icon red">🚨</div>
+            </div>
+            <div class="stat-value" id="alertCount">3</div>
+            <div class="stat-delta down" id="alertDelta">▲ 1 nueva</div>
+          </div>
+        </div>
+
+        <!-- ===== CHARTS ROW ===== -->
+        <div class="charts-row">
+          <div class="chart-card">
+            <div class="chart-card-header">
+              <span class="chart-card-title">📈 Temperatura y Humedad (24h)</span>
+              <span class="chart-period">Últimas 24 horas</span>
+            </div>
+            <div class="chart-area">
+              <canvas id="chartTempHum"></canvas>
+            </div>
+          </div>
+          <div class="chart-card">
+            <div class="chart-card-header">
+              <span class="chart-card-title">📊 CO₂ y Luminosidad</span>
+              <span class="chart-period">Hoy</span>
+            </div>
+            <div class="chart-area">
+              <canvas id="chartCO2Lux"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== BOTTOM ROW ===== -->
+        <div class="bottom-row">
+          <!-- Sensor Status -->
+          <div class="data-card">
+            <div class="data-card-title">🌡️ Estado de Sensores</div>
+            <ul class="sensor-list" id="sensorList">
+              <li class="sensor-item">
+                <div class="sensor-info">
+                  <span class="sensor-status online"></span>
+                  <div>
+                    <div class="sensor-name">DS18B20 — Temperatura Interior</div>
+                    <div class="sensor-proto">1-Wire · GPIO4 · Polling: 1s</div>
+                  </div>
+                </div>
+                <span class="sensor-value" id="sDS18B20">25.3°C</span>
+              </li>
+              <li class="sensor-item">
+                <div class="sensor-info">
+                  <span class="sensor-status online"></span>
+                  <div>
+                    <div class="sensor-name">DHT22 — Temp + Humedad</div>
+                    <div class="sensor-proto">GPIO · GPIO17 · Polling: 2s</div>
+                  </div>
+                </div>
+                <span class="sensor-value" id="sDHT22">22.1°C / 68.5%</span>
+              </li>
+              <li class="sensor-item">
+                <div class="sensor-info">
+                  <span class="sensor-status online"></span>
+                  <div>
+                    <div class="sensor-name">BH1750 — Luminosidad</div>
+                    <div class="sensor-proto">I2C · 0x23 · Polling: 1s</div>
+                  </div>
+                </div>
+                <span class="sensor-value" id="sBH1750">12,450 lx</span>
+              </li>
+              <li class="sensor-item">
+                <div class="sensor-info">
+                  <span class="sensor-status warning"></span>
+                  <div>
+                    <div class="sensor-name">Soil Moisture — Humedad del Suelo</div>
+                    <div class="sensor-proto">ADC · ADS1115 A0 · Polling: 5s</div>
+                  </div>
+                </div>
+                <span class="sensor-value" id="sSoil">55.2%</span>
+              </li>
+              <li class="sensor-item">
+                <div class="sensor-info">
+                  <span class="sensor-status online"></span>
+                  <div>
+                    <div class="sensor-name">MHZ-19C — CO₂</div>
+                    <div class="sensor-proto">UART · /dev/ttyS0 · Polling: 5s</div>
+                  </div>
+                </div>
+                <span class="sensor-value" id="sMHZ19C">820 ppm</span>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Recent Alerts -->
+          <div class="data-card">
+            <div class="data-card-title">🚨 Alertas Recientes</div>
+            <ul class="alert-list" id="alertList">
+              <li class="alert-item">
+                <span class="alert-severity critical"></span>
+                <div>
+                  <div class="alert-text">Temperatura > 30°C — Zona Interior</div>
+                  <div class="alert-meta">DS18B20 · 31.2°C · Hace 15 min · 🔴 Crítica</div>
+                </div>
+              </li>
+              <li class="alert-item">
+                <span class="alert-severity warning"></span>
+                <div>
+                  <div class="alert-text">Humedad del Suelo < 40%</div>
+                  <div class="alert-meta">Soil Moisture · 38.5% · Hace 25 min · ⚠️ Advertencia</div>
+                </div>
+              </li>
+              <li class="alert-item">
+                <span class="alert-severity info"></span>
+                <div>
+                  <div class="alert-text">CO₂ > 1000 ppm — Zona A</div>
+                  <div class="alert-meta">MHZ-19C · 1,120 ppm · Hace 45 min · ℹ️ Info</div>
+                </div>
+              </li>
+              <li class="alert-item">
+                <span class="alert-severity warning"></span>
+                <div>
+                  <div class="alert-text">Luminosidad baja < 5000 lux</div>
+                  <div class="alert-meta">BH1750 · 4,800 lux · Hace 1h · ⚠️ Advertencia</div>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
