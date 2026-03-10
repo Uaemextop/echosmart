@@ -207,7 +207,7 @@ class OneWireManager:
             if lines[0].strip()[-3:] != 'YES':
                 return None
             
-            # Segunda línea: temperatuta
+            # Segunda línea: temperatura
             pos = lines[1].find('t=')
             if pos != -1:
                 temp_raw = int(lines[1][pos+2:])
