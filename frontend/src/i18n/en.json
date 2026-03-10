@@ -1,0 +1,60 @@
+{
+  "app": {
+    "title": "EchoSmart",
+    "subtitle": "Smart Environmental Monitoring"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "sensors_online": "Sensors Online",
+    "active_alerts": "Active Alerts",
+    "total_sensors": "Total Sensors",
+    "gateways": "Gateways"
+  },
+  "sensors": {
+    "title": "Sensors",
+    "name": "Name",
+    "type": "Type",
+    "status": "Status",
+    "location": "Location",
+    "create": "Create Sensor",
+    "edit": "Edit Sensor",
+    "delete": "Delete",
+    "last_reading": "Last Reading"
+  },
+  "alerts": {
+    "title": "Alerts",
+    "critical": "Critical",
+    "high": "High",
+    "medium": "Medium",
+    "low": "Low",
+    "acknowledge": "Acknowledge",
+    "no_alerts": "No active alerts"
+  },
+  "reports": {
+    "title": "Reports",
+    "generate": "Generate Report",
+    "status": "Status",
+    "format": "Format"
+  },
+  "auth": {
+    "login": "Login",
+    "logout": "Logout",
+    "email": "Email",
+    "password": "Password",
+    "forgot_password": "Forgot your password?",
+    "invalid_credentials": "Invalid credentials"
+  },
+  "admin": {
+    "users": "Users"
+  },
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "search": "Search",
+    "filter": "Filter"
+  }
+}
