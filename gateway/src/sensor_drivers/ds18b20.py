@@ -23,7 +23,7 @@ class DS18B20Driver(SensorDriver):
     def initialize(self) -> bool:
         if not self.simulation:
             self._onewire = OnewireManager()
-        logger.info("DS18B20 %s initialised (simulation=%s)", self.sensor_id, self.simulation)
+        logger.info("DS18B20 %s initialized (simulation=%s)", self.sensor_id, self.simulation)
         return True
 
     def read(self) -> Optional[dict]:

@@ -45,7 +45,7 @@ class SensorManager:
         driver = driver_cls(sensor_id, cfg)
 
         if not driver.initialize():
-            logger.error("Failed to initialise sensor %s", sensor_id)
+            logger.error("Failed to initialize sensor %s", sensor_id)
             return False
 
         self.sensors[sensor_id] = driver

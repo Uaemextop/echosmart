@@ -57,7 +57,7 @@ class MQTTPublisher:
 
     def _publish(self, topic: str, payload: dict) -> bool:
         if not self.client:
-            logger.warning("MQTT client not initialised — skipping publish to %s", topic)
+            logger.warning("MQTT client not initialized — skipping publish to %s", topic)
             return False
         try:
             result = self.client.publish(topic, json.dumps(payload), qos=1)

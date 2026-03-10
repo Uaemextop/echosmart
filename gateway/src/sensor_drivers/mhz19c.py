@@ -25,7 +25,7 @@ class MHZ19CDriver(SensorDriver):
         if not self.simulation:
             baudrate = self.config.get("baudrate", 9600)
             self._uart = UARTManager(self.port, baudrate)
-        logger.info("MHZ19C %s initialised (simulation=%s)", self.sensor_id, self.simulation)
+        logger.info("MHZ19C %s initialized (simulation=%s)", self.sensor_id, self.simulation)
         return True
 
     def read(self) -> Optional[dict]:

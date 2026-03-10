@@ -27,7 +27,7 @@ class SoilMoistureDriver(SensorDriver):
             bus = self.config.get("i2c_bus", 1)
             self._i2c = I2CManager(bus)
         logger.info(
-            "SoilMoisture %s initialised on channel %d (simulation=%s)",
+            "SoilMoisture %s initialized on channel %d (simulation=%s)",
             self.sensor_id, self.channel, self.simulation,
         )
         return True

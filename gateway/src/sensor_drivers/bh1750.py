@@ -27,7 +27,7 @@ class BH1750Driver(SensorDriver):
             bus = self.config.get("i2c_bus", 1)
             self._i2c = I2CManager(bus)
             self._i2c.write(self.address, bytes([BH1750_CONTINUOUS_HIGH_RES]))
-        logger.info("BH1750 %s initialised at 0x%02x (simulation=%s)", self.sensor_id, self.address, self.simulation)
+        logger.info("BH1750 %s initialized at 0x%02x (simulation=%s)", self.sensor_id, self.address, self.simulation)
         return True
 
     def read(self) -> Optional[dict]:

@@ -26,7 +26,7 @@ class DHT22Driver(SensorDriver):
         if not self.simulation:
             self._gpio = GPIOManager()
             self._gpio.setup_pin(self.pin, "input")
-        logger.info("DHT22 %s initialised on pin %d (simulation=%s)", self.sensor_id, self.pin, self.simulation)
+        logger.info("DHT22 %s initialized on pin %d (simulation=%s)", self.sensor_id, self.pin, self.simulation)
         return True
 
     def read(self) -> Optional[dict]:
