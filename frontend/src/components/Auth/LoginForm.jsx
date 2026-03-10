@@ -87,7 +87,11 @@ function LoginForm() {
           </button>
 
           <p style={{ textAlign: 'center', marginTop: '16px', fontSize: '14px' }}>
-            <a href="#" style={{ color: '#2563eb' }}>
+            <a
+              href="#!"
+              onClick={(e) => e.preventDefault()}
+              style={{ color: '#2563eb' }}
+            >
               {t('auth.forgot_password')}
             </a>
           </p>

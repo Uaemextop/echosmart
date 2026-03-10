@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchReadings } from '../store/readingsSlice';
 
@@ -9,17 +9,16 @@ export const useReadings = (sensorId, options = {}) => {
   );
   const { loading, error } = useSelector((state) => state.readings);
 
+  const from = options.from;
+  const to = options.to;
+
+  const params = useMemo(() => ({ sensorId, from, to }), [sensorId, from, to]);
+
   useEffect(() => {
-    if (sensorId) {
-      dispatch(
-        fetchReadings({
-          sensorId,
-          from: options.from,
-          to: options.to,
-        })
-      );
+    if (params.sensorId) {
+      dispatch(fetchReadings(params));
     }
-  }, [dispatch, sensorId, options.from, options.to]);
+  }, [dispatch, params]);
 
   return { readings, loading, error };
 };

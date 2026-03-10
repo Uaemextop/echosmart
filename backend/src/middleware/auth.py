@@ -63,6 +63,12 @@ def get_current_user(
 
 
 def require_role(*roles: str):
+    """Return a FastAPI dependency that enforces role-based access control.
+
+    Usage with FastAPI's Depends():
+        admin_only = Depends(require_role("admin"))
+        admin_or_operator = Depends(require_role("admin", "operator"))
+    """
     def role_checker(current_user: User = Depends(get_current_user)) -> User:
         if current_user.role not in roles:
             raise HTTPException(

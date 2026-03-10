@@ -1,11 +1,10 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-let nextNotificationId = 1;
-
 const initialState = {
   theme: 'light',
   sidebarOpen: true,
   notifications: [],
+  nextNotificationId: 1,
 };
 
 const uiSlice = createSlice({
@@ -20,9 +19,10 @@ const uiSlice = createSlice({
     },
     addNotification(state, action) {
       state.notifications.push({
-        id: nextNotificationId++,
+        id: state.nextNotificationId,
         ...action.payload,
       });
+      state.nextNotificationId += 1;
     },
     removeNotification(state, action) {
       state.notifications = state.notifications.filter(
