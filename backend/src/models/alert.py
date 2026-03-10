@@ -27,7 +27,7 @@ class AlertRule(Base):
     severity: Mapped[str] = mapped_column(String(20), nullable=False)
     cooldown_minutes: Mapped[int] = mapped_column(Integer, default=30, nullable=False)
     notification_channels: Mapped[list] = mapped_column(
-        JSON, default=lambda: ["email"], nullable=False
+        JSON, default=list, nullable=False
     )
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     created_at: Mapped[datetime] = mapped_column(

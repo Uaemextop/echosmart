@@ -13,7 +13,10 @@ class ConnectionManager:
 
     def disconnect(self, websocket: WebSocket, tenant_id: str):
         if tenant_id in self.active_connections:
-            self.active_connections[tenant_id].remove(websocket)
+            try:
+                self.active_connections[tenant_id].remove(websocket)
+            except ValueError:
+                pass
 
     async def broadcast_to_tenant(self, tenant_id: str, message: dict):
         if tenant_id in self.active_connections:
