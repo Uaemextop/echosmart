@@ -1,0 +1,38 @@
+{
+  "dashboard": {
+    "title": "Dashboard",
+    "sensors_online": "Sensores en línea",
+    "active_alerts": "Alertas activas",
+    "total_sensors": "Total de sensores"
+  },
+  "sensors": {
+    "title": "Sensores",
+    "name": "Nombre",
+    "type": "Tipo",
+    "location": "Ubicación",
+    "status": "Estado",
+    "online": "En línea",
+    "offline": "Fuera de línea"
+  },
+  "alerts": {
+    "title": "Alertas",
+    "critical": "Crítica",
+    "high": "Alta",
+    "medium": "Media",
+    "low": "Baja",
+    "acknowledge": "Confirmar"
+  },
+  "auth": {
+    "login": "Iniciar sesión",
+    "logout": "Cerrar sesión",
+    "email": "Correo electrónico",
+    "password": "Contraseña"
+  },
+  "common": {
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "loading": "Cargando..."
+  }
+}

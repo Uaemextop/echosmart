@@ -1,0 +1,30 @@
+{
+  "polling_interval": 60,
+  "sensors": [
+    {
+      "type": "ds18b20",
+      "name": "Temperatura Zona A",
+      "device_id": "28-xxxxxxxxxxxx"
+    },
+    {
+      "type": "dht22",
+      "name": "Temp + Humedad Zona A",
+      "pin": 4
+    },
+    {
+      "type": "bh1750",
+      "name": "Luminosidad Zona A",
+      "address": "0x23"
+    },
+    {
+      "type": "soil_moisture",
+      "name": "Humedad Suelo Zona A",
+      "channel": 0
+    },
+    {
+      "type": "mhz19c",
+      "name": "CO2 Zona A",
+      "port": "/dev/ttyS0"
+    }
+  ]
+}
