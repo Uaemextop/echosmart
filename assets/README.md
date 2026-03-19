@@ -6,13 +6,15 @@ Recursos visuales y guía de identidad de marca para la plataforma EchoSmart.
 
 ## 🎨 Paleta de Colores
 
-### Colores Primarios (Dark Theme — Estilo Starlink)
+### Colores Primarios (Dark Theme — Fondo Negro Puro)
 
 | Color | Hex | Uso |
 |-------|-----|-----|
-| **Background Dark** | `#0A1A0F` | Fondo principal de todas las apps |
-| **Surface Dark** | `#0D2818` | Cards, paneles, modales |
-| **Surface Elevated** | `#1A2E1F` | Elementos elevados, hover states |
+| **Background** | `#000000` | Fondo principal de todas las apps (negro puro) |
+| **Surface** | `#111111` | Cards, paneles, modales |
+| **Surface Elevated** | `#1A1A1A` | Elementos elevados, hover states |
+| **Surface Hover** | `#222222` | Estados hover, selección |
+| **Sidebar** | `#0A0A0A` | Barra lateral, paneles secundarios |
 | **Green Primary** | `#00E676` | Acentos principales, CTAs, datos activos |
 | **Green Deep** | `#2E7D32` | Gradientes, iconos secundarios |
 | **Cyan Signal** | `#00BCD4` | Conectividad, señales, links |
@@ -93,28 +95,28 @@ assets/
 
 ---
 
-## 🎯 Diseño de UI — Dark Theme (Estilo Starlink)
+## 🎯 Diseño de UI — Dark Theme (Fondo Negro Puro)
 
 ### Principios
 
-1. **Fondo ultra-oscuro** (#0A1A0F) — reminiscente del espacio
-2. **Acentos verdes neón** (#00E676) — conectan con la naturaleza/agricultura
-3. **Cyan para señales** (#00BCD4) — comunica conectividad IoT/satélite
-4. **Cards con bordes sutiles** — glassmorphism con blur mínimo
-5. **Animaciones suaves** — transiciones de 300ms ease-out
-6. **Datos prominentes** — valores numéricos grandes, labels pequeños
-7. **Grids de referencia** — líneas sutiles que recuerdan mapas/tech
+1. **Fondo negro puro** (#000000) — limpio, sin tonos verdosos
+2. **Superficies en gris oscuro** (#111111, #1A1A1A) — sin tinte de color
+3. **Acentos verdes neón** (#00E676) — solo para highlights y datos activos
+4. **Cyan para señales** (#00BCD4) — conectividad IoT/satélite
+5. **Sin líneas decorativas** — sin grids, franjas o patrones en fondos
+6. **Cards con bordes sutiles** — `rgba(255,255,255,0.06)` mínimo
+7. **Datos prominentes** — valores numéricos grandes, labels pequeños
 
 ### Componentes Clave
 
 | Componente | Estilo |
 |-----------|--------|
-| Cards | `bg: #0D2818`, `border: 1px solid rgba(0,230,118,0.1)`, `border-radius: 16px` |
-| Botones Primary | `bg: #00E676`, `text: #0A1A0F`, `border-radius: 12px` |
+| Cards | `bg: #111111`, `border: 1px solid rgba(255,255,255,0.06)`, `border-radius: 16px` |
+| Botones Primary | `bg: #00E676`, `text: #000000`, `border-radius: 12px` |
 | Botones Secondary | `bg: transparent`, `border: 1px solid #00E676`, `text: #00E676` |
-| Inputs | `bg: #1A2E1F`, `border: 1px solid #2E7D32`, `text: #E0E0E0` |
-| Sidebar | `bg: #060E09`, `width: 280px`, `border-right: 1px solid rgba(0,230,118,0.06)` |
-| Charts | Líneas `#00E676` sobre fondo `#0D2818`, grid `rgba(255,255,255,0.04)` |
+| Inputs | `bg: #1A1A1A`, `border: 1px solid #333333`, `text: #E0E0E0` |
+| Sidebar | `bg: #0A0A0A`, `width: 280px`, `border-right: 1px solid rgba(255,255,255,0.06)` |
+| Charts | Líneas `#00E676` sobre fondo `#111111`, grid `rgba(255,255,255,0.04)` |
 
 ---
 
