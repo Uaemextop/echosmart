@@ -7,8 +7,8 @@
     .sublabel { font-size: 10px; fill: #78909C; }
     .arrow { stroke: #00E676; stroke-width: 2; fill: none; marker-end: url(#arrowG); }
     .arrow-cyan { stroke: #00BCD4; stroke-width: 1.5; fill: none; marker-end: url(#arrowC); }
-    .box { rx: 12; fill: #0D2818; stroke: rgba(0,230,118,0.2); stroke-width: 1; }
-    .box-cloud { rx: 12; fill: #0A1E30; stroke: rgba(0,188,212,0.25); stroke-width: 1; }
+    .box { rx: 12; fill: #111111; stroke: rgba(255,255,255,0.08); stroke-width: 1; }
+    .box-cloud { rx: 12; fill: #0D1A2E; stroke: rgba(0,188,212,0.25); stroke-width: 1; }
     .box-edge { rx: 12; fill: #1A1A0A; stroke: rgba(255,143,0,0.25); stroke-width: 1; }
   </style>
   <defs>
@@ -18,14 +18,10 @@
     <marker id="arrowC" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
       <polygon points="0 0, 8 3, 0 6" fill="#00BCD4"/>
     </marker>
-    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#060E09"/>
-      <stop offset="100%" style="stop-color:#0A1A0F"/>
-    </linearGradient>
   </defs>
 
   <!-- Background -->
-  <rect width="1100" height="750" fill="url(#bgGrad)"/>
+  <rect width="1100" height="750" fill="#000000"/>
 
   <!-- Title -->
   <text x="550" y="35" text-anchor="middle" class="title">ARQUITECTURA GENERAL — EchoSmart v1.0</text>
@@ -37,7 +33,7 @@
   <text x="180" y="120" text-anchor="middle" class="sublabel">Raspberry Pi 4B · Python 3.9+</text>
 
   <!-- Sensors -->
-  <rect x="50" y="135" width="120" height="90" rx="8" fill="#1A2E1F" stroke="rgba(255,82,82,0.3)" stroke-width="1"/>
+  <rect x="50" y="135" width="120" height="90" rx="8" fill="#1A1A1A" stroke="rgba(255,82,82,0.3)" stroke-width="1"/>
   <text x="110" y="155" text-anchor="middle" class="sublabel" fill="#FF5252">SENSORES</text>
   <text x="110" y="172" text-anchor="middle" class="sublabel">🌡️ DS18B20</text>
   <text x="110" y="185" text-anchor="middle" class="sublabel">💧 DHT22</text>
@@ -45,7 +41,7 @@
   <text x="110" y="211" text-anchor="middle" class="sublabel">🌱 Soil · 💨 CO₂</text>
 
   <!-- Gateway modules -->
-  <rect x="190" y="135" width="120" height="90" rx="8" fill="#1A2E1F" stroke="rgba(0,230,118,0.2)" stroke-width="1"/>
+  <rect x="190" y="135" width="120" height="90" rx="8" fill="#1A1A1A" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
   <text x="250" y="155" text-anchor="middle" class="sublabel" fill="#00E676">SOFTWARE</text>
   <text x="250" y="172" text-anchor="middle" class="sublabel">HAL Layer</text>
   <text x="250" y="185" text-anchor="middle" class="sublabel">Sensor Manager</text>
@@ -53,12 +49,12 @@
   <text x="250" y="211" text-anchor="middle" class="sublabel">Cloud Sync</text>
 
   <!-- Local storage -->
-  <rect x="50" y="240" width="120" height="50" rx="8" fill="#1A2E1F" stroke="rgba(255,213,79,0.2)" stroke-width="1"/>
+  <rect x="50" y="240" width="120" height="50" rx="8" fill="#1A1A1A" stroke="rgba(255,213,79,0.2)" stroke-width="1"/>
   <text x="110" y="260" text-anchor="middle" class="sublabel" fill="#FFD54F">SQLite</text>
   <text x="110" y="275" text-anchor="middle" class="sublabel">Caché local</text>
 
   <!-- MQTT -->
-  <rect x="190" y="240" width="120" height="50" rx="8" fill="#1A2E1F" stroke="rgba(0,188,212,0.2)" stroke-width="1"/>
+  <rect x="190" y="240" width="120" height="50" rx="8" fill="#1A1A1A" stroke="rgba(0,188,212,0.2)" stroke-width="1"/>
   <text x="250" y="260" text-anchor="middle" class="sublabel" fill="#00BCD4">Mosquitto</text>
   <text x="250" y="275" text-anchor="middle" class="sublabel">MQTT Broker</text>
 
@@ -122,27 +118,27 @@
   <text x="920" y="120" text-anchor="middle" class="sublabel">Multiplataforma · API Compartida</text>
 
   <!-- Web -->
-  <rect x="790" y="140" width="260" height="55" rx="8" fill="#1A2E1F" stroke="rgba(0,230,118,0.2)" stroke-width="1"/>
+  <rect x="790" y="140" width="260" height="55" rx="8" fill="#1A1A1A" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
   <text x="920" y="162" text-anchor="middle" class="sublabel" fill="#00E676">💻 Frontend Web</text>
   <text x="920" y="178" text-anchor="middle" class="sublabel">React 18 + Vite + Redux Toolkit</text>
 
   <!-- Mobile -->
-  <rect x="790" y="205" width="260" height="55" rx="8" fill="#1A2E1F" stroke="rgba(0,188,212,0.2)" stroke-width="1"/>
+  <rect x="790" y="205" width="260" height="55" rx="8" fill="#1A1A1A" stroke="rgba(0,188,212,0.2)" stroke-width="1"/>
   <text x="920" y="227" text-anchor="middle" class="sublabel" fill="#00BCD4">📱 App Móvil (Android + iOS)</text>
   <text x="920" y="243" text-anchor="middle" class="sublabel">React Native · Expo · APK / IPA</text>
 
   <!-- Desktop -->
-  <rect x="790" y="270" width="260" height="55" rx="8" fill="#1A2E1F" stroke="rgba(171,71,188,0.2)" stroke-width="1"/>
+  <rect x="790" y="270" width="260" height="55" rx="8" fill="#1A1A1A" stroke="rgba(171,71,188,0.2)" stroke-width="1"/>
   <text x="920" y="292" text-anchor="middle" class="sublabel" fill="#AB47BC">🖥️ Desktop (Win + Mac + Linux)</text>
   <text x="920" y="308" text-anchor="middle" class="sublabel">Electron · EXE / DMG / AppImage</text>
 
   <!-- Admin Panel -->
-  <rect x="790" y="335" width="260" height="55" rx="8" fill="#1A2E1F" stroke="rgba(255,143,0,0.2)" stroke-width="1"/>
+  <rect x="790" y="335" width="260" height="55" rx="8" fill="#1A1A1A" stroke="rgba(255,143,0,0.2)" stroke-width="1"/>
   <text x="920" y="357" text-anchor="middle" class="sublabel" fill="#FF8F00">⚙️ Panel Admin</text>
   <text x="920" y="373" text-anchor="middle" class="sublabel">Clientes · Invernaderos · Soporte · OTA</text>
 
   <!-- Shared Module -->
-  <rect x="790" y="410" width="260" height="45" rx="8" fill="#1A2E1F" stroke="rgba(0,230,118,0.15)" stroke-width="1"/>
+  <rect x="790" y="410" width="260" height="45" rx="8" fill="#1A1A1A" stroke="rgba(0,230,118,0.15)" stroke-width="1"/>
   <text x="920" y="435" text-anchor="middle" class="sublabel" fill="#00E676">📦 shared/ — API Client · Constants · Types</text>
 
   <!-- ═══ CONNECTION ARROWS ═══ -->
@@ -158,35 +154,35 @@
   <line x1="700" y1="280" x2="788" y2="365" class="arrow-cyan"/>
 
   <!-- ═══ BOTTOM LEGEND ═══ -->
-  <rect x="30" y="540" width="1040" height="190" rx="12" fill="#0D2818" stroke="rgba(0,230,118,0.1)" stroke-width="1"/>
+  <rect x="30" y="540" width="1040" height="190" rx="12" fill="#111111" stroke="rgba(0,230,118,0.1)" stroke-width="1"/>
   <text x="550" y="570" text-anchor="middle" class="label">PROTOCOLOS Y TECNOLOGÍAS</text>
 
   <!-- Protocol boxes -->
-  <rect x="50" y="590" width="140" height="50" rx="6" fill="#1A2E1F"/>
+  <rect x="50" y="590" width="140" height="50" rx="6" fill="#1A1A1A"/>
   <text x="120" y="612" text-anchor="middle" class="sublabel" fill="#FF5252">🌡️ 1-Wire</text>
   <text x="120" y="628" text-anchor="middle" class="sublabel">DS18B20</text>
 
-  <rect x="200" y="590" width="140" height="50" rx="6" fill="#1A2E1F"/>
+  <rect x="200" y="590" width="140" height="50" rx="6" fill="#1A1A1A"/>
   <text x="270" y="612" text-anchor="middle" class="sublabel" fill="#42A5F5">💧 GPIO</text>
   <text x="270" y="628" text-anchor="middle" class="sublabel">DHT22</text>
 
-  <rect x="350" y="590" width="140" height="50" rx="6" fill="#1A2E1F"/>
+  <rect x="350" y="590" width="140" height="50" rx="6" fill="#1A1A1A"/>
   <text x="420" y="612" text-anchor="middle" class="sublabel" fill="#FFD54F">☀️ I2C</text>
   <text x="420" y="628" text-anchor="middle" class="sublabel">BH1750</text>
 
-  <rect x="500" y="590" width="140" height="50" rx="6" fill="#1A2E1F"/>
+  <rect x="500" y="590" width="140" height="50" rx="6" fill="#1A1A1A"/>
   <text x="570" y="612" text-anchor="middle" class="sublabel" fill="#8D6E63">🌱 ADC</text>
   <text x="570" y="628" text-anchor="middle" class="sublabel">Soil Moisture</text>
 
-  <rect x="650" y="590" width="140" height="50" rx="6" fill="#1A2E1F"/>
+  <rect x="650" y="590" width="140" height="50" rx="6" fill="#1A1A1A"/>
   <text x="720" y="612" text-anchor="middle" class="sublabel" fill="#78909C">💨 UART</text>
   <text x="720" y="628" text-anchor="middle" class="sublabel">MHZ-19C CO₂</text>
 
-  <rect x="800" y="590" width="140" height="50" rx="6" fill="#1A2E1F"/>
+  <rect x="800" y="590" width="140" height="50" rx="6" fill="#1A1A1A"/>
   <text x="870" y="612" text-anchor="middle" class="sublabel" fill="#00BCD4">📡 MQTT</text>
   <text x="870" y="628" text-anchor="middle" class="sublabel">Mosquitto</text>
 
-  <rect x="950" y="590" width="110" height="50" rx="6" fill="#1A2E1F"/>
+  <rect x="950" y="590" width="110" height="50" rx="6" fill="#1A1A1A"/>
   <text x="1005" y="612" text-anchor="middle" class="sublabel" fill="#00E676">🔒 JWT</text>
   <text x="1005" y="628" text-anchor="middle" class="sublabel">Auth + RBAC</text>
 

@@ -10,21 +10,21 @@
     <marker id="a" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#00E676"/></marker>
     <marker id="ar" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#FF5252"/></marker>
   </defs>
-  <rect width="800" height="450" fill="#060E09"/>
+  <rect width="800" height="450" fill="#000000"/>
   <text x="400" y="28" text-anchor="middle" class="title">FLUJO DE AUTENTICACIÓN — JWT + RBAC</text>
 
   <!-- Client -->
-  <rect x="30" y="60" width="130" height="360" rx="10" fill="#0D2818" stroke="rgba(0,230,118,0.2)" stroke-width="1"/>
+  <rect x="30" y="60" width="130" height="360" rx="10" fill="#111111" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
   <text x="95" y="85" text-anchor="middle" class="label" fill="#00E676">CLIENTE</text>
   <text x="95" y="100" text-anchor="middle" class="detail">Web / Mobile / Desktop</text>
 
   <!-- Backend -->
-  <rect x="320" y="60" width="160" height="360" rx="10" fill="#0A1E30" stroke="rgba(0,188,212,0.2)" stroke-width="1"/>
+  <rect x="320" y="60" width="160" height="360" rx="10" fill="#0D1A2E" stroke="rgba(0,188,212,0.2)" stroke-width="1"/>
   <text x="400" y="85" text-anchor="middle" class="label" fill="#00BCD4">BACKEND API</text>
   <text x="400" y="100" text-anchor="middle" class="detail">FastAPI + JWT</text>
 
   <!-- Database -->
-  <rect x="640" y="60" width="130" height="360" rx="10" fill="#0D2818" stroke="rgba(66,165,245,0.3)" stroke-width="1"/>
+  <rect x="640" y="60" width="130" height="360" rx="10" fill="#111111" stroke="rgba(66,165,245,0.3)" stroke-width="1"/>
   <text x="705" y="85" text-anchor="middle" class="label" fill="#42A5F5">BASE DE DATOS</text>
   <text x="705" y="100" text-anchor="middle" class="detail">PostgreSQL + Redis</text>
 
@@ -69,7 +69,7 @@
   <text x="240" y="385" text-anchor="middle" class="detail">{refresh_token} → Nuevo access_token</text>
 
   <!-- RBAC Legend -->
-  <rect x="170" y="410" width="460" height="30" rx="6" fill="#1A2E1F" stroke="rgba(0,230,118,0.1)" stroke-width="1"/>
+  <rect x="170" y="410" width="460" height="30" rx="6" fill="#1A1A1A" stroke="rgba(0,230,118,0.1)" stroke-width="1"/>
   <text x="230" y="429" text-anchor="middle" class="detail" fill="#FF1744">🔴 admin: todo</text>
   <text x="350" y="429" text-anchor="middle" class="detail" fill="#FF9100">🟠 operator: read/write sensores</text>
   <text x="500" y="429" text-anchor="middle" class="detail" fill="#448AFF">🔵 viewer: solo lectura</text>

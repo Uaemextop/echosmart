@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
   <!-- Satellite/Connectivity icon -->
-  <circle cx="24" cy="24" r="22" fill="#1A1A2E" stroke="#00BCD4" stroke-width="1" opacity="0.3"/>
+  <circle cx="24" cy="24" r="22" fill="#111111" stroke="#00BCD4" stroke-width="1" opacity="0.3"/>
   <circle cx="20" cy="28" r="3" fill="#00BCD4"/>
   <path d="M 20 28 Q 28 12 38 10" stroke="#00BCD4" stroke-width="1.5" fill="none"/>
   <path d="M 25 20 Q 32 16 36 14" stroke="#00BCD4" stroke-width="1.5" fill="none" opacity="0.5"/>

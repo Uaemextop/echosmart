@@ -15,11 +15,11 @@
     </marker>
   </defs>
 
-  <rect width="900" height="650" fill="#060E09"/>
+  <rect width="900" height="650" fill="#000000"/>
   <text x="450" y="30" text-anchor="middle" class="title">DIAGRAMA ENTIDAD-RELACIÓN — Base de Datos PostgreSQL</text>
 
   <!-- ═══ TENANTS ═══ -->
-  <rect x="350" y="55" width="200" height="130" rx="10" fill="#0D2818" stroke="rgba(255,143,0,0.3)" stroke-width="1"/>
+  <rect x="350" y="55" width="200" height="130" rx="10" fill="#111111" stroke="rgba(255,143,0,0.3)" stroke-width="1"/>
   <text x="450" y="75" text-anchor="middle" class="entity">TENANTS</text>
   <line x1="360" y1="82" x2="540" y2="82" stroke="#2E7D32" stroke-width="0.5"/>
   <text x="370" y="98" class="pk">🔑 id UUID PK</text>
@@ -30,7 +30,7 @@
   <text x="370" y="168" class="field">created_at TIMESTAMP</text>
 
   <!-- ═══ USERS ═══ -->
-  <rect x="30" y="55" width="200" height="155" rx="10" fill="#0D2818" stroke="rgba(0,230,118,0.3)" stroke-width="1"/>
+  <rect x="30" y="55" width="200" height="155" rx="10" fill="#111111" stroke="rgba(0,230,118,0.3)" stroke-width="1"/>
   <text x="130" y="75" text-anchor="middle" class="entity">USERS</text>
   <line x1="40" y1="82" x2="220" y2="82" stroke="#2E7D32" stroke-width="0.5"/>
   <text x="50" y="98" class="pk">🔑 id UUID PK</text>
@@ -43,7 +43,7 @@
   <text x="50" y="196" class="field">created_at TIMESTAMP</text>
 
   <!-- ═══ GATEWAYS ═══ -->
-  <rect x="670" y="55" width="200" height="155" rx="10" fill="#0D2818" stroke="rgba(0,188,212,0.3)" stroke-width="1"/>
+  <rect x="670" y="55" width="200" height="155" rx="10" fill="#111111" stroke="rgba(0,188,212,0.3)" stroke-width="1"/>
   <text x="770" y="75" text-anchor="middle" class="entity">GATEWAYS</text>
   <line x1="680" y1="82" x2="860" y2="82" stroke="#2E7D32" stroke-width="0.5"/>
   <text x="690" y="98" class="pk">🔑 id UUID PK</text>
@@ -56,7 +56,7 @@
   <text x="690" y="196" class="field">firmware_version VARCHAR</text>
 
   <!-- ═══ SENSORS ═══ -->
-  <rect x="350" y="260" width="200" height="175" rx="10" fill="#0D2818" stroke="rgba(255,82,82,0.3)" stroke-width="1"/>
+  <rect x="350" y="260" width="200" height="175" rx="10" fill="#111111" stroke="rgba(255,82,82,0.3)" stroke-width="1"/>
   <text x="450" y="280" text-anchor="middle" class="entity">SENSORS</text>
   <line x1="360" y1="287" x2="540" y2="287" stroke="#2E7D32" stroke-width="0.5"/>
   <text x="370" y="303" class="pk">🔑 id UUID PK</text>
@@ -71,7 +71,7 @@
   <text x="370" y="429" class="field">location VARCHAR(255)</text>
 
   <!-- ═══ READINGS ═══ -->
-  <rect x="30" y="300" width="200" height="110" rx="10" fill="#0D2818" stroke="rgba(171,71,188,0.3)" stroke-width="1"/>
+  <rect x="30" y="300" width="200" height="110" rx="10" fill="#111111" stroke="rgba(171,71,188,0.3)" stroke-width="1"/>
   <text x="130" y="320" text-anchor="middle" class="entity">READINGS</text>
   <line x1="40" y1="327" x2="220" y2="327" stroke="#2E7D32" stroke-width="0.5"/>
   <text x="50" y="343" class="pk">🔑 id UUID PK</text>
@@ -81,7 +81,7 @@
   <text x="50" y="399" class="field">timestamp TIMESTAMP INDEX</text>
 
   <!-- ═══ ALERTS ═══ -->
-  <rect x="670" y="280" width="200" height="170" rx="10" fill="#0D2818" stroke="rgba(255,23,68,0.3)" stroke-width="1"/>
+  <rect x="670" y="280" width="200" height="170" rx="10" fill="#111111" stroke="rgba(255,23,68,0.3)" stroke-width="1"/>
   <text x="770" y="300" text-anchor="middle" class="entity">ALERTS</text>
   <line x1="680" y1="307" x2="860" y2="307" stroke="#2E7D32" stroke-width="0.5"/>
   <text x="690" y="323" class="pk">🔑 id UUID PK</text>
@@ -95,7 +95,7 @@
   <text x="690" y="435" class="field">acknowledged BOOLEAN</text>
 
   <!-- ═══ REPORTS ═══ -->
-  <rect x="350" y="490" width="200" height="140" rx="10" fill="#0D2818" stroke="rgba(255,143,0,0.3)" stroke-width="1"/>
+  <rect x="350" y="490" width="200" height="140" rx="10" fill="#111111" stroke="rgba(255,143,0,0.3)" stroke-width="1"/>
   <text x="450" y="510" text-anchor="middle" class="entity">REPORTS</text>
   <line x1="360" y1="517" x2="540" y2="517" stroke="#2E7D32" stroke-width="0.5"/>
   <text x="370" y="533" class="pk">🔑 id UUID PK</text>
@@ -132,7 +132,7 @@
   <text x="610" y="353" text-anchor="middle" class="detail">1:N</text>
 
   <!-- Users → Reports -->
-  <line x1="130" y1="210" x2="130" y2="560" x2="350" y2="560" stroke="#546E7A" stroke-width="1" stroke-dasharray="4,3"/>
+  <line x1="130" y1="210" x2="130" y2="560" stroke="#546E7A" stroke-width="1" stroke-dasharray="4,3"/>
   <line x1="130" y1="560" x2="350" y2="560" stroke="#546E7A" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#a)"/>
   <text x="240" y="553" class="detail">1:N</text>
 </svg>

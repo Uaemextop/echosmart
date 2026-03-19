@@ -5,36 +5,36 @@
     .label { font-size: 10px; fill: #E0E0E0; font-weight: 600; }
     .detail { font-size: 8px; fill: #78909C; }
   </style>
-  <rect width="800" height="500" fill="#0A1A0F"/>
+  <rect width="800" height="500" fill="#000000"/>
   <text x="400" y="16" text-anchor="middle" class="detail" fill="#546E7A">WIREFRAME — MAPA DEL INVERNADERO (Vista Satelital)</text>
 
   <!-- Sidebar mini -->
-  <rect x="0" y="25" width="50" height="475" fill="#060E09" stroke="rgba(0,230,118,0.06)" stroke-width="1"/>
+  <rect x="0" y="25" width="50" height="475" fill="#0A0A0A" stroke="rgba(0,230,118,0.06)" stroke-width="1"/>
   <text x="25" y="55" text-anchor="middle" class="detail" fill="#00E676">🌿</text>
   <text x="25" y="85" text-anchor="middle" class="detail">📊</text>
   <text x="25" y="110" text-anchor="middle" class="detail">🌡️</text>
-  <rect x="7" y="120" width="36" height="28" rx="6" fill="#1A2E1F"/>
+  <rect x="7" y="120" width="36" height="28" rx="6" fill="#1A1A1A"/>
   <text x="25" y="138" text-anchor="middle" class="detail" fill="#00E676">🗺️</text>
   <text x="25" y="165" text-anchor="middle" class="detail">⚠️</text>
 
   <!-- Header -->
-  <rect x="50" y="25" width="750" height="40" fill="#0D2818"/>
+  <rect x="50" y="25" width="750" height="40" fill="#111111"/>
   <text x="70" y="50" class="title">Mapa del Invernadero — Zona A</text>
   <text x="780" y="50" text-anchor="end" class="detail" fill="#00E676">● En vivo</text>
 
   <!-- Map controls -->
-  <rect x="690" y="75" width="90" height="28" rx="6" fill="#0D2818" stroke="rgba(0,230,118,0.15)" stroke-width="1"/>
+  <rect x="690" y="75" width="90" height="28" rx="6" fill="#111111" stroke="rgba(0,230,118,0.15)" stroke-width="1"/>
   <text x="710" y="93" class="detail" fill="#00BCD4">🛰️ Satélite</text>
-  <rect x="690" y="108" width="90" height="28" rx="6" fill="#1A2E1F"/>
+  <rect x="690" y="108" width="90" height="28" rx="6" fill="#1A1A1A"/>
   <text x="710" y="126" class="detail" fill="#78909C">🗺️ Mapa</text>
-  <rect x="690" y="141" width="90" height="28" rx="6" fill="#1A2E1F"/>
+  <rect x="690" y="141" width="90" height="28" rx="6" fill="#1A1A1A"/>
   <text x="710" y="159" class="detail" fill="#78909C">✏️ Dibujar</text>
 
   <!-- Map area (satellite background sim) -->
-  <rect x="60" y="70" width="620" height="350" rx="8" fill="#0A1510"/>
+  <rect x="60" y="70" width="620" height="350" rx="8" fill="#0A0A0A"/>
 
   <!-- Satellite texture simulation -->
-  <rect x="60" y="70" width="620" height="350" rx="8" fill="#0C1A10" opacity="0.5"/>
+  <rect x="60" y="70" width="620" height="350" rx="8" fill="#0A0A0A" opacity="0.5"/>
 
   <!-- Greenhouse polygon -->
   <polygon points="120,350 120,150 380,100 620,150 620,350 530,380 200,380" fill="rgba(0,230,118,0.06)" stroke="#00E676" stroke-width="1.5"/>
@@ -60,8 +60,8 @@
 
   <!-- Light sensor Z-B -->
   <circle cx="460" cy="180" r="16" fill="#FFD54F" opacity="0.9"/>
-  <text x="460" y="176" text-anchor="middle" style="font-size:7px;fill:#0A1A0F;">☀️</text>
-  <text x="460" y="186" text-anchor="middle" style="font-size:8px;fill:#0A1A0F;font-weight:bold;">18.5K</text>
+  <text x="460" y="176" text-anchor="middle" style="font-size:7px;fill:#000000;">☀️</text>
+  <text x="460" y="186" text-anchor="middle" style="font-size:8px;fill:#000000;font-weight:bold;">18.5K</text>
 
   <!-- Temp sensor Z-B (WARNING) -->
   <circle cx="520" cy="200" r="16" fill="#FF1744" opacity="0.9"/>
@@ -83,7 +83,7 @@
   <text x="420" y="306" text-anchor="middle" style="font-size:8px;fill:white;font-weight:bold;">620</text>
 
   <!-- Sensor detail popup -->
-  <rect x="140" y="120" width="180" height="65" rx="8" fill="#0D2818" stroke="rgba(255,82,82,0.3)" stroke-width="1"/>
+  <rect x="140" y="120" width="180" height="65" rx="8" fill="#111111" stroke="rgba(255,82,82,0.3)" stroke-width="1"/>
   <text x="155" y="138" class="label" fill="#FF5252">🌡️ DS18B20 — Zona A</text>
   <text x="155" y="153" class="detail">Temperatura: 24.5°C</text>
   <text x="155" y="166" class="detail" fill="#00E676">● Normal (18-28°C)</text>
@@ -91,7 +91,7 @@
   <line x1="200" y1="185" x2="200" y2="190" stroke="#FF5252" stroke-width="1"/>
 
   <!-- Bottom panel -->
-  <rect x="60" y="430" width="720" height="60" rx="10" fill="#0D2818" stroke="rgba(0,230,118,0.08)" stroke-width="1"/>
+  <rect x="60" y="430" width="720" height="60" rx="10" fill="#111111" stroke="rgba(0,230,118,0.08)" stroke-width="1"/>
   <text x="80" y="452" class="label">Leyenda</text>
   <circle cx="80" cy="472" r="5" fill="#FF5252"/>
   <text x="92" y="476" class="detail">Temperatura</text>

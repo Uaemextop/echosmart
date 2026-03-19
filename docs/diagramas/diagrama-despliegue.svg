@@ -8,7 +8,7 @@
   <defs>
     <marker id="a" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#00E676"/></marker>
   </defs>
-  <rect width="900" height="500" fill="#060E09"/>
+  <rect width="900" height="500" fill="#000000"/>
   <text x="450" y="30" text-anchor="middle" class="title">DIAGRAMA DE DESPLIEGUE — Infraestructura</text>
 
   <!-- Internet cloud -->
@@ -16,12 +16,12 @@
   <text x="450" y="84" text-anchor="middle" class="label" fill="#546E7A">☁️ Internet</text>
 
   <!-- CDN -->
-  <rect x="30" y="130" width="160" height="60" rx="10" fill="#0D2818" stroke="rgba(0,230,118,0.2)" stroke-width="1"/>
+  <rect x="30" y="130" width="160" height="60" rx="10" fill="#111111" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
   <text x="110" y="155" text-anchor="middle" class="label" fill="#00E676">CDN (Vercel/Netlify)</text>
   <text x="110" y="173" text-anchor="middle" class="detail">Frontend estático</text>
 
   <!-- Load Balancer -->
-  <rect x="370" y="130" width="160" height="60" rx="10" fill="#0A1E30" stroke="rgba(0,188,212,0.2)" stroke-width="1"/>
+  <rect x="370" y="130" width="160" height="60" rx="10" fill="#0D1A2E" stroke="rgba(0,188,212,0.2)" stroke-width="1"/>
   <text x="450" y="155" text-anchor="middle" class="label" fill="#00BCD4">Nginx / Ingress</text>
   <text x="450" y="173" text-anchor="middle" class="detail">Load Balancer + TLS</text>
 
@@ -30,7 +30,7 @@
   <text x="450" y="245" text-anchor="middle" class="label" fill="#00BCD4">Kubernetes Cluster</text>
 
   <!-- Backend pods -->
-  <rect x="270" y="260" width="100" height="50" rx="6" fill="#0A1A2E" stroke="rgba(0,230,118,0.2)" stroke-width="1"/>
+  <rect x="270" y="260" width="100" height="50" rx="6" fill="#0A1A2E" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
   <text x="320" y="280" text-anchor="middle" class="detail" fill="#00E676">Backend Pod</text>
   <text x="320" y="296" text-anchor="middle" class="detail">FastAPI ×2</text>
 
@@ -63,17 +63,17 @@
   <text x="790" y="245" text-anchor="middle" class="label" fill="#FF8F00">Raspberry Pi 4B</text>
   <text x="790" y="265" text-anchor="middle" class="detail">Gateway Edge</text>
 
-  <rect x="725" y="280" width="130" height="22" rx="4" fill="#1A2E1F"/>
+  <rect x="725" y="280" width="130" height="22" rx="4" fill="#1A1A1A"/>
   <text x="790" y="296" text-anchor="middle" class="detail" fill="#00E676">EchoSmart Gateway</text>
 
-  <rect x="725" y="310" width="60" height="22" rx="4" fill="#1A2E1F"/>
+  <rect x="725" y="310" width="60" height="22" rx="4" fill="#1A1A1A"/>
   <text x="755" y="326" text-anchor="middle" class="detail" fill="#FFD54F">SQLite</text>
 
-  <rect x="795" y="310" width="60" height="22" rx="4" fill="#1A2E1F"/>
+  <rect x="795" y="310" width="60" height="22" rx="4" fill="#1A1A1A"/>
   <text x="825" y="326" text-anchor="middle" class="detail" fill="#00BCD4">MQTT</text>
 
   <!-- Mobile devices -->
-  <rect x="30" y="260" width="160" height="100" rx="10" fill="#0D2818" stroke="rgba(0,230,118,0.15)" stroke-width="1"/>
+  <rect x="30" y="260" width="160" height="100" rx="10" fill="#111111" stroke="rgba(0,230,118,0.15)" stroke-width="1"/>
   <text x="110" y="285" text-anchor="middle" class="label" fill="#00E676">Dispositivos Cliente</text>
   <text x="110" y="303" text-anchor="middle" class="detail">📱 Android (APK)</text>
   <text x="110" y="318" text-anchor="middle" class="detail">📱 iOS (IPA)</text>
@@ -91,7 +91,7 @@
   <line x1="110" y1="190" x2="110" y2="258" stroke="#00E676" stroke-width="1" marker-end="url(#a)"/>
 
   <!-- Legend -->
-  <rect x="30" y="430" width="840" height="55" rx="10" fill="#0D2818" stroke="rgba(0,230,118,0.08)" stroke-width="1"/>
+  <rect x="30" y="430" width="840" height="55" rx="10" fill="#111111" stroke="rgba(0,230,118,0.08)" stroke-width="1"/>
   <text x="450" y="453" text-anchor="middle" class="label">Tecnologías de Despliegue</text>
   <text x="110" y="472" text-anchor="middle" class="detail" fill="#00BCD4">Docker + Kubernetes</text>
   <text x="260" y="472" text-anchor="middle" class="detail" fill="#00E676">GitHub Actions CI/CD</text>

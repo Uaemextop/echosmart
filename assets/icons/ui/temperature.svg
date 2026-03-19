@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
   <!-- Temperature icon -->
-  <circle cx="24" cy="24" r="22" fill="#1A1A2E" stroke="#FF5252" stroke-width="1" opacity="0.3"/>
+  <circle cx="24" cy="24" r="22" fill="#111111" stroke="#FF5252" stroke-width="1" opacity="0.3"/>
   <rect x="20" y="8" width="8" height="24" rx="4" fill="none" stroke="#FF5252" stroke-width="2"/>
   <circle cx="24" cy="34" r="6" fill="#FF5252" opacity="0.8"/>
   <rect x="22" y="16" width="4" height="14" rx="2" fill="#FF5252" opacity="0.6"/>

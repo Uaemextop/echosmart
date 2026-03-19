@@ -5,10 +5,10 @@
       <stop offset="100%" style="stop-color:#2E7D32;stop-opacity:1" />
     </linearGradient>
   </defs>
-  <rect width="1024" height="1024" rx="220" fill="#0A1A0F"/>
+  <rect width="1024" height="1024" rx="220" fill="#111111"/>
   <path d="M 210 810 Q 210 340 510 210 Q 665 150 750 320 Q 785 445 665 510 Q 555 560 470 680 Q 425 750 385 810 Z" fill="url(#leafGrad)" />
-  <path d="M 385 810 Q 425 580 555 450" stroke="#0A1A0F" stroke-width="18" fill="none" opacity="0.5"/>
-  <circle cx="555" cy="450" r="22" fill="#0A1A0F" opacity="0.5"/>
+  <path d="M 385 810 Q 425 580 555 450" stroke="#000000" stroke-width="18" fill="none" opacity="0.5"/>
+  <circle cx="555" cy="450" r="22" fill="#000000" opacity="0.5"/>
   <circle cx="685" cy="240" r="25" fill="#00BCD4" opacity="0.8"/>
   <circle cx="770" cy="305" r="18" fill="#00BCD4" opacity="0.5"/>
   <circle cx="735" cy="190" r="16" fill="#1565C0" opacity="0.6"/>

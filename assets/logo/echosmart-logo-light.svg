@@ -7,10 +7,10 @@
   </defs>
   <g transform="translate(20, 15)">
     <path d="M 10 80 Q 10 20 50 10 Q 70 5 80 25 Q 85 40 70 50 Q 55 55 45 70 Q 40 78 35 85 Z" fill="url(#leafGrad)" />
-    <path d="M 35 85 Q 40 55 55 40" stroke="#0A1A0F" stroke-width="2" fill="none" opacity="0.5"/>
-    <circle cx="55" cy="40" r="2.5" fill="#0A1A0F" opacity="0.6"/>
+    <path d="M 35 85 Q 40 55 55 40" stroke="#000000" stroke-width="2" fill="none" opacity="0.5"/>
+    <circle cx="55" cy="40" r="2.5" fill="#000000" opacity="0.6"/>
   </g>
-  <text x="125" y="62" font-family="'Segoe UI', sans-serif" font-size="48" font-weight="700" fill="#1A1A2E" letter-spacing="-1">
+  <text x="125" y="62" font-family="'Segoe UI', sans-serif" font-size="48" font-weight="700" fill="#111111" letter-spacing="-1">
     Echo<tspan fill="#2E7D32">Smart</tspan>
   </text>
   <text x="127" y="88" font-family="'Segoe UI', sans-serif" font-size="13" fill="#546E7A" letter-spacing="3">

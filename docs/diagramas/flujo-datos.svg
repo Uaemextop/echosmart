@@ -15,7 +15,7 @@
     </marker>
   </defs>
 
-  <rect width="1000" height="600" fill="#060E09"/>
+  <rect width="1000" height="600" fill="#000000"/>
 
   <text x="500" y="30" text-anchor="middle" class="title">FLUJO DE DATOS END-TO-END — Lectura de Sensor</text>
 
@@ -32,7 +32,7 @@
   <line x1="180" y1="130" x2="220" y2="130" stroke="#00E676" stroke-width="2" marker-end="url(#a)"/>
 
   <!-- Step 2: HAL -->
-  <rect x="222" y="70" width="150" height="120" rx="12" fill="#0D2818" stroke="rgba(0,230,118,0.2)" stroke-width="1"/>
+  <rect x="222" y="70" width="150" height="120" rx="12" fill="#111111" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
   <text x="297" y="92" text-anchor="middle" class="num" fill="#00E676">②</text>
   <text x="297" y="110" text-anchor="middle" class="step">HAL + DRIVER</text>
   <text x="297" y="128" text-anchor="middle" class="detail">Hardware Abstraction</text>
@@ -44,7 +44,7 @@
   <line x1="372" y1="130" x2="412" y2="130" stroke="#00E676" stroke-width="2" marker-end="url(#a)"/>
 
   <!-- Step 3: Sensor Manager -->
-  <rect x="414" y="70" width="150" height="120" rx="12" fill="#0D2818" stroke="rgba(0,230,118,0.2)" stroke-width="1"/>
+  <rect x="414" y="70" width="150" height="120" rx="12" fill="#111111" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
   <text x="489" y="92" text-anchor="middle" class="num" fill="#00E676">③</text>
   <text x="489" y="110" text-anchor="middle" class="step">SENSOR MANAGER</text>
   <text x="489" y="128" text-anchor="middle" class="detail">Polling periódico</text>
@@ -58,17 +58,17 @@
   <line x1="564" y1="155" x2="630" y2="185" stroke="#00BCD4" stroke-width="1.5" marker-end="url(#ac)"/>
 
   <!-- Step 4a: SQLite -->
-  <rect x="632" y="50" width="140" height="55" rx="8" fill="#1A2E1F" stroke="rgba(255,213,79,0.3)" stroke-width="1"/>
+  <rect x="632" y="50" width="140" height="55" rx="8" fill="#1A1A1A" stroke="rgba(255,213,79,0.3)" stroke-width="1"/>
   <text x="702" y="72" text-anchor="middle" class="step" fill="#FFD54F">SQLite Cache</text>
   <text x="702" y="90" text-anchor="middle" class="detail">Almacén local offline</text>
 
   <!-- Step 4b: Alert Engine -->
-  <rect x="632" y="112" width="140" height="55" rx="8" fill="#1A2E1F" stroke="rgba(0,230,118,0.3)" stroke-width="1"/>
+  <rect x="632" y="112" width="140" height="55" rx="8" fill="#1A1A1A" stroke="rgba(0,230,118,0.3)" stroke-width="1"/>
   <text x="702" y="134" text-anchor="middle" class="step" fill="#00E676">Alert Engine</text>
   <text x="702" y="152" text-anchor="middle" class="detail">Evaluación local reglas</text>
 
   <!-- Step 4c: MQTT -->
-  <rect x="632" y="175" width="140" height="55" rx="8" fill="#1A2E1F" stroke="rgba(0,188,212,0.3)" stroke-width="1"/>
+  <rect x="632" y="175" width="140" height="55" rx="8" fill="#1A1A1A" stroke="rgba(0,188,212,0.3)" stroke-width="1"/>
   <text x="702" y="197" text-anchor="middle" class="step" fill="#00BCD4">MQTT Publish</text>
   <text x="702" y="215" text-anchor="middle" class="detail">Publicación local</text>
 
@@ -76,7 +76,7 @@
   <line x1="772" y1="77" x2="830" y2="130" stroke="#FFD54F" stroke-width="1.5" marker-end="url(#a)"/>
 
   <!-- Step 5: Cloud Sync -->
-  <rect x="632" y="260" width="340" height="55" rx="12" fill="#0D2818" stroke="rgba(0,230,118,0.3)" stroke-width="1"/>
+  <rect x="632" y="260" width="340" height="55" rx="12" fill="#111111" stroke="rgba(0,230,118,0.3)" stroke-width="1"/>
   <text x="802" y="278" text-anchor="middle" class="num" fill="#00E676">④</text>
   <text x="802" y="296" text-anchor="middle" class="step">CLOUD SYNC — Batch cada 5 min + reintentos exponenciales</text>
 
@@ -84,7 +84,7 @@
   <line x1="802" y1="315" x2="802" y2="345" stroke="#00BCD4" stroke-width="2" marker-end="url(#ac)"/>
 
   <!-- Step 6: Backend -->
-  <rect x="30" y="345" width="940" height="80" rx="12" fill="#0A1E30" stroke="rgba(0,188,212,0.2)" stroke-width="1"/>
+  <rect x="30" y="345" width="940" height="80" rx="12" fill="#0D1A2E" stroke="rgba(0,188,212,0.2)" stroke-width="1"/>
   <text x="500" y="370" text-anchor="middle" class="num" fill="#00BCD4">⑤</text>
   <text x="500" y="390" text-anchor="middle" class="step">BACKEND CLOUD — FastAPI</text>
 
@@ -113,29 +113,29 @@
   <line x1="500" y1="425" x2="500" y2="460" stroke="#00E676" stroke-width="2" marker-end="url(#a)"/>
 
   <!-- Step 7: Clients -->
-  <rect x="30" y="462" width="940" height="70" rx="12" fill="#0D2818" stroke="rgba(0,230,118,0.15)" stroke-width="1"/>
+  <rect x="30" y="462" width="940" height="70" rx="12" fill="#111111" stroke="rgba(0,230,118,0.15)" stroke-width="1"/>
   <text x="500" y="487" text-anchor="middle" class="num" fill="#00E676">⑥</text>
   <text x="500" y="505" text-anchor="middle" class="step">CLIENTES — Actualización en tiempo real vía WebSocket + REST API</text>
 
-  <rect x="55" y="520" width="100" height="18" rx="4" fill="#1A2E1F"/>
+  <rect x="55" y="520" width="100" height="18" rx="4" fill="#1A1A1A"/>
   <text x="105" y="533" text-anchor="middle" class="detail" fill="#00E676">Web React</text>
 
-  <rect x="170" y="520" width="100" height="18" rx="4" fill="#1A2E1F"/>
+  <rect x="170" y="520" width="100" height="18" rx="4" fill="#1A1A1A"/>
   <text x="220" y="533" text-anchor="middle" class="detail" fill="#00BCD4">Android</text>
 
-  <rect x="285" y="520" width="100" height="18" rx="4" fill="#1A2E1F"/>
+  <rect x="285" y="520" width="100" height="18" rx="4" fill="#1A1A1A"/>
   <text x="335" y="533" text-anchor="middle" class="detail" fill="#00BCD4">iOS</text>
 
-  <rect x="400" y="520" width="100" height="18" rx="4" fill="#1A2E1F"/>
+  <rect x="400" y="520" width="100" height="18" rx="4" fill="#1A1A1A"/>
   <text x="450" y="533" text-anchor="middle" class="detail" fill="#AB47BC">Windows</text>
 
-  <rect x="515" y="520" width="100" height="18" rx="4" fill="#1A2E1F"/>
+  <rect x="515" y="520" width="100" height="18" rx="4" fill="#1A1A1A"/>
   <text x="565" y="533" text-anchor="middle" class="detail" fill="#AB47BC">macOS</text>
 
-  <rect x="630" y="520" width="100" height="18" rx="4" fill="#1A2E1F"/>
+  <rect x="630" y="520" width="100" height="18" rx="4" fill="#1A1A1A"/>
   <text x="680" y="533" text-anchor="middle" class="detail" fill="#AB47BC">Linux</text>
 
-  <rect x="745" y="520" width="100" height="18" rx="4" fill="#1A2E1F"/>
+  <rect x="745" y="520" width="100" height="18" rx="4" fill="#1A1A1A"/>
   <text x="795" y="533" text-anchor="middle" class="detail" fill="#FF8F00">Admin Panel</text>
 
   <!-- Footer -->

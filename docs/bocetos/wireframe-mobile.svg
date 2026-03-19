@@ -6,49 +6,49 @@
     .value { font-size: 22px; font-weight: 700; }
     .small-value { font-size: 14px; font-weight: 700; }
   </style>
-  <rect width="400" height="780" fill="#0A1A0F"/>
+  <rect width="400" height="780" fill="#000000"/>
   <text x="200" y="16" text-anchor="middle" class="detail" fill="#546E7A">WIREFRAME — APP MÓVIL (Android / iOS)</text>
 
   <!-- Phone frame -->
-  <rect x="20" y="30" width="360" height="720" rx="30" fill="#0A1A0F" stroke="#1A2E1F" stroke-width="2"/>
+  <rect x="20" y="30" width="360" height="720" rx="30" fill="#000000" stroke="#1A1A1A" stroke-width="2"/>
 
   <!-- Status bar -->
-  <rect x="20" y="30" width="360" height="30" rx="30" fill="#060E09"/>
+  <rect x="20" y="30" width="360" height="30" rx="30" fill="#000000"/>
   <text x="55" y="50" class="detail">📶 EchoSmart</text>
   <text x="200" y="50" text-anchor="middle" class="detail">9:41</text>
   <text x="345" y="50" text-anchor="end" class="detail">🔋 85%</text>
 
   <!-- Header -->
-  <rect x="20" y="60" width="360" height="50" fill="#0D2818"/>
+  <rect x="20" y="60" width="360" height="50" fill="#111111"/>
   <text x="55" y="88" class="label" fill="#00E676">🌿 Invernadero Principal</text>
   <text x="340" y="88" text-anchor="end" class="detail" fill="#00E676">● Online</text>
 
   <!-- Quick Stats -->
-  <rect x="35" y="120" width="80" height="70" rx="10" fill="#0D2818" stroke="rgba(255,82,82,0.15)" stroke-width="1"/>
+  <rect x="35" y="120" width="80" height="70" rx="10" fill="#111111" stroke="rgba(255,82,82,0.15)" stroke-width="1"/>
   <text x="75" y="143" text-anchor="middle" class="detail" fill="#78909C">🌡️ Temp</text>
   <text x="75" y="168" text-anchor="middle" class="small-value" fill="#FF5252">24.5°</text>
   <text x="75" y="182" text-anchor="middle" class="detail" fill="#00E676">Normal</text>
 
-  <rect x="125" y="120" width="80" height="70" rx="10" fill="#0D2818" stroke="rgba(66,165,245,0.15)" stroke-width="1"/>
+  <rect x="125" y="120" width="80" height="70" rx="10" fill="#111111" stroke="rgba(66,165,245,0.15)" stroke-width="1"/>
   <text x="165" y="143" text-anchor="middle" class="detail" fill="#78909C">💧 Hum</text>
   <text x="165" y="168" text-anchor="middle" class="small-value" fill="#42A5F5">68.2%</text>
   <text x="165" y="182" text-anchor="middle" class="detail" fill="#00E676">Normal</text>
 
-  <rect x="215" y="120" width="80" height="70" rx="10" fill="#0D2818" stroke="rgba(255,213,79,0.15)" stroke-width="1"/>
+  <rect x="215" y="120" width="80" height="70" rx="10" fill="#111111" stroke="rgba(255,213,79,0.15)" stroke-width="1"/>
   <text x="255" y="143" text-anchor="middle" class="detail" fill="#78909C">☀️ Luz</text>
   <text x="255" y="168" text-anchor="middle" class="small-value" fill="#FFD54F">18.5K</text>
   <text x="255" y="182" text-anchor="middle" class="detail" fill="#00E676">Normal</text>
 
-  <rect x="305" y="120" width="60" height="70" rx="10" fill="#0D2818" stroke="rgba(120,144,156,0.15)" stroke-width="1"/>
+  <rect x="305" y="120" width="60" height="70" rx="10" fill="#111111" stroke="rgba(120,144,156,0.15)" stroke-width="1"/>
   <text x="335" y="143" text-anchor="middle" class="detail" fill="#78909C">💨</text>
   <text x="335" y="168" text-anchor="middle" class="small-value" fill="#78909C">620</text>
   <text x="335" y="182" text-anchor="middle" class="detail" fill="#00E676">OK</text>
 
   <!-- Map Preview -->
-  <rect x="35" y="205" width="330" height="180" rx="12" fill="#0D2818" stroke="rgba(0,230,118,0.1)" stroke-width="1"/>
+  <rect x="35" y="205" width="330" height="180" rx="12" fill="#111111" stroke="rgba(0,230,118,0.1)" stroke-width="1"/>
   <text x="55" y="225" class="label" fill="#00E676">🗺️ Mapa del Invernadero</text>
   <!-- Satellite bg simulation -->
-  <rect x="45" y="235" width="310" height="140" rx="8" fill="#0A1510"/>
+  <rect x="45" y="235" width="310" height="140" rx="8" fill="#0A0A0A"/>
   <!-- Greenhouse polygon -->
   <polygon points="80,340 80,270 200,250 320,270 320,340 280,360 120,360" fill="rgba(0,230,118,0.08)" stroke="#00E676" stroke-width="1"/>
   <!-- Sensor dots on map -->
@@ -61,11 +61,11 @@
   <circle cx="180" cy="340" r="8" fill="#8D6E63" opacity="0.8"/>
   <text x="180" y="344" text-anchor="middle" style="font-size:6px;fill:white;font-weight:bold;">72%</text>
   <!-- Map type toggle -->
-  <rect x="300" y="245" width="45" height="18" rx="4" fill="#1A2E1F"/>
+  <rect x="300" y="245" width="45" height="18" rx="4" fill="#1A1A1A"/>
   <text x="322" y="257" text-anchor="middle" class="detail" fill="#00BCD4">🛰️</text>
 
   <!-- Chart -->
-  <rect x="35" y="400" width="330" height="120" rx="12" fill="#0D2818" stroke="rgba(0,230,118,0.08)" stroke-width="1"/>
+  <rect x="35" y="400" width="330" height="120" rx="12" fill="#111111" stroke="rgba(0,230,118,0.08)" stroke-width="1"/>
   <text x="55" y="420" class="label">Temperatura 24h</text>
   <polyline points="55,480 85,475 115,470 145,478 175,465 205,455 235,450 265,453 295,448 325,445 345,450" stroke="#FF5252" stroke-width="2" fill="none"/>
   <rect x="55" y="455" width="290" height="20" fill="#00E676" opacity="0.03"/>
@@ -76,26 +76,26 @@
   <circle cx="55" cy="558" r="5" fill="#FF1744"/>
   <text x="70" y="553" class="detail" fill="#E0E0E0">⚠️ Temperatura Zona B: 32.5°C</text>
   <text x="70" y="567" class="detail" fill="#FF5252">Crítica · hace 2 min</text>
-  <rect x="310" y="547" width="40" height="20" rx="4" fill="#1A2E1F"/>
+  <rect x="310" y="547" width="40" height="20" rx="4" fill="#1A1A1A"/>
   <text x="330" y="560" text-anchor="middle" class="detail" fill="#00E676">Ver</text>
 
   <!-- Sensor List Preview -->
-  <rect x="35" y="595" width="330" height="90" rx="12" fill="#0D2818" stroke="rgba(0,230,118,0.08)" stroke-width="1"/>
+  <rect x="35" y="595" width="330" height="90" rx="12" fill="#111111" stroke="rgba(0,230,118,0.08)" stroke-width="1"/>
   <text x="55" y="615" class="label">Sensores</text>
   <text x="345" y="615" text-anchor="end" class="detail" fill="#00BCD4">Ver todos →</text>
 
-  <rect x="45" y="625" width="310" height="22" rx="4" fill="#1A2E1F"/>
+  <rect x="45" y="625" width="310" height="22" rx="4" fill="#1A1A1A"/>
   <circle cx="60" cy="636" r="3" fill="#00E676"/>
   <text x="72" y="639" class="detail" fill="#E0E0E0">DS18B20 — Zona A</text>
   <text x="340" y="639" text-anchor="end" class="detail" fill="#FF5252">24.5°C</text>
 
-  <rect x="45" y="652" width="310" height="22" rx="4" fill="#1A2E1F"/>
+  <rect x="45" y="652" width="310" height="22" rx="4" fill="#1A1A1A"/>
   <circle cx="60" cy="663" r="3" fill="#00E676"/>
   <text x="72" y="666" class="detail" fill="#E0E0E0">DHT22 — Zona A</text>
   <text x="340" y="666" text-anchor="end" class="detail" fill="#42A5F5">68.2%</text>
 
   <!-- Bottom Tab Bar -->
-  <rect x="20" y="695" width="360" height="55" rx="0" fill="#060E09" stroke="rgba(0,230,118,0.06)" stroke-width="1"/>
+  <rect x="20" y="695" width="360" height="55" rx="0" fill="#000000" stroke="rgba(0,230,118,0.06)" stroke-width="1"/>
   <text x="60" y="720" text-anchor="middle" class="detail" fill="#00E676">🏠</text>
   <text x="60" y="735" text-anchor="middle" style="font-size:7px;fill:#00E676;">Inicio</text>
   <text x="130" y="720" text-anchor="middle" class="detail">🌡️</text>

@@ -18,13 +18,13 @@
     <!-- Smart leaf -->
     <path d="M 10 80 Q 10 20 50 10 Q 70 5 80 25 Q 85 40 70 50 Q 55 55 45 70 Q 40 78 35 85 Z" fill="url(#leafGrad)" />
     <!-- Leaf vein / circuit lines -->
-    <path d="M 35 85 Q 40 55 55 40" stroke="#0A1A0F" stroke-width="2" fill="none" opacity="0.5"/>
-    <path d="M 42 60 L 55 52" stroke="#0A1A0F" stroke-width="1.5" fill="none" opacity="0.4"/>
-    <path d="M 38 70 L 50 65" stroke="#0A1A0F" stroke-width="1.5" fill="none" opacity="0.4"/>
+    <path d="M 35 85 Q 40 55 55 40" stroke="#000000" stroke-width="2" fill="none" opacity="0.5"/>
+    <path d="M 42 60 L 55 52" stroke="#000000" stroke-width="1.5" fill="none" opacity="0.4"/>
+    <path d="M 38 70 L 50 65" stroke="#000000" stroke-width="1.5" fill="none" opacity="0.4"/>
     <!-- Circuit dots -->
-    <circle cx="55" cy="40" r="2.5" fill="#0A1A0F" opacity="0.6"/>
-    <circle cx="55" cy="52" r="2" fill="#0A1A0F" opacity="0.5"/>
-    <circle cx="50" cy="65" r="2" fill="#0A1A0F" opacity="0.5"/>
+    <circle cx="55" cy="40" r="2.5" fill="#000000" opacity="0.6"/>
+    <circle cx="55" cy="52" r="2" fill="#000000" opacity="0.5"/>
+    <circle cx="50" cy="65" r="2" fill="#000000" opacity="0.5"/>
   </g>
   <!-- Text: EchoSmart -->
   <text x="125" y="62" font-family="'Segoe UI', 'SF Pro Display', system-ui, sans-serif" font-size="48" font-weight="700" fill="#E0E0E0" letter-spacing="-1">
