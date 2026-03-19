@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 120">
+  <defs>
+    <linearGradient id="leafGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00E676;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#2E7D32;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="signalGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#00BCD4;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1565C0;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <!-- Leaf / Plant Icon -->
+  <g transform="translate(20, 15)">
+    <!-- Satellite signal arcs -->
+    <path d="M 45 10 Q 65 -5 80 15" stroke="url(#signalGrad)" stroke-width="2.5" fill="none" opacity="0.4"/>
+    <path d="M 40 20 Q 65 0 85 25" stroke="url(#signalGrad)" stroke-width="2.5" fill="none" opacity="0.6"/>
+    <path d="M 35 30 Q 65 5 90 35" stroke="url(#signalGrad)" stroke-width="2.5" fill="none" opacity="0.8"/>
+    <!-- Smart leaf -->
+    <path d="M 10 80 Q 10 20 50 10 Q 70 5 80 25 Q 85 40 70 50 Q 55 55 45 70 Q 40 78 35 85 Z" fill="url(#leafGrad)" />
+    <!-- Leaf vein / circuit lines -->
+    <path d="M 35 85 Q 40 55 55 40" stroke="#0A1A0F" stroke-width="2" fill="none" opacity="0.5"/>
+    <path d="M 42 60 L 55 52" stroke="#0A1A0F" stroke-width="1.5" fill="none" opacity="0.4"/>
+    <path d="M 38 70 L 50 65" stroke="#0A1A0F" stroke-width="1.5" fill="none" opacity="0.4"/>
+    <!-- Circuit dots -->
+    <circle cx="55" cy="40" r="2.5" fill="#0A1A0F" opacity="0.6"/>
+    <circle cx="55" cy="52" r="2" fill="#0A1A0F" opacity="0.5"/>
+    <circle cx="50" cy="65" r="2" fill="#0A1A0F" opacity="0.5"/>
+  </g>
+  <!-- Text: EchoSmart -->
+  <text x="125" y="62" font-family="'Segoe UI', 'SF Pro Display', system-ui, sans-serif" font-size="48" font-weight="700" fill="#E0E0E0" letter-spacing="-1">
+    Echo<tspan fill="#00E676">Smart</tspan>
+  </text>
+  <!-- Tagline -->
+  <text x="127" y="88" font-family="'Segoe UI', 'SF Pro Display', system-ui, sans-serif" font-size="13" fill="#78909C" letter-spacing="3" text-transform="uppercase">
+    SMART GREENHOUSE IoT
+  </text>
+</svg>

@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+  <defs>
+    <linearGradient id="leafGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00E676;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#2E7D32;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <!-- Rounded square background for app -->
+  <rect x="2" y="2" width="116" height="116" rx="26" fill="#0A1A0F"/>
+  <!-- Leaf -->
+  <path d="M 25 95 Q 25 40 60 25 Q 78 18 88 38 Q 92 52 78 60 Q 65 66 55 80 Q 50 88 45 95 Z" fill="url(#leafGrad)" />
+  <path d="M 45 95 Q 50 68 65 53" stroke="#0A1A0F" stroke-width="2.5" fill="none" opacity="0.5"/>
+  <circle cx="65" cy="53" r="3" fill="#0A1A0F" opacity="0.5"/>
+  <!-- Signal dots -->
+  <circle cx="80" cy="28" r="3" fill="#00BCD4" opacity="0.8"/>
+  <circle cx="90" cy="36" r="2" fill="#00BCD4" opacity="0.5"/>
+  <circle cx="86" cy="22" r="2" fill="#1565C0" opacity="0.6"/>
+</svg>

@@ -1,0 +1,26 @@
+<!-- Desktop renderer loads the React frontend build -->
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EchoSmart</title>
+    <style>
+      body {
+        margin: 0;
+        background: #0A1A0F;
+        color: #E0E0E0;
+        font-family: 'Segoe UI', 'SF Pro Display', system-ui, sans-serif;
+      }
+      #root {
+        min-height: 100vh;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <!-- In production, this loads the built React app -->
+    <!-- In dev, main.js loads http://localhost:5173 instead -->
+    <script src="./main.jsx" type="module"></script>
+  </body>
+</html>

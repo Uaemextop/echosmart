@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+  <!-- Soil moisture icon -->
+  <circle cx="24" cy="24" r="22" fill="#1A1A2E" stroke="#8D6E63" stroke-width="1" opacity="0.3"/>
+  <path d="M 8 28 L 40 28" stroke="#8D6E63" stroke-width="2"/>
+  <path d="M 24 12 L 24 28" stroke="#4CAF50" stroke-width="2"/>
+  <path d="M 20 18 L 24 14 L 28 18" stroke="#4CAF50" stroke-width="1.5" fill="none"/>
+  <path d="M 18 32 Q 20 30 22 32" stroke="#42A5F5" stroke-width="1.5" fill="none" opacity="0.6"/>
+  <path d="M 26 34 Q 28 32 30 34" stroke="#42A5F5" stroke-width="1.5" fill="none" opacity="0.6"/>
+  <rect x="10" y="28" width="28" height="12" rx="2" fill="#8D6E63" opacity="0.3"/>
+</svg>

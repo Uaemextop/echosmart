@@ -1,0 +1,42 @@
+{
+  "name": "echosmart-desktop",
+  "version": "1.0.0",
+  "description": "EchoSmart - Aplicación de escritorio para monitoreo de invernaderos",
+  "main": "src/main/main.js",
+  "scripts": {
+    "dev": "electron .",
+    "build:win": "electron-builder --win",
+    "build:mac": "electron-builder --mac",
+    "build:linux": "electron-builder --linux",
+    "build:all": "electron-builder --win --mac --linux"
+  },
+  "dependencies": {
+    "electron-store": "^8.1.0",
+    "electron-updater": "^6.1.0"
+  },
+  "devDependencies": {
+    "electron": "^28.0.0",
+    "electron-builder": "^24.9.0"
+  },
+  "build": {
+    "appId": "com.echosmart.desktop",
+    "productName": "EchoSmart",
+    "directories": {
+      "output": "build"
+    },
+    "win": {
+      "target": ["nsis", "msi"],
+      "icon": "resources/icons/win/icon.ico"
+    },
+    "mac": {
+      "target": ["dmg"],
+      "icon": "resources/icons/mac/icon.icns",
+      "category": "public.app-category.utilities"
+    },
+    "linux": {
+      "target": ["AppImage", "deb"],
+      "icon": "resources/icons/linux/",
+      "category": "Utility"
+    }
+  }
+}
