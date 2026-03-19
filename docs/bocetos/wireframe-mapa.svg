@@ -1,0 +1,115 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500">
+  <style>
+    text { font-family: 'Segoe UI', system-ui, sans-serif; }
+    .title { font-size: 14px; font-weight: 700; fill: #E0E0E0; }
+    .label { font-size: 10px; fill: #E0E0E0; font-weight: 600; }
+    .detail { font-size: 8px; fill: #78909C; }
+  </style>
+  <rect width="800" height="500" fill="#0A1A0F"/>
+  <text x="400" y="16" text-anchor="middle" class="detail" fill="#546E7A">WIREFRAME — MAPA DEL INVERNADERO (Vista Satelital)</text>
+
+  <!-- Sidebar mini -->
+  <rect x="0" y="25" width="50" height="475" fill="#060E09" stroke="rgba(0,230,118,0.06)" stroke-width="1"/>
+  <text x="25" y="55" text-anchor="middle" class="detail" fill="#00E676">🌿</text>
+  <text x="25" y="85" text-anchor="middle" class="detail">📊</text>
+  <text x="25" y="110" text-anchor="middle" class="detail">🌡️</text>
+  <rect x="7" y="120" width="36" height="28" rx="6" fill="#1A2E1F"/>
+  <text x="25" y="138" text-anchor="middle" class="detail" fill="#00E676">🗺️</text>
+  <text x="25" y="165" text-anchor="middle" class="detail">⚠️</text>
+
+  <!-- Header -->
+  <rect x="50" y="25" width="750" height="40" fill="#0D2818"/>
+  <text x="70" y="50" class="title">Mapa del Invernadero — Zona A</text>
+  <text x="780" y="50" text-anchor="end" class="detail" fill="#00E676">● En vivo</text>
+
+  <!-- Map controls -->
+  <rect x="690" y="75" width="90" height="28" rx="6" fill="#0D2818" stroke="rgba(0,230,118,0.15)" stroke-width="1"/>
+  <text x="710" y="93" class="detail" fill="#00BCD4">🛰️ Satélite</text>
+  <rect x="690" y="108" width="90" height="28" rx="6" fill="#1A2E1F"/>
+  <text x="710" y="126" class="detail" fill="#78909C">🗺️ Mapa</text>
+  <rect x="690" y="141" width="90" height="28" rx="6" fill="#1A2E1F"/>
+  <text x="710" y="159" class="detail" fill="#78909C">✏️ Dibujar</text>
+
+  <!-- Map area (satellite background sim) -->
+  <rect x="60" y="70" width="620" height="350" rx="8" fill="#0A1510"/>
+
+  <!-- Satellite texture simulation -->
+  <rect x="60" y="70" width="620" height="350" rx="8" fill="#0C1A10" opacity="0.5"/>
+
+  <!-- Greenhouse polygon -->
+  <polygon points="120,350 120,150 380,100 620,150 620,350 530,380 200,380" fill="rgba(0,230,118,0.06)" stroke="#00E676" stroke-width="1.5"/>
+  <!-- Zone labels -->
+  <text x="220" y="200" class="label" fill="#00E676" opacity="0.5">ZONA A</text>
+  <text x="420" y="200" class="label" fill="#00BCD4" opacity="0.5">ZONA B</text>
+  <text x="320" y="320" class="label" fill="#FF8F00" opacity="0.5">ZONA C</text>
+
+  <!-- Zone dividers -->
+  <line x1="340" y1="110" x2="340" y2="370" stroke="#00E676" stroke-width="0.5" stroke-dasharray="4,4" opacity="0.3"/>
+  <line x1="200" y1="260" x2="560" y2="260" stroke="#00E676" stroke-width="0.5" stroke-dasharray="4,4" opacity="0.3"/>
+
+  <!-- Sensor markers -->
+  <!-- Temp sensor Z-A -->
+  <circle cx="200" cy="190" r="16" fill="#FF5252" opacity="0.9"/>
+  <text x="200" y="186" text-anchor="middle" style="font-size:7px;fill:white;">🌡️</text>
+  <text x="200" y="196" text-anchor="middle" style="font-size:8px;fill:white;font-weight:bold;">24.5°</text>
+
+  <!-- Humidity sensor Z-A -->
+  <circle cx="260" cy="220" r="16" fill="#42A5F5" opacity="0.9"/>
+  <text x="260" y="216" text-anchor="middle" style="font-size:7px;fill:white;">💧</text>
+  <text x="260" y="226" text-anchor="middle" style="font-size:8px;fill:white;font-weight:bold;">68.2%</text>
+
+  <!-- Light sensor Z-B -->
+  <circle cx="460" cy="180" r="16" fill="#FFD54F" opacity="0.9"/>
+  <text x="460" y="176" text-anchor="middle" style="font-size:7px;fill:#0A1A0F;">☀️</text>
+  <text x="460" y="186" text-anchor="middle" style="font-size:8px;fill:#0A1A0F;font-weight:bold;">18.5K</text>
+
+  <!-- Temp sensor Z-B (WARNING) -->
+  <circle cx="520" cy="200" r="16" fill="#FF1744" opacity="0.9"/>
+  <circle cx="520" cy="200" r="20" fill="none" stroke="#FF1744" stroke-width="1" opacity="0.4">
+    <animate attributeName="r" values="16;24;16" dur="2s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.6;0;0.6" dur="2s" repeatCount="indefinite"/>
+  </circle>
+  <text x="520" y="196" text-anchor="middle" style="font-size:7px;fill:white;">🌡️</text>
+  <text x="520" y="206" text-anchor="middle" style="font-size:8px;fill:white;font-weight:bold;">32.5°</text>
+
+  <!-- Soil moisture Z-C -->
+  <circle cx="300" cy="310" r="16" fill="#8D6E63" opacity="0.9"/>
+  <text x="300" y="306" text-anchor="middle" style="font-size:7px;fill:white;">🌱</text>
+  <text x="300" y="316" text-anchor="middle" style="font-size:8px;fill:white;font-weight:bold;">72%</text>
+
+  <!-- CO2 sensor Z-C -->
+  <circle cx="420" cy="300" r="16" fill="#78909C" opacity="0.9"/>
+  <text x="420" y="296" text-anchor="middle" style="font-size:7px;fill:white;">💨</text>
+  <text x="420" y="306" text-anchor="middle" style="font-size:8px;fill:white;font-weight:bold;">620</text>
+
+  <!-- Sensor detail popup -->
+  <rect x="140" y="120" width="180" height="65" rx="8" fill="#0D2818" stroke="rgba(255,82,82,0.3)" stroke-width="1"/>
+  <text x="155" y="138" class="label" fill="#FF5252">🌡️ DS18B20 — Zona A</text>
+  <text x="155" y="153" class="detail">Temperatura: 24.5°C</text>
+  <text x="155" y="166" class="detail" fill="#00E676">● Normal (18-28°C)</text>
+  <text x="155" y="179" class="detail">Última lectura: hace 5s</text>
+  <line x1="200" y1="185" x2="200" y2="190" stroke="#FF5252" stroke-width="1"/>
+
+  <!-- Bottom panel -->
+  <rect x="60" y="430" width="720" height="60" rx="10" fill="#0D2818" stroke="rgba(0,230,118,0.08)" stroke-width="1"/>
+  <text x="80" y="452" class="label">Leyenda</text>
+  <circle cx="80" cy="472" r="5" fill="#FF5252"/>
+  <text x="92" y="476" class="detail">Temperatura</text>
+  <circle cx="170" cy="472" r="5" fill="#42A5F5"/>
+  <text x="182" y="476" class="detail">Humedad</text>
+  <circle cx="245" cy="472" r="5" fill="#FFD54F"/>
+  <text x="257" y="476" class="detail">Luz</text>
+  <circle cx="295" cy="472" r="5" fill="#8D6E63"/>
+  <text x="307" y="476" class="detail">Suelo</text>
+  <circle cx="355" cy="472" r="5" fill="#78909C"/>
+  <text x="367" y="476" class="detail">CO₂</text>
+  <circle cx="420" cy="472" r="5" fill="#FF1744">
+    <animate attributeName="opacity" values="1;0.3;1" dur="1s" repeatCount="indefinite"/>
+  </circle>
+  <text x="432" y="476" class="detail" fill="#FF1744">Alerta activa</text>
+
+  <!-- Coordinates -->
+  <text x="660" y="476" text-anchor="end" class="detail">19.4326° N, 99.1332° W · Zoom: 18</text>
+
+  <text x="400" y="498" text-anchor="middle" class="detail" fill="#2E7D32">BOCETO — Mapa del Invernadero · Vista satelital · Sensores con valores en tiempo real</text>
+</svg>

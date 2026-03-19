@@ -1,0 +1,132 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 550">
+  <style>
+    text { font-family: 'Segoe UI', system-ui, sans-serif; }
+    .title { font-size: 14px; font-weight: 700; fill: #E0E0E0; }
+    .label { font-size: 10px; fill: #E0E0E0; font-weight: 600; }
+    .detail { font-size: 8px; fill: #78909C; }
+  </style>
+  <rect width="1000" height="550" fill="#0A1A0F"/>
+  <text x="500" y="16" text-anchor="middle" class="detail" fill="#546E7A">WIREFRAME — PANEL DE ADMINISTRACIÓN</text>
+
+  <!-- Sidebar -->
+  <rect x="0" y="25" width="200" height="525" fill="#060E09" stroke="rgba(0,230,118,0.06)" stroke-width="1"/>
+  <text x="100" y="55" text-anchor="middle" style="font-size:16px;font-weight:700;" fill="#E0E0E0">Echo<tspan fill="#00E676">Smart</tspan></text>
+  <text x="100" y="70" text-anchor="middle" class="detail" fill="#FF8F00">ADMIN PANEL</text>
+
+  <!-- Nav items -->
+  <rect x="10" y="90" width="180" height="32" rx="8" fill="#1A2E1F"/>
+  <text x="30" y="110" class="detail" fill="#00E676">📊 Dashboard Admin</text>
+
+  <rect x="10" y="130" width="180" height="32" rx="8" fill="transparent"/>
+  <text x="30" y="150" class="detail">👥 Clientes</text>
+
+  <rect x="10" y="170" width="180" height="32" rx="8" fill="transparent"/>
+  <text x="30" y="190" class="detail">🏠 Invernaderos</text>
+
+  <rect x="10" y="210" width="180" height="32" rx="8" fill="transparent"/>
+  <text x="30" y="230" class="detail">🎫 Soporte Técnico</text>
+
+  <rect x="10" y="250" width="180" height="32" rx="8" fill="transparent"/>
+  <text x="30" y="270" class="detail">🔄 Actualizaciones OTA</text>
+
+  <rect x="10" y="290" width="180" height="32" rx="8" fill="transparent"/>
+  <text x="30" y="310" class="detail">🔧 Gateways</text>
+
+  <rect x="10" y="330" width="180" height="32" rx="8" fill="transparent"/>
+  <text x="30" y="350" class="detail">📈 Analíticas</text>
+
+  <rect x="10" y="490" width="180" height="32" rx="8" fill="transparent"/>
+  <text x="30" y="510" class="detail" fill="#FF5252">🚪 Cerrar sesión</text>
+
+  <!-- Main Content -->
+  <rect x="200" y="25" width="800" height="45" fill="#0D2818"/>
+  <text x="220" y="53" class="title">Dashboard Administrativo</text>
+  <text x="980" y="53" text-anchor="end" class="detail">👤 admin@echosmart.io</text>
+
+  <!-- Stats cards -->
+  <rect x="215" y="82" width="180" height="80" rx="10" fill="#0D2818" stroke="rgba(0,230,118,0.1)" stroke-width="1"/>
+  <text x="235" y="102" class="detail" fill="#78909C">Clientes Activos</text>
+  <text x="235" y="130" style="font-size:28px;font-weight:700;" fill="#00E676">47</text>
+  <text x="235" y="150" class="detail" fill="#00E676">↑ 12% este mes</text>
+
+  <rect x="410" y="82" width="180" height="80" rx="10" fill="#0D2818" stroke="rgba(0,188,212,0.1)" stroke-width="1"/>
+  <text x="430" y="102" class="detail" fill="#78909C">Invernaderos</text>
+  <text x="430" y="130" style="font-size:28px;font-weight:700;" fill="#00BCD4">128</text>
+  <text x="430" y="150" class="detail" fill="#00BCD4">86 activos</text>
+
+  <rect x="605" y="82" width="180" height="80" rx="10" fill="#0D2818" stroke="rgba(255,143,0,0.1)" stroke-width="1"/>
+  <text x="625" y="102" class="detail" fill="#78909C">Gateways Online</text>
+  <text x="625" y="130" style="font-size:28px;font-weight:700;" fill="#FF8F00">94</text>
+  <text x="625" y="150" class="detail" fill="#FF8F00">de 128</text>
+
+  <rect x="800" y="82" width="180" height="80" rx="10" fill="#0D2818" stroke="rgba(255,23,68,0.1)" stroke-width="1"/>
+  <text x="820" y="102" class="detail" fill="#78909C">Tickets Abiertos</text>
+  <text x="820" y="130" style="font-size:28px;font-weight:700;" fill="#FF1744">8</text>
+  <text x="820" y="150" class="detail" fill="#FF5252">3 urgentes</text>
+
+  <!-- Clients Table -->
+  <rect x="215" y="175" width="560" height="350" rx="10" fill="#0D2818" stroke="rgba(0,230,118,0.08)" stroke-width="1"/>
+  <text x="235" y="200" class="label">Clientes Recientes</text>
+  <rect x="600" y="185" width="80" height="24" rx="6" fill="#00E676"/>
+  <text x="640" y="201" text-anchor="middle" style="font-size:9px;font-weight:600;fill:#0A1A0F;">+ Nuevo</text>
+  <rect x="690" y="185" width="70" height="24" rx="6" fill="#1A2E1F"/>
+  <text x="725" y="201" text-anchor="middle" class="detail" fill="#E0E0E0">Filtrar</text>
+
+  <!-- Table header -->
+  <rect x="225" y="218" width="540" height="22" rx="0" fill="#1A2E1F"/>
+  <text x="240" y="233" class="detail" fill="#78909C">EMPRESA</text>
+  <text x="380" y="233" class="detail" fill="#78909C">CONTACTO</text>
+  <text x="500" y="233" class="detail" fill="#78909C">INVERNADEROS</text>
+  <text x="620" y="233" class="detail" fill="#78909C">PLAN</text>
+  <text x="720" y="233" class="detail" fill="#78909C">ESTADO</text>
+
+  <!-- Table rows -->
+  <text x="240" y="260" class="detail" fill="#E0E0E0">AgroTech MX</text>
+  <text x="380" y="260" class="detail">carlos@agrotech.mx</text>
+  <text x="530" y="260" text-anchor="middle" class="detail">12</text>
+  <rect x="610" y="250" width="50" height="16" rx="4" fill="#1A2E1F"/>
+  <text x="635" y="262" text-anchor="middle" class="detail" fill="#00E676">PRO</text>
+  <circle cx="725" cy="256" r="4" fill="#00E676"/>
+  <text x="738" y="260" class="detail" fill="#00E676">Activo</text>
+
+  <line x1="225" y1="270" x2="765" y2="270" stroke="#1A2E1F" stroke-width="0.5"/>
+
+  <text x="240" y="290" class="detail" fill="#E0E0E0">Viveros del Valle</text>
+  <text x="380" y="290" class="detail">maria@viveros.com</text>
+  <text x="530" y="290" text-anchor="middle" class="detail">5</text>
+  <rect x="610" y="280" width="50" height="16" rx="4" fill="#1A2E1F"/>
+  <text x="635" y="292" text-anchor="middle" class="detail" fill="#42A5F5">BASIC</text>
+  <circle cx="725" cy="286" r="4" fill="#00E676"/>
+  <text x="738" y="290" class="detail" fill="#00E676">Activo</text>
+
+  <line x1="225" y1="300" x2="765" y2="300" stroke="#1A2E1F" stroke-width="0.5"/>
+
+  <text x="240" y="320" class="detail" fill="#E0E0E0">Flores Premium</text>
+  <text x="380" y="320" class="detail">info@flores.mx</text>
+  <text x="530" y="320" text-anchor="middle" class="detail">3</text>
+  <rect x="610" y="310" width="50" height="16" rx="4" fill="#1A2E1F"/>
+  <text x="635" y="322" text-anchor="middle" class="detail" fill="#FF8F00">ENTER</text>
+  <circle cx="725" cy="316" r="4" fill="#FFD600"/>
+  <text x="738" y="320" class="detail" fill="#FFD600">Trial</text>
+
+  <!-- Support Tickets -->
+  <rect x="790" y="175" width="190" height="350" rx="10" fill="#0D2818" stroke="rgba(255,23,68,0.08)" stroke-width="1"/>
+  <text x="810" y="200" class="label" fill="#FF1744">🎫 Tickets Recientes</text>
+
+  <rect x="800" y="215" width="170" height="45" rx="6" fill="#1A0A0A" stroke="rgba(255,23,68,0.15)" stroke-width="1"/>
+  <text x="810" y="233" class="detail" fill="#E0E0E0">Gateway sin conexión</text>
+  <text x="810" y="247" class="detail" fill="#FF1744">🔴 Urgente · AgroTech</text>
+
+  <rect x="800" y="268" width="170" height="45" rx="6" fill="#1A0D00" stroke="rgba(255,145,0,0.15)" stroke-width="1"/>
+  <text x="810" y="286" class="detail" fill="#E0E0E0">Error en reportes</text>
+  <text x="810" y="300" class="detail" fill="#FF9100">🟠 Media · Viveros</text>
+
+  <rect x="800" y="321" width="170" height="45" rx="6" fill="#0D2818" stroke="rgba(68,138,255,0.15)" stroke-width="1"/>
+  <text x="810" y="339" class="detail" fill="#E0E0E0">Consulta facturación</text>
+  <text x="810" y="353" class="detail" fill="#448AFF">🔵 Baja · Flores</text>
+
+  <text x="885" y="390" text-anchor="middle" class="detail" fill="#00BCD4">Ver todos →</text>
+
+  <!-- Annotation -->
+  <text x="600" y="540" text-anchor="middle" class="detail" fill="#2E7D32">BOCETO — Panel de Administración · Gestión de clientes, invernaderos, soporte y OTA</text>
+</svg>
