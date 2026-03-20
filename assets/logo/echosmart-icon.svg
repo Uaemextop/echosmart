@@ -1,27 +1,21 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" fill="none">
   <defs>
     <linearGradient id="leafGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#00E676;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#2E7D32;stop-opacity:1" />
+      <stop offset="0%" stop-color="#00E676"/>
+      <stop offset="100%" stop-color="#2E7D32"/>
     </linearGradient>
-    <linearGradient id="signalGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" style="stop-color:#00BCD4;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#1565C0;stop-opacity:1" />
+    <linearGradient id="signalGrad" x1="0%" y1="50%" x2="100%" y2="50%">
+      <stop offset="0%" stop-color="#00BCD4"/>
+      <stop offset="100%" stop-color="#00838F"/>
     </linearGradient>
   </defs>
-  <!-- Background circle -->
-  <circle cx="60" cy="60" r="56" fill="#000000"/>
-  <circle cx="60" cy="60" r="55" fill="none" stroke="#00E676" stroke-width="1" opacity="0.3"/>
-  <!-- Signal arcs -->
-  <path d="M 60 22 Q 78 12 92 28" stroke="url(#signalGrad)" stroke-width="2" fill="none" opacity="0.4"/>
-  <path d="M 56 30 Q 78 18 95 38" stroke="url(#signalGrad)" stroke-width="2" fill="none" opacity="0.6"/>
-  <path d="M 52 38 Q 78 24 97 48" stroke="url(#signalGrad)" stroke-width="2" fill="none" opacity="0.8"/>
-  <!-- Smart leaf -->
-  <path d="M 25 95 Q 25 40 60 25 Q 78 18 88 38 Q 92 52 78 60 Q 65 66 55 80 Q 50 88 45 95 Z" fill="url(#leafGrad)" />
-  <!-- Circuit veins -->
-  <path d="M 45 95 Q 50 68 65 53" stroke="#000000" stroke-width="2" fill="none" opacity="0.5"/>
-  <path d="M 52 73 L 65 65" stroke="#000000" stroke-width="1.5" fill="none" opacity="0.4"/>
-  <!-- Circuit dots -->
-  <circle cx="65" cy="53" r="3" fill="#000000" opacity="0.6"/>
-  <circle cx="65" cy="65" r="2" fill="#000000" opacity="0.5"/>
+  <!-- Leaf shape -->
+  <path d="M30 95Q18 55 45 28Q58 15 78 15Q88 15 95 20Q95 35 88 52Q72 85 35 95Q32 95 30 95z" fill="url(#leafGrad)" opacity="0.9"/>
+  <!-- Leaf vein -->
+  <path d="M88 22Q60 50 32 92" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity="0.3" fill="none"/>
+  <path d="M78 30Q58 48 42 80" stroke="#fff" stroke-width="1.2" stroke-linecap="round" opacity="0.15" fill="none"/>
+  <!-- Signal arcs emanating from leaf tip -->
+  <path d="M72 28a20 20 0 0 1 14 14" stroke="url(#signalGrad)" stroke-width="3" stroke-linecap="round" fill="none" opacity="0.9"/>
+  <path d="M78 18a30 30 0 0 1 22 22" stroke="url(#signalGrad)" stroke-width="2.5" stroke-linecap="round" fill="none" opacity="0.6"/>
+  <path d="M84 8a40 40 0 0 1 30 30" stroke="url(#signalGrad)" stroke-width="2" stroke-linecap="round" fill="none" opacity="0.35"/>
 </svg>

@@ -1,6 +1,17 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
-  <!-- Humidity icon -->
-  <circle cx="24" cy="24" r="22" fill="#111111" stroke="#42A5F5" stroke-width="1" opacity="0.3"/>
-  <path d="M 24 8 Q 36 22 36 30 Q 36 38 24 40 Q 12 38 12 30 Q 12 22 24 8 Z" fill="none" stroke="#42A5F5" stroke-width="2"/>
-  <path d="M 24 14 Q 32 24 32 30 Q 32 36 24 37" fill="#42A5F5" opacity="0.3"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none">
+  <defs>
+    <linearGradient id="dropGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#90CAF9"/>
+      <stop offset="100%" stop-color="#42A5F5"/>
+    </linearGradient>
+  </defs>
+  <!-- Main water droplet -->
+  <path d="M24 4C24 4 10 20 10 30a14 14 0 0 0 28 0C38 20 24 4 24 4z" stroke="#42A5F5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Inner highlight -->
+  <path d="M24 10c0 0-9 11-9 18a9 9 0 0 0 3 6.7" stroke="url(#dropGrad)" stroke-width="1.5" stroke-linecap="round" fill="none" opacity="0.5"/>
+  <!-- Ripple arcs at bottom -->
+  <path d="M17 34a8 8 0 0 0 14 0" stroke="#42A5F5" stroke-width="1.2" stroke-linecap="round" fill="none" opacity="0.4"/>
+  <path d="M19 37a5.5 5.5 0 0 0 10 0" stroke="#42A5F5" stroke-width="1" stroke-linecap="round" fill="none" opacity="0.3"/>
+  <!-- Inner fill shimmer -->
+  <path d="M24 12c0 0-8 10-8 17a8 8 0 0 0 16 0c0-7-8-17-8-17z" fill="url(#dropGrad)" opacity="0.2"/>
 </svg>

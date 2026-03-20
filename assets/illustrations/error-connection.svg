@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" fill="none">
+  <!-- Left broken link piece -->
+  <g transform="translate(100, 100)">
+    <path d="M0 30a30 30 0 0 1 30-30h20l-8 12h-12a18 18 0 0 0 0 36h12l8 12H30a30 30 0 0 1-30-30z" stroke="#FF5252" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.7"/>
+  </g>
+  <!-- Right broken link piece -->
+  <g transform="translate(220, 100)">
+    <path d="M60 30a30 30 0 0 0-30-30H10l8 12h12a18 18 0 0 1 0 36H18l-8 12h20a30 30 0 0 0 30-30z" stroke="#FF5252" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.7"/>
+  </g>
+  <!-- Broken connection sparks -->
+  <line x1="185" y1="122" x2="195" y2="118" stroke="#FF5252" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+  <line x1="192" y1="130" x2="200" y2="128" stroke="#FF5252" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/>
+  <line x1="188" y1="138" x2="196" y2="142" stroke="#FF5252" stroke-width="2" stroke-linecap="round" opacity="0.5"/>
+  <!-- Lightning bolt / disconnect symbol -->
+  <path d="M195 110l-6 15h10l-6 15" stroke="#FF5252" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.5"/>
+  <!-- X marks -->
+  <g opacity="0.3">
+    <line x1="190" y1="80" x2="196" y2="86" stroke="#FF5252" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="196" y1="80" x2="190" y2="86" stroke="#FF5252" stroke-width="1.5" stroke-linecap="round"/>
+  </g>
+  <g opacity="0.2">
+    <line x1="210" y1="160" x2="216" y2="166" stroke="#FF5252" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="216" y1="160" x2="210" y2="166" stroke="#FF5252" stroke-width="1.5" stroke-linecap="round"/>
+  </g>
+  <!-- Status text placeholder -->
+  <rect x="150" y="200" width="100" height="5" rx="2.5" fill="#333333" opacity="0.4"/>
+  <rect x="165" y="215" width="70" height="3" rx="1.5" fill="#222222" opacity="0.3"/>
+</svg>
