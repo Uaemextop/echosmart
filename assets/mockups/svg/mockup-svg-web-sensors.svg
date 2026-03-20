@@ -1,0 +1,181 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" fill="none">
+  <style>
+    text { font-family: -apple-system, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif; }
+    .title { font-size: 24px; fill: #E0E0E0; font-weight: 700; }
+    .subtitle { font-size: 14px; fill: #78909C; font-weight: 400; }
+    .value { font-size: 36px; fill: #E0E0E0; font-weight: 700; }
+    .label { font-size: 12px; fill: #78909C; font-weight: 500; }
+    .small { font-size: 11px; fill: #546E7A; }
+    .accent { fill: #00E676; }
+    .nav-item { font-size: 13px; fill: #78909C; }
+    .nav-active { font-size: 13px; fill: #00E676; }
+  </style>
+  <rect width="1920" height="1080" fill="#000000"/>
+
+  <!-- Sidebar -->
+  <rect x="0" y="0" width="240" height="1080" fill="#0A0A0A"/>
+  <text x="30" y="45" font-size="20" fill="#00E676" font-weight="700" font-family="-apple-system, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif">🌿 EchoSmart</text>
+  <g transform="translate(0,80)">
+    <circle cx="30" cy="22" r="8" stroke="#78909C" stroke-width="1.5" fill="none"/>
+    <text x="50" y="27" class="nav-item">Dashboard</text>
+  </g>
+  <rect x="0" y="124" width="240" height="44" fill="#111111"/>
+  <rect x="0" y="124" width="3" height="44" fill="#00E676"/>
+  <circle cx="30" cy="146" r="8" stroke="#00E676" stroke-width="1.5" fill="none"/>
+  <text x="50" y="151" class="nav-active">Sensors</text>
+  <g transform="translate(0,178)">
+    <circle cx="30" cy="22" r="8" stroke="#78909C" stroke-width="1.5" fill="none"/>
+    <text x="50" y="27" class="nav-item">Alerts</text>
+  </g>
+  <g transform="translate(0,222)">
+    <circle cx="30" cy="22" r="8" stroke="#78909C" stroke-width="1.5" fill="none"/>
+    <text x="50" y="27" class="nav-item">Map</text>
+  </g>
+  <g transform="translate(0,266)">
+    <circle cx="30" cy="22" r="8" stroke="#78909C" stroke-width="1.5" fill="none"/>
+    <text x="50" y="27" class="nav-item">Reports</text>
+  </g>
+  <g transform="translate(0,310)">
+    <circle cx="30" cy="22" r="8" stroke="#78909C" stroke-width="1.5" fill="none"/>
+    <text x="50" y="27" class="nav-item">Settings</text>
+  </g>
+  <g transform="translate(0,354)">
+    <circle cx="30" cy="22" r="8" stroke="#78909C" stroke-width="1.5" fill="none"/>
+    <text x="50" y="27" class="nav-item">Users</text>
+  </g>
+
+  <!-- Header -->
+  <rect x="240" y="0" width="1680" height="64" fill="#0A0A0A"/>
+  <text x="280" y="40" class="title">Sensors</text>
+
+  <!-- Filter Toolbar -->
+  <g transform="translate(280, 84)">
+    <rect x="0" y="0" width="300" height="36" rx="8" fill="#111111" stroke="#1E1E1E" stroke-width="1"/>
+    <text x="16" y="23" class="small">Search sensors...</text>
+    <rect x="320" y="0" width="140" height="36" rx="8" fill="#111111" stroke="#1E1E1E" stroke-width="1"/>
+    <text x="336" y="23" class="label">Type ▾</text>
+    <rect x="480" y="0" width="140" height="36" rx="8" fill="#111111" stroke="#1E1E1E" stroke-width="1"/>
+    <text x="496" y="23" class="label">Status ▾</text>
+    <rect x="1420" y="0" width="140" height="36" rx="8" fill="#00E676"/>
+    <text x="1450" y="23" font-size="13" fill="#000000" font-weight="600" font-family="-apple-system, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif">+ Add Sensor</text>
+  </g>
+
+  <!-- Sensor Grid 3x3 -->
+  <g transform="translate(280, 145)">
+    <!-- Row 1 -->
+    <g transform="translate(0, 0)">
+      <rect x="0" y="0" width="510" height="180" rx="12" fill="#111111" stroke="#1E1E1E" stroke-width="1"/>
+      <circle cx="30" cy="30" r="10" fill="#FF5252" opacity="0.2"/>
+      <circle cx="30" cy="30" r="5" fill="#FF5252"/>
+      <text x="50" y="35" font-size="15" fill="#E0E0E0" font-weight="600" font-family="-apple-system, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif">Temperature A1</text>
+      <text x="24" y="90" class="value">24.5°C</text>
+      <circle cx="24" cy="120" r="4" fill="#00E676"/>
+      <text x="36" y="124" class="small" fill="#00E676">Online</text>
+      <text x="24" y="150" class="small">Last: 5s ago</text>
+      <polyline points="350,80 370,70 390,75 410,60 430,65 450,55 470,60 490,50" stroke="#FF5252" stroke-width="1.5" fill="none"/>
+    </g>
+    <g transform="translate(530, 0)">
+      <rect x="0" y="0" width="510" height="180" rx="12" fill="#111111" stroke="#1E1E1E" stroke-width="1"/>
+      <circle cx="30" cy="30" r="10" fill="#42A5F5" opacity="0.2"/>
+      <circle cx="30" cy="30" r="5" fill="#42A5F5"/>
+      <text x="50" y="35" font-size="15" fill="#E0E0E0" font-weight="600" font-family="-apple-system, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif">Humidity B1</text>
+      <text x="24" y="90" class="value">62%</text>
+      <circle cx="24" cy="120" r="4" fill="#00E676"/>
+      <text x="36" y="124" class="small" fill="#00E676">Online</text>
+      <text x="24" y="150" class="small">Last: 3s ago</text>
+      <polyline points="350,70 370,75 390,65 410,70 430,60 450,65 470,55 490,60" stroke="#42A5F5" stroke-width="1.5" fill="none"/>
+    </g>
+    <g transform="translate(1060, 0)">
+      <rect x="0" y="0" width="510" height="180" rx="12" fill="#111111" stroke="#1E1E1E" stroke-width="1"/>
+      <circle cx="30" cy="30" r="10" fill="#FFD54F" opacity="0.2"/>
+      <circle cx="30" cy="30" r="5" fill="#FFD54F"/>
+      <text x="50" y="35" font-size="15" fill="#E0E0E0" font-weight="600" font-family="-apple-system, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif">Light A2</text>
+      <text x="24" y="90" class="value">850 lux</text>
+      <circle cx="24" cy="120" r="4" fill="#00E676"/>
+      <text x="36" y="124" class="small" fill="#00E676">Online</text>
+      <text x="24" y="150" class="small">Last: 8s ago</text>
+      <polyline points="350,60 370,50 390,55 410,45 430,50 450,40 470,45 490,35" stroke="#FFD54F" stroke-width="1.5" fill="none"/>
+    </g>
+
+    <!-- Row 2 -->
+    <g transform="translate(0, 200)">
+      <rect x="0" y="0" width="510" height="180" rx="12" fill="#111111" stroke="#1E1E1E" stroke-width="1"/>
+      <circle cx="30" cy="30" r="10" fill="#78909C" opacity="0.2"/>
+      <circle cx="30" cy="30" r="5" fill="#78909C"/>
+      <text x="50" y="35" font-size="15" fill="#E0E0E0" font-weight="600" font-family="-apple-system, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif">CO₂ Sensor C1</text>
+      <text x="24" y="90" class="value">412 ppm</text>
+      <circle cx="24" cy="120" r="4" fill="#00E676"/>
+      <text x="36" y="124" class="small" fill="#00E676">Online</text>
+      <text x="24" y="150" class="small">Last: 12s ago</text>
+      <polyline points="350,65 370,70 390,60 410,65 430,70 450,60 470,55 490,65" stroke="#78909C" stroke-width="1.5" fill="none"/>
+    </g>
+    <g transform="translate(530, 200)">
+      <rect x="0" y="0" width="510" height="180" rx="12" fill="#111111" stroke="#1E1E1E" stroke-width="1"/>
+      <circle cx="30" cy="30" r="10" fill="#8D6E63" opacity="0.2"/>
+      <circle cx="30" cy="30" r="5" fill="#8D6E63"/>
+      <text x="50" y="35" font-size="15" fill="#E0E0E0" font-weight="600" font-family="-apple-system, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif">Soil Moisture B2</text>
+      <text x="24" y="90" class="value">45%</text>
+      <circle cx="24" cy="120" r="4" fill="#00E676"/>
+      <text x="36" y="124" class="small" fill="#00E676">Online</text>
+      <text x="24" y="150" class="small">Last: 6s ago</text>
+      <polyline points="350,75 370,70 390,80 410,75 430,70 450,80 470,75 490,70" stroke="#8D6E63" stroke-width="1.5" fill="none"/>
+    </g>
+    <g transform="translate(1060, 200)">
+      <rect x="0" y="0" width="510" height="180" rx="12" fill="#111111" stroke="#1E1E1E" stroke-width="1"/>
+      <circle cx="30" cy="30" r="10" fill="#FF5252" opacity="0.2"/>
+      <circle cx="30" cy="30" r="5" fill="#FF5252"/>
+      <text x="50" y="35" font-size="15" fill="#E0E0E0" font-weight="600" font-family="-apple-system, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif">Temperature B3</text>
+      <text x="24" y="90" class="value">22.1°C</text>
+      <circle cx="24" cy="120" r="4" fill="#FF5252"/>
+      <text x="36" y="124" class="small" fill="#FF5252">Offline</text>
+      <text x="24" y="150" class="small">Last: 5m ago</text>
+      <polyline points="350,70 370,65 390,70 410,75 430,70 450,75 470,80 490,80" stroke="#FF5252" stroke-width="1.5" fill="none" stroke-dasharray="3,3"/>
+    </g>
+
+    <!-- Row 3 -->
+    <g transform="translate(0, 400)">
+      <rect x="0" y="0" width="510" height="180" rx="12" fill="#111111" stroke="#1E1E1E" stroke-width="1"/>
+      <circle cx="30" cy="30" r="10" fill="#42A5F5" opacity="0.2"/>
+      <circle cx="30" cy="30" r="5" fill="#42A5F5"/>
+      <text x="50" y="35" font-size="15" fill="#E0E0E0" font-weight="600" font-family="-apple-system, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif">Humidity C2</text>
+      <text x="24" y="90" class="value">58%</text>
+      <circle cx="24" cy="120" r="4" fill="#00E676"/>
+      <text x="36" y="124" class="small" fill="#00E676">Online</text>
+      <text x="24" y="150" class="small">Last: 2s ago</text>
+      <polyline points="350,65 370,60 390,70 410,65 430,55 450,60 470,50 490,55" stroke="#42A5F5" stroke-width="1.5" fill="none"/>
+    </g>
+    <g transform="translate(530, 400)">
+      <rect x="0" y="0" width="510" height="180" rx="12" fill="#111111" stroke="#1E1E1E" stroke-width="1"/>
+      <circle cx="30" cy="30" r="10" fill="#FFD54F" opacity="0.2"/>
+      <circle cx="30" cy="30" r="5" fill="#FFD54F"/>
+      <text x="50" y="35" font-size="15" fill="#E0E0E0" font-weight="600" font-family="-apple-system, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif">Light C3</text>
+      <text x="24" y="90" class="value">320 lux</text>
+      <circle cx="24" cy="120" r="4" fill="#00E676"/>
+      <text x="36" y="124" class="small" fill="#00E676">Online</text>
+      <text x="24" y="150" class="small">Last: 4s ago</text>
+      <polyline points="350,80 370,75 390,85 410,70 430,75 450,65 470,70 490,60" stroke="#FFD54F" stroke-width="1.5" fill="none"/>
+    </g>
+    <g transform="translate(1060, 400)">
+      <rect x="0" y="0" width="510" height="180" rx="12" fill="#111111" stroke="#1E1E1E" stroke-width="1"/>
+      <circle cx="30" cy="30" r="10" fill="#8D6E63" opacity="0.2"/>
+      <circle cx="30" cy="30" r="5" fill="#8D6E63"/>
+      <text x="50" y="35" font-size="15" fill="#E0E0E0" font-weight="600" font-family="-apple-system, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif">Soil Moisture A3</text>
+      <text x="24" y="90" class="value">52%</text>
+      <circle cx="24" cy="120" r="4" fill="#00E676"/>
+      <text x="36" y="124" class="small" fill="#00E676">Online</text>
+      <text x="24" y="150" class="small">Last: 10s ago</text>
+      <polyline points="350,70 370,65 390,75 410,70 430,60 450,65 470,55 490,60" stroke="#8D6E63" stroke-width="1.5" fill="none"/>
+    </g>
+  </g>
+
+  <!-- Pagination -->
+  <g transform="translate(880, 760)">
+    <text x="0" y="0" font-size="14" fill="#78909C" font-family="-apple-system, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif">←</text>
+    <rect x="30" y="-16" width="32" height="24" rx="6" fill="#00E676"/>
+    <text x="40" y="2" font-size="13" fill="#000000" font-weight="600" font-family="-apple-system, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif">1</text>
+    <text x="80" y="2" font-size="13" fill="#78909C" font-family="-apple-system, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif">2</text>
+    <text x="110" y="2" font-size="13" fill="#78909C" font-family="-apple-system, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif">3</text>
+    <text x="140" y="2" font-size="13" fill="#78909C" font-family="-apple-system, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif">4</text>
+    <text x="170" y="0" font-size="14" fill="#78909C" font-family="-apple-system, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif">→</text>
+  </g>
+</svg>
