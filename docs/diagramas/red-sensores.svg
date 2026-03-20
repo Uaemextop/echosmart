@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500">
+  <style>
+    text { font-family: 'Segoe UI', system-ui, sans-serif; }
+    .title { font-size: 16px; font-weight: 700; fill: #E0E0E0; }
+    .label { font-size: 11px; fill: #E0E0E0; font-weight: 600; }
+    .detail { font-size: 9px; fill: #78909C; }
+    .bus { font-size: 10px; font-weight: 600; }
+  </style>
+  <rect width="800" height="500" fill="#000000"/>
+  <text x="400" y="28" text-anchor="middle" class="title">RED DE SENSORES — Topología y Protocolos</text>
+
+  <!-- Raspberry Pi Hub -->
+  <rect x="300" y="190" width="200" height="120" rx="16" fill="#1A1A0A" stroke="rgba(255,143,0,0.4)" stroke-width="2"/>
+  <text x="400" y="220" text-anchor="middle" class="label" fill="#FF8F00">🔧 Raspberry Pi 4B</text>
+  <text x="400" y="240" text-anchor="middle" class="detail">GPIO · I2C · 1-Wire · UART</text>
+  <text x="400" y="258" text-anchor="middle" class="detail">SDA=GPIO2 · SCL=GPIO3</text>
+  <text x="400" y="276" text-anchor="middle" class="detail">1-Wire=GPIO4 · UART=GPIO14/15</text>
+  <text x="400" y="294" text-anchor="middle" class="detail">ADC via ADS1115 (I2C 0x48)</text>
+
+  <!-- DS18B20 -->
+  <rect x="30" y="50" width="150" height="80" rx="10" fill="#111111" stroke="rgba(255,82,82,0.4)" stroke-width="1"/>
+  <text x="105" y="75" text-anchor="middle" class="label" fill="#FF5252">🌡️ DS18B20</text>
+  <text x="105" y="93" text-anchor="middle" class="detail">Temperatura</text>
+  <text x="105" y="108" text-anchor="middle" class="detail">-55°C a +125°C (±0.5°C)</text>
+  <text x="105" y="123" text-anchor="middle" class="bus" fill="#FF5252">1-Wire · GPIO4</text>
+  <line x1="180" y1="100" x2="300" y2="210" stroke="#FF5252" stroke-width="1.5"/>
+
+  <!-- DHT22 -->
+  <rect x="620" y="50" width="150" height="80" rx="10" fill="#111111" stroke="rgba(66,165,245,0.4)" stroke-width="1"/>
+  <text x="695" y="75" text-anchor="middle" class="label" fill="#42A5F5">💧 DHT22</text>
+  <text x="695" y="93" text-anchor="middle" class="detail">Temp + Humedad</text>
+  <text x="695" y="108" text-anchor="middle" class="detail">0-100% HR · -40°C a +80°C</text>
+  <text x="695" y="123" text-anchor="middle" class="bus" fill="#42A5F5">GPIO · Pin 4</text>
+  <line x1="620" y1="100" x2="500" y2="210" stroke="#42A5F5" stroke-width="1.5"/>
+
+  <!-- BH1750 -->
+  <rect x="30" y="370" width="150" height="80" rx="10" fill="#111111" stroke="rgba(255,213,79,0.4)" stroke-width="1"/>
+  <text x="105" y="395" text-anchor="middle" class="label" fill="#FFD54F">☀️ BH1750</text>
+  <text x="105" y="413" text-anchor="middle" class="detail">Luminosidad</text>
+  <text x="105" y="428" text-anchor="middle" class="detail">0 – 65,535 lux</text>
+  <text x="105" y="443" text-anchor="middle" class="bus" fill="#FFD54F">I2C · 0x23</text>
+  <line x1="180" y1="400" x2="300" y2="290" stroke="#FFD54F" stroke-width="1.5"/>
+
+  <!-- Soil Moisture -->
+  <rect x="325" y="370" width="150" height="80" rx="10" fill="#111111" stroke="rgba(141,110,99,0.4)" stroke-width="1"/>
+  <text x="400" y="395" text-anchor="middle" class="label" fill="#8D6E63">🌱 Soil Moisture</text>
+  <text x="400" y="413" text-anchor="middle" class="detail">Humedad de suelo</text>
+  <text x="400" y="428" text-anchor="middle" class="detail">Analógico 0–1023</text>
+  <text x="400" y="443" text-anchor="middle" class="bus" fill="#8D6E63">ADC · ADS1115 Ch0</text>
+  <line x1="400" y1="370" x2="400" y2="310" stroke="#8D6E63" stroke-width="1.5"/>
+
+  <!-- MHZ-19C -->
+  <rect x="620" y="370" width="150" height="80" rx="10" fill="#111111" stroke="rgba(120,144,156,0.4)" stroke-width="1"/>
+  <text x="695" y="395" text-anchor="middle" class="label" fill="#78909C">💨 MHZ-19C</text>
+  <text x="695" y="413" text-anchor="middle" class="detail">CO₂</text>
+  <text x="695" y="428" text-anchor="middle" class="detail">0 – 5,000 ppm</text>
+  <text x="695" y="443" text-anchor="middle" class="bus" fill="#78909C">UART · /dev/ttyS0</text>
+  <line x1="620" y1="400" x2="500" y2="290" stroke="#78909C" stroke-width="1.5"/>
+
+  <!-- ADS1115 ADC -->
+  <rect x="225" y="150" width="65" height="30" rx="6" fill="#1A1A1A" stroke="rgba(141,110,99,0.3)" stroke-width="1"/>
+  <text x="257" y="169" text-anchor="middle" class="detail" fill="#8D6E63">ADS1115</text>
+  <text x="257" y="140" text-anchor="middle" class="detail">ADC I2C 0x48</text>
+  <line x1="257" y1="180" x2="300" y2="250" stroke="#8D6E63" stroke-width="1" stroke-dasharray="3,3"/>
+
+  <!-- Legend -->
+  <rect x="30" y="470" width="740" height="22" rx="4" fill="#1A1A1A"/>
+  <text x="110" y="485" text-anchor="middle" class="detail" fill="#FF5252">━ 1-Wire</text>
+  <text x="230" y="485" text-anchor="middle" class="detail" fill="#42A5F5">━ GPIO</text>
+  <text x="350" y="485" text-anchor="middle" class="detail" fill="#FFD54F">━ I2C (SDA/SCL)</text>
+  <text x="490" y="485" text-anchor="middle" class="detail" fill="#8D6E63">━ ADC (ADS1115)</text>
+  <text x="640" y="485" text-anchor="middle" class="detail" fill="#78909C">━ UART (Serial)</text>
+</svg>

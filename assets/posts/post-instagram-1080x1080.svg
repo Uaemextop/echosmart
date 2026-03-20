@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1080">
+  <defs>
+    <linearGradient id="leafGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00E676"/>
+      <stop offset="100%" style="stop-color:#2E7D32"/>
+    </linearGradient>
+  </defs>
+  <rect width="1080" height="1080" fill="#000000"/>
+  <!-- Leaf icon large -->
+  <g transform="translate(340, 180) scale(3.5)">
+    <path d="M 25 95 Q 25 40 60 25 Q 78 18 88 38 Q 92 52 78 60 Q 65 66 55 80 Q 50 88 45 95 Z" fill="url(#leafGrad)" />
+    <path d="M 45 95 Q 50 68 65 53" stroke="#000000" stroke-width="2" fill="none" opacity="0.5"/>
+    <circle cx="65" cy="53" r="3" fill="#000000" opacity="0.5"/>
+  </g>
+  <!-- Text -->
+  <text x="540" y="720" font-family="'Segoe UI', sans-serif" font-size="72" font-weight="700" fill="#E0E0E0" text-anchor="middle">
+    Echo<tspan fill="#00E676">Smart</tspan>
+  </text>
+  <text x="540" y="775" font-family="'Segoe UI', sans-serif" font-size="22" fill="#78909C" text-anchor="middle" letter-spacing="4">
+    SMART GREENHOUSE IoT
+  </text>
+  <!-- Feature cards -->
+  <g transform="translate(100, 840)">
+    <rect x="0" y="0" width="250" height="60" rx="12" fill="#1A1A1A" opacity="0.8"/>
+    <text x="125" y="25" font-family="sans-serif" font-size="14" fill="#00E676" text-anchor="middle" font-weight="600">🌡️ Temperatura</text>
+    <text x="125" y="45" font-family="sans-serif" font-size="12" fill="#78909C" text-anchor="middle">Monitoreo 24/7</text>
+  </g>
+  <g transform="translate(400, 840)">
+    <rect x="0" y="0" width="250" height="60" rx="12" fill="#1A1A1A" opacity="0.8"/>
+    <text x="125" y="25" font-family="sans-serif" font-size="14" fill="#42A5F5" text-anchor="middle" font-weight="600">💧 Humedad</text>
+    <text x="125" y="45" font-family="sans-serif" font-size="12" fill="#78909C" text-anchor="middle">Control preciso</text>
+  </g>
+  <g transform="translate(700, 840)">
+    <rect x="0" y="0" width="250" height="60" rx="12" fill="#1A1A1A" opacity="0.8"/>
+    <text x="125" y="25" font-family="sans-serif" font-size="14" fill="#FFD54F" text-anchor="middle" font-weight="600">☀️ Luminosidad</text>
+    <text x="125" y="45" font-family="sans-serif" font-size="12" fill="#78909C" text-anchor="middle">Optimización luz</text>
+  </g>
+  <!-- Bottom bar -->
+  <rect x="0" y="1040" width="1080" height="40" fill="#00E676" opacity="0.1"/>
+  <text x="540" y="1065" font-family="sans-serif" font-size="14" fill="#00E676" text-anchor="middle" letter-spacing="2">www.echosmart.io</text>
+</svg>

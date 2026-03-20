@@ -1,0 +1,70 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:14-alpine
+    environment:
+      POSTGRES_DB: echosmart
+      POSTGRES_USER: echosmart
+      POSTGRES_PASSWORD: echosmart_dev
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  influxdb:
+    image: influxdb:2.7-alpine
+    environment:
+      DOCKER_INFLUXDB_INIT_MODE: setup
+      DOCKER_INFLUXDB_INIT_USERNAME: echosmart
+      DOCKER_INFLUXDB_INIT_PASSWORD: echosmart_dev
+      DOCKER_INFLUXDB_INIT_ORG: echosmart
+      DOCKER_INFLUXDB_INIT_BUCKET: sensor_readings
+    ports:
+      - "8086:8086"
+    volumes:
+      - influxdb_data:/var/lib/influxdb2
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  mosquitto:
+    image: eclipse-mosquitto:2
+    ports:
+      - "1883:1883"
+      - "9001:9001"
+    volumes:
+      - ./infra/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql://echosmart:echosmart_dev@postgres:5432/echosmart
+      INFLUXDB_URL: http://influxdb:8086
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET_KEY: dev-secret-key-change-in-production
+    depends_on:
+      - postgres
+      - influxdb
+      - redis
+    volumes:
+      - ./backend:/app
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
+  influxdb_data:

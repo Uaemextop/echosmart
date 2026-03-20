@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" fill="none">
+  <!-- Large 404 text -->
+  <text x="200" y="140" font-family="'Segoe UI', 'SF Pro Display', system-ui, sans-serif" font-size="90" font-weight="800" fill="#222222" text-anchor="middle" letter-spacing="-2">404</text>
+  <!-- Lost sensor icon overlaid on the "0" -->
+  <g transform="translate(175, 75)" opacity="0.4">
+    <!-- Sensor chip outline -->
+    <rect x="0" y="0" width="50" height="50" rx="8" stroke="#78909C" stroke-width="1.5" stroke-dasharray="4 3"/>
+    <circle cx="25" cy="25" r="8" stroke="#78909C" stroke-width="1.2"/>
+    <!-- Question mark inside -->
+    <text x="25" y="29" font-family="'Segoe UI', sans-serif" font-size="14" fill="#78909C" text-anchor="middle" font-weight="700">?</text>
+  </g>
+  <!-- Floating signal waves (lost) -->
+  <path d="M140 90a6 6 0 0 0-4 4" stroke="#78909C" stroke-width="1" stroke-linecap="round" opacity="0.2"/>
+  <path d="M134 85a12 12 0 0 0-8 8" stroke="#78909C" stroke-width="1" stroke-linecap="round" opacity="0.15"/>
+  <path d="M268 90a6 6 0 0 1 4 4" stroke="#78909C" stroke-width="1" stroke-linecap="round" opacity="0.2"/>
+  <path d="M274 85a12 12 0 0 1 8 8" stroke="#78909C" stroke-width="1" stroke-linecap="round" opacity="0.15"/>
+  <!-- Subtext placeholder -->
+  <rect x="140" y="175" width="120" height="5" rx="2.5" fill="#333333" opacity="0.35"/>
+  <rect x="158" y="190" width="84" height="3" rx="1.5" fill="#222222" opacity="0.25"/>
+  <!-- Decorative elements -->
+  <circle cx="100" cy="200" r="3" fill="#78909C" opacity="0.1"/>
+  <circle cx="310" cy="180" r="2" fill="#78909C" opacity="0.08"/>
+  <circle cx="90" cy="100" r="2" fill="#78909C" opacity="0.06"/>
+  <circle cx="320" cy="110" r="2.5" fill="#78909C" opacity="0.06"/>
+</svg>

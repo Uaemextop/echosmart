@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none">
+  <defs>
+    <linearGradient id="leafFill" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#00E676"/>
+      <stop offset="100%" stop-color="#2E7D32"/>
+    </linearGradient>
+  </defs>
+  <!-- Leaf shape -->
+  <path d="M10 38Q6 20 24 6q18 8 16 30Q30 42 20 40Q14 40 10 38z" stroke="url(#leafFill)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="#00E676" fill-opacity="0.1"/>
+  <!-- Vein - center -->
+  <path d="M24 8c-2 10-6 20-12 28" stroke="#00E676" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/>
+  <!-- Side veins -->
+  <path d="M18 24q4-2 8-6" stroke="#00E676" stroke-width="1" stroke-linecap="round" opacity="0.35"/>
+  <path d="M15 30q5-2 9-6" stroke="#00E676" stroke-width="1" stroke-linecap="round" opacity="0.3"/>
+  <path d="M20 18q4-1 7-4" stroke="#00E676" stroke-width="1" stroke-linecap="round" opacity="0.3"/>
+</svg>

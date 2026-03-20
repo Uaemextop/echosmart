@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none">
+  <!-- Folded map -->
+  <path d="M6 10l12 4v24l-12-4V10z" stroke="#00E676" stroke-width="2" stroke-linejoin="round" fill="#00E676" fill-opacity="0.06"/>
+  <path d="M18 14l12-4v24l-12 4V14z" stroke="#00E676" stroke-width="2" stroke-linejoin="round" fill="#00E676" fill-opacity="0.1"/>
+  <path d="M30 10l12 4v24l-12-4V10z" stroke="#00E676" stroke-width="2" stroke-linejoin="round" fill="#00E676" fill-opacity="0.06"/>
+  <!-- Pin -->
+  <path d="M24 10a5 5 0 0 1 5 5c0 4-5 8-5 8s-5-4-5-8a5 5 0 0 1 5-5z" fill="#00E676" opacity="0.8" stroke="#00E676" stroke-width="1"/>
+  <circle cx="24" cy="15" r="2" fill="#fff" opacity="0.9"/>
+</svg>

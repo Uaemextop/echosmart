@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none">
+  <!-- Pump body -->
+  <rect x="14" y="18" width="16" height="18" rx="2" stroke="#42A5F5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Motor top -->
+  <rect x="18" y="10" width="8" height="8" rx="2" stroke="#42A5F5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Inlet pipe left -->
+  <path d="M4 28h10" stroke="#42A5F5" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M4 24v8" stroke="#42A5F5" stroke-width="2" stroke-linecap="round"/>
+  <!-- Outlet pipe right -->
+  <path d="M30 28h14" stroke="#42A5F5" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M44 24v8" stroke="#42A5F5" stroke-width="2" stroke-linecap="round"/>
+  <!-- Water drops from outlet -->
+  <path d="M40 34c0 0-.8-1.5-.8-2.2a.8.8 0 0 1 1.6 0c0 .7-.8 2.2-.8 2.2z" fill="#42A5F5" opacity="0.5"/>
+  <path d="M36 37c0 0-.6-1.2-.6-1.7a.6.6 0 0 1 1.2 0c0 .5-.6 1.7-.6 1.7z" fill="#42A5F5" opacity="0.4"/>
+  <!-- Pressure gauge -->
+  <circle cx="22" cy="26" r="3" stroke="#42A5F5" stroke-width="1.5" opacity="0.6"/>
+  <line x1="22" y1="26" x2="22" y2="24" stroke="#42A5F5" stroke-width="1.2" stroke-linecap="round" opacity="0.6"/>
+</svg>

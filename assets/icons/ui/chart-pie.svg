@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none">
+  <!-- Pie circle -->
+  <circle cx="24" cy="24" r="16" stroke="#FFD54F" stroke-width="2" opacity="0.3"/>
+  <!-- Slice 1 (~40%) -->
+  <path d="M24 24L24 8A16 16 0 0 1 39.6 28.9z" fill="#FFD54F" fill-opacity="0.35" stroke="#FFD54F" stroke-width="1.5" stroke-linejoin="round"/>
+  <!-- Slice 2 (~35%) -->
+  <path d="M24 24L39.6 28.9A16 16 0 0 1 12.1 35.6z" fill="#FFD54F" fill-opacity="0.2" stroke="#FFD54F" stroke-width="1.5" stroke-linejoin="round"/>
+  <!-- Slice 3 (~25%) -->
+  <path d="M24 24L12.1 35.6A16 16 0 0 1 24 8z" fill="#FFD54F" fill-opacity="0.5" stroke="#FFD54F" stroke-width="1.5" stroke-linejoin="round"/>
+</svg>

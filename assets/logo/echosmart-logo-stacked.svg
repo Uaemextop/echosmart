@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 240" fill="none">
+  <defs>
+    <linearGradient id="leafGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00E676"/>
+      <stop offset="100%" stop-color="#2E7D32"/>
+    </linearGradient>
+    <linearGradient id="signalGrad" x1="0%" y1="50%" x2="100%" y2="50%">
+      <stop offset="0%" stop-color="#00BCD4"/>
+      <stop offset="100%" stop-color="#00838F"/>
+    </linearGradient>
+  </defs>
+  <!-- Icon centered above -->
+  <g transform="translate(40, 10) scale(1)">
+    <path d="M30 95Q18 55 45 28Q58 15 78 15Q88 15 95 20Q95 35 88 52Q72 85 35 95Q32 95 30 95z" fill="url(#leafGrad)" opacity="0.9"/>
+    <path d="M88 22Q60 50 32 92" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity="0.3" fill="none"/>
+    <path d="M78 30Q58 48 42 80" stroke="#fff" stroke-width="1.2" stroke-linecap="round" opacity="0.15" fill="none"/>
+    <path d="M72 28a20 20 0 0 1 14 14" stroke="url(#signalGrad)" stroke-width="3" stroke-linecap="round" fill="none" opacity="0.9"/>
+    <path d="M78 18a30 30 0 0 1 22 22" stroke="url(#signalGrad)" stroke-width="2.5" stroke-linecap="round" fill="none" opacity="0.6"/>
+    <path d="M84 8a40 40 0 0 1 30 30" stroke="url(#signalGrad)" stroke-width="2" stroke-linecap="round" fill="none" opacity="0.35"/>
+  </g>
+  <!-- Text stacked below -->
+  <text x="100" y="145" font-family="'Segoe UI', 'SF Pro Display', system-ui, sans-serif" font-size="36" font-weight="700" fill="#E0E0E0" letter-spacing="-0.5" text-anchor="middle">
+    Echo<tspan fill="#00E676">Smart</tspan>
+  </text>
+  <text x="100" y="168" font-family="'Segoe UI', 'SF Pro Display', system-ui, sans-serif" font-size="10" fill="#78909C" letter-spacing="2.5" text-anchor="middle">
+    SMART AGRICULTURE MONITORING
+  </text>
+</svg>

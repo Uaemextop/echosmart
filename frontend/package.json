@@ -1,0 +1,40 @@
+{
+  "name": "echosmart-frontend",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Dashboard web para la plataforma IoT EchoSmart",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "lint": "eslint src/ --ext .js,.jsx",
+    "format": "prettier --write src/"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.20.0",
+    "@reduxjs/toolkit": "^1.9.7",
+    "react-redux": "^8.1.3",
+    "recharts": "^2.10.0",
+    "axios": "^1.6.0",
+    "react-i18next": "^13.5.0",
+    "i18next": "^23.7.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.2.0",
+    "vite": "^5.0.0",
+    "vitest": "^1.0.0",
+    "@testing-library/react": "^14.1.0",
+    "@testing-library/jest-dom": "^6.1.0",
+    "eslint": "^8.54.0",
+    "eslint-plugin-react": "^7.33.2",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "prettier": "^3.1.0",
+    "jsdom": "^23.0.0"
+  }
+}

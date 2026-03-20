@@ -1,0 +1,34 @@
+{
+  "expo": {
+    "name": "EchoSmart",
+    "slug": "echosmart",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icons/app-icon.png",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/images/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#2E7D32"
+    },
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.echosmart.app",
+      "infoPlist": {
+        "NSFaceIDUsageDescription": "Usa Face ID para acceder a EchoSmart de forma segura."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/icons/adaptive-icon.png",
+        "backgroundColor": "#2E7D32"
+      },
+      "package": "com.echosmart.app",
+      "permissions": ["INTERNET", "RECEIVE_BOOT_COMPLETED", "VIBRATE"]
+    },
+    "plugins": [
+      "expo-notifications"
+    ]
+  }
+}

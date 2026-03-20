@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" fill="none">
+  <!-- Alert bell (larger) -->
+  <g transform="translate(100, 50)">
+    <path d="M40 60c0-10 0-24 0-30a40 40 0 0 1 80 0c0 6 0 20 0 30l8 12H32l8-12z" stroke="#FF1744" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.6"/>
+    <path d="M65 78a15 15 0 0 0 30 0" stroke="#FF1744" stroke-width="2" stroke-linecap="round" opacity="0.4"/>
+    <circle cx="80" cy="20" r="3" stroke="#FF1744" stroke-width="2" opacity="0.5"/>
+    <!-- Exclamation -->
+    <line x1="80" y1="38" x2="80" y2="52" stroke="#FF1744" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
+    <circle cx="80" cy="58" r="2" fill="#FF1744" opacity="0.7"/>
+  </g>
+  <!-- Signal rings from bell -->
+  <path d="M155 80a8 8 0 0 1 6 6" stroke="#FF1744" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/>
+  <path d="M160 74a14 14 0 0 1 10 10" stroke="#FF1744" stroke-width="1.2" stroke-linecap="round" opacity="0.25"/>
+  <!-- Phone device -->
+  <g transform="translate(260, 80)">
+    <rect x="0" y="0" width="60" height="110" rx="8" stroke="#333333" stroke-width="1.5"/>
+    <!-- Screen area -->
+    <rect x="5" y="15" width="50" height="80" rx="2" stroke="#222222" stroke-width="1" opacity="0.5"/>
+    <!-- Top notch -->
+    <rect x="20" y="4" width="20" height="3" rx="1.5" fill="#333333" opacity="0.4"/>
+    <!-- Alert notification on phone -->
+    <rect x="8" y="25" width="44" height="22" rx="3" stroke="#FF1744" stroke-width="1" opacity="0.5"/>
+    <circle cx="18" cy="36" r="4" stroke="#FF1744" stroke-width="1" opacity="0.4"/>
+    <line x1="26" y1="32" x2="46" y2="32" stroke="#FF1744" stroke-width="1" stroke-linecap="round" opacity="0.3"/>
+    <line x1="26" y1="38" x2="40" y2="38" stroke="#333333" stroke-width="1" stroke-linecap="round" opacity="0.3"/>
+    <!-- Second notification -->
+    <rect x="8" y="52" width="44" height="18" rx="3" stroke="#FFD54F" stroke-width="1" opacity="0.35"/>
+    <line x1="14" y1="62" x2="46" y2="62" stroke="#333333" stroke-width="1" stroke-linecap="round" opacity="0.2"/>
+  </g>
+  <!-- Connection arrow bell to phone -->
+  <path d="M220 120h30" stroke="#00BCD4" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="4 3" opacity="0.4"/>
+  <polyline points="247,116 252,120 247,124" stroke="#00BCD4" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.4"/>
+  <!-- Small accent elements -->
+  <circle cx="240" cy="105" r="2" fill="#00BCD4" opacity="0.3"/>
+  <circle cx="248" cy="135" r="1.5" fill="#00BCD4" opacity="0.2"/>
+</svg>
