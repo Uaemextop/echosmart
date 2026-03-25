@@ -127,21 +127,124 @@
 
 ## Fase 1: MVP — Gateway Local (Semanas 1–3)
 
-### 1.1 Configuración del Hardware
-- [ ] Provisionar Raspberry Pi 4B con Raspberry Pi OS 64-bit
-- [ ] Configurar interfaces GPIO, I2C, 1-Wire y UART
-- [ ] Conectar sensores: DS18B20, DHT22, BH1750
-- [ ] Conectar sensores: Soil Moisture (ADS1115), MHZ-19C (CO₂)
-- [ ] Calibrar cada sensor y verificar lecturas de prueba
+> ⚠️ **IMPORTANTE — Enfoque "Simulation-First"**: Todo el desarrollo de drivers y software del gateway se realiza **sin hardware físico**. Cada driver incluye un modo de simulación (`simulation=True`) que genera datos realistas dentro de los rangos del invernadero. El hardware físico (Raspberry Pi + sensores) se integra únicamente en la **Fase 8: Testing con Hardware Real**.
 
-### 1.2 Software del Gateway
+### 1.1 Definición de Sensores para Invernadero Inteligente
+
+A continuación se definen los **5 sensores** seleccionados para el proyecto. Cada uno fue investigado y validado como apropiado para monitoreo ambiental en invernaderos agrícolas.
+
+#### 🌡️ Sensor 1: DS18B20 — Temperatura Ambiental
+| Especificación | Valor |
+|---|---|
+| **Modelo** | Dallas DS18B20 (versión encapsulada impermeable) |
+| **Variable** | Temperatura del aire / sustrato |
+| **Protocolo** | 1-Wire (un solo pin de datos, hasta 100m de cable) |
+| **Rango de medición** | -55°C a +125°C |
+| **Precisión** | ±0.5°C (en rango -10°C a +85°C) |
+| **Resolución** | 9–12 bits configurable (0.0625°C a 12 bits) |
+| **Alimentación** | 3.0V – 5.5V (compatible con RPi 3.3V) |
+| **Rango óptimo invernadero** | 18°C – 28°C |
+| **¿Por qué este sensor?** | Estándar de facto en proyectos IoT agrícolas. Resistente al agua (versión encapsulada), permite múltiples sensores en el mismo bus 1-Wire con direcciones únicas. Precio bajo (~$2 USD). Compatible nativo con Raspberry Pi. |
+| **Driver** | `gateway/src/sensor_drivers/ds18b20.py` |
+| **Simulación** | Genera valores aleatorios entre 15.0°C y 35.0°C |
+
+#### 💧 Sensor 2: DHT22 (AM2302) — Temperatura + Humedad Relativa
+| Especificación | Valor |
+|---|---|
+| **Modelo** | Aosong DHT22 / AM2302 |
+| **Variables** | Temperatura + Humedad relativa del aire |
+| **Protocolo** | Protocolo propietario 1-wire digital (GPIO) |
+| **Rango temperatura** | -40°C a +80°C (±0.5°C) |
+| **Rango humedad** | 0% – 100% RH (±2–5% RH) |
+| **Frecuencia de muestreo** | 1 lectura cada 2 segundos (0.5 Hz) |
+| **Alimentación** | 3.3V – 6V |
+| **Rango óptimo invernadero** | Temp: 18–28°C, Humedad: 60–80% RH |
+| **¿Por qué este sensor?** | Combina temperatura y humedad en un solo módulo. Mejor precisión que el DHT11. Muy utilizado en agricultura de precisión. Bajo costo (~$3 USD). Amplia librería de soporte en Python (`adafruit-circuitpython-dht`). |
+| **Driver** | `gateway/src/sensor_drivers/dht22.py` |
+| **Simulación** | Temp: 15.0–35.0°C, Humedad: 40.0–90.0% |
+
+#### ☀️ Sensor 3: BH1750 — Luminosidad (Lux)
+| Especificación | Valor |
+|---|---|
+| **Modelo** | ROHM BH1750FVI |
+| **Variable** | Intensidad luminosa (iluminancia) |
+| **Protocolo** | I2C (dirección 0x23 o 0x5C) |
+| **Rango de medición** | 1 – 65,535 lux |
+| **Resolución** | 1 lux (modo alta resolución) |
+| **Precisión** | ±20% (respuesta espectral similar al ojo humano) |
+| **Alimentación** | 2.4V – 3.6V (compatible con RPi 3.3V) |
+| **Rango óptimo invernadero** | 10,000 – 30,000 lux |
+| **¿Por qué este sensor?** | Sensor digital de luz con salida directa en lux (no requiere conversión). Protocolo I2C estándar. Ideal para determinar si el invernadero necesita iluminación suplementaria o protección contra exceso de luz. Precio muy bajo (~$1.5 USD). |
+| **Driver** | `gateway/src/sensor_drivers/bh1750.py` |
+| **Simulación** | Genera valores entre 500 y 50,000 lux |
+
+#### 🌱 Sensor 4: Sensor de Humedad de Suelo + ADS1115 (ADC)
+| Especificación | Valor |
+|---|---|
+| **Modelo** | Sensor capacitivo de humedad de suelo v1.2 + ADS1115 (ADC 16-bit) |
+| **Variable** | Humedad volumétrica del sustrato/suelo |
+| **Protocolo** | Analógico → I2C (vía ADS1115) |
+| **Rango de medición** | 0% – 100% (calibrado a capacitancia del suelo) |
+| **Resolución ADC** | 16 bits (ADS1115), 4 canales multiplexados |
+| **Alimentación** | 3.3V – 5V |
+| **Rango óptimo invernadero** | 50% – 80% de humedad de suelo |
+| **¿Por qué este sensor?** | El sensor capacitivo (v1.2) es superior al resistivo: no se corroe, vida útil más larga. El ADS1115 proporciona conversión analógico-digital de alta resolución via I2C. Permite conectar hasta 4 sensores de suelo en un solo módulo. Precio combinado ~$4 USD. |
+| **Driver** | `gateway/src/sensor_drivers/soil_moisture.py` |
+| **Simulación** | Genera valores entre 20.0% y 90.0% |
+
+#### 🏭 Sensor 5: MH-Z19C — Concentración de CO₂
+| Especificación | Valor |
+|---|---|
+| **Modelo** | Winsen MH-Z19C (NDIR infrarrojo) |
+| **Variable** | Concentración de dióxido de carbono (CO₂) |
+| **Protocolo** | UART (TTL 3.3V, 9600 baud) + PWM |
+| **Rango de medición** | 400 – 5,000 ppm (versión estándar) |
+| **Precisión** | ±50 ppm + 5% del valor leído |
+| **Tiempo de respuesta** | < 120 segundos (T90) |
+| **Precalentamiento** | 3 minutos |
+| **Vida útil** | > 5 años |
+| **Alimentación** | 4.9V – 5.1V (requiere nivel de voltaje estable) |
+| **Rango óptimo invernadero** | 400 – 1,000 ppm |
+| **¿Por qué este sensor?** | Tecnología NDIR (infrarrojo no dispersivo) ofrece mediciones precisas y estables a largo plazo. Autocalibración incorporada (ABC logic). El CO₂ es crítico para la fotosíntesis; niveles altos indican ventilación insuficiente. Compatible con UART del RPi. Precio ~$18 USD. |
+| **Driver** | `gateway/src/sensor_drivers/mhz19c.py` |
+| **Simulación** | Genera valores entre 350 y 2,000 ppm |
+
+#### Resumen de Sensores
+
+| # | Sensor | Variable | Protocolo | Pin/Bus RPi | Rango Invernadero | Precio aprox. |
+|---|--------|----------|-----------|-------------|-------------------|---------------|
+| 1 | DS18B20 | Temperatura | 1-Wire | GPIO 4 | 18–28°C | ~$2 |
+| 2 | DHT22 | Temp + Humedad | GPIO | GPIO 17 | 18–28°C / 60–80% | ~$3 |
+| 3 | BH1750 | Luminosidad | I2C | SDA/SCL | 10K–30K lux | ~$1.5 |
+| 4 | Soil Moisture + ADS1115 | Humedad suelo | I2C (ADC) | SDA/SCL | 50–80% | ~$4 |
+| 5 | MH-Z19C | CO₂ | UART | TX/RX | 400–1000 ppm | ~$18 |
+| | | | | **Total** | | **~$28.5** |
+
+**Raspberry Pi recomendado**: Raspberry Pi 4 Model B (2GB+ RAM) — $35–55 USD
+**Costo total estimado del hardware**: ~$65–85 USD (RPi + 5 sensores + cables/protoboard)
+
+### 1.2 Software del Gateway (Desarrollo en Modo Simulación)
+
+> 🖥️ **Todo el desarrollo de esta sección se realiza SIN hardware físico.** Los drivers operan en `simulation=True` por defecto, generando datos realistas para pruebas. La implementación de lectura real del hardware (GPIO, I2C, 1-Wire, UART) queda como `TODO` para completar en la Fase 8.
+
 - [x] Implementar Hardware Abstraction Layer (`gateway/src/hal.py`)
+  - [x] Clase `HAL` con métodos: `read_gpio()`, `read_i2c()`, `read_1wire()`, `read_uart()`
+  - [x] Modo simulación que no requiere hardware real
+  - [ ] Implementación real de GPIO (librería `RPi.GPIO` o `gpiozero`)
+  - [ ] Implementación real de I2C (librería `smbus2`)
+  - [ ] Implementación real de 1-Wire (lectura de `/sys/bus/w1/devices/`)
+  - [ ] Implementación real de UART (librería `pyserial`)
 - [x] Desarrollar drivers de sensores en `gateway/src/sensor_drivers/`
-  - [x] `ds18b20.py` — Temperatura (1-Wire)
-  - [x] `dht22.py` — Temperatura + Humedad (GPIO)
-  - [x] `bh1750.py` — Luminosidad (I2C)
-  - [x] `soil_moisture.py` — Humedad de suelo (ADC)
-  - [x] `mhz19c.py` — CO₂ (UART)
+  - [x] `ds18b20.py` — Temperatura (1-Wire) — con modo simulación
+  - [x] `dht22.py` — Temperatura + Humedad (GPIO) — con modo simulación
+  - [x] `bh1750.py` — Luminosidad (I2C) — con modo simulación
+  - [x] `soil_moisture.py` — Humedad de suelo (ADC via I2C) — con modo simulación
+  - [x] `mhz19c.py` — CO₂ (UART) — con modo simulación
+  - [ ] Implementar lectura real del DS18B20 desde `/sys/bus/w1/devices/28-*/w1_slave`
+  - [ ] Implementar lectura real del DHT22 vía `adafruit-circuitpython-dht`
+  - [ ] Implementar lectura real del BH1750 vía `smbus2` (registros I2C)
+  - [ ] Implementar lectura real del ADS1115 vía `adafruit-circuitpython-ads1x15`
+  - [ ] Implementar lectura real del MH-Z19C vía `pyserial` (protocolo UART 9600 baud)
 - [x] Implementar `sensor_manager.py` con polling configurable
 - [x] Implementar caché local en SQLite (`local_db.py`)
 - [ ] Configurar broker MQTT local (Mosquitto)
@@ -149,7 +252,7 @@
 - [x] Implementar `discovery.py` con auto-descubrimiento SSDP
 - [x] Implementar `alert_engine.py` — Motor de alertas local
 - [x] Implementar `cloud_sync.py` — Sincronización batch con reintentos
-- [x] Escribir tests unitarios para cada driver y módulo
+- [x] Escribir tests unitarios para cada driver y módulo (con simulación)
 - [ ] Configurar servicio systemd (`echosmart-gateway.service`)
 
 ---
@@ -345,6 +448,75 @@
 - [ ] SSO (Google, Microsoft, SAML)
 - [ ] 2FA (TOTP)
 - [ ] Sistema de suscripciones y facturación
+
+---
+
+## Fase 8: Testing con Hardware Real (Final)
+
+> 🔧 **Esta fase se ejecuta ÚNICAMENTE cuando todo el software está completo y probado en modo simulación.** Aquí se adquiere el hardware físico y se validan los drivers contra sensores reales.
+
+### 8.1 Adquisición de Hardware
+- [ ] Adquirir Raspberry Pi 4 Model B (2GB+ RAM)
+- [ ] Adquirir fuente de alimentación oficial RPi (5V 3A USB-C)
+- [ ] Adquirir tarjeta microSD (32GB+ clase 10)
+- [ ] Adquirir sensor DS18B20 (versión encapsulada impermeable)
+- [ ] Adquirir sensor DHT22 / AM2302
+- [ ] Adquirir sensor BH1750FVI (módulo breakout)
+- [ ] Adquirir sensor capacitivo de humedad de suelo v1.2
+- [ ] Adquirir módulo ADC ADS1115 (16-bit, 4 canales)
+- [ ] Adquirir sensor MH-Z19C (CO₂ NDIR)
+- [ ] Adquirir protoboard, cables jumper, resistencias pull-up (4.7kΩ para 1-Wire)
+- [ ] Verificar que todos los componentes sean compatibles con RPi 3.3V/5V
+
+### 8.2 Configuración del Raspberry Pi
+- [ ] Instalar Raspberry Pi OS 64-bit (Lite o Desktop)
+- [ ] Habilitar interfaces: I2C (`raspi-config` → Interfacing → I2C)
+- [ ] Habilitar interfaces: 1-Wire (`dtoverlay=w1-gpio` en `/boot/config.txt`)
+- [ ] Habilitar interfaces: UART (`enable_uart=1` en `/boot/config.txt`, deshabilitar consola serial)
+- [ ] Instalar dependencias del sistema: `python3-pip`, `python3-venv`, `i2c-tools`, `git`
+- [ ] Verificar bus I2C: `i2cdetect -y 1` (debe mostrar dirección 0x23 del BH1750 y 0x48 del ADS1115)
+- [ ] Verificar bus 1-Wire: `ls /sys/bus/w1/devices/` (debe mostrar dispositivo 28-xxxx del DS18B20)
+
+### 8.3 Conexión Física de Sensores
+- [ ] Conectar DS18B20 a GPIO 4 con resistencia pull-up de 4.7kΩ entre DATA y VCC (3.3V)
+- [ ] Conectar DHT22 a GPIO 17 con resistencia pull-up de 10kΩ (si el módulo no la incluye)
+- [ ] Conectar BH1750 a bus I2C (SDA → GPIO 2, SCL → GPIO 3), alimentar a 3.3V
+- [ ] Conectar ADS1115 a bus I2C (SDA → GPIO 2, SCL → GPIO 3), dirección por defecto 0x48
+- [ ] Conectar sensor de humedad de suelo al canal A0 del ADS1115
+- [ ] Conectar MH-Z19C a UART (TX sensor → RX RPi GPIO 15, RX sensor → TX RPi GPIO 14), alimentar a 5V
+- [ ] Verificar pinout con diagrama antes de encender (evitar daños)
+
+### 8.4 Validación de Drivers con Hardware Real
+- [ ] Cambiar configuración del gateway a `simulation=False`
+- [ ] Instalar librerías de hardware: `pip install RPi.GPIO adafruit-circuitpython-dht adafruit-circuitpython-ads1x15 smbus2 pyserial`
+- [ ] Completar implementación real en `ds18b20.py` — leer `/sys/bus/w1/devices/28-*/w1_slave`
+- [ ] Completar implementación real en `dht22.py` — usar `adafruit_dht.DHT22(board.D17)`
+- [ ] Completar implementación real en `bh1750.py` — leer registros I2C con `smbus2`
+- [ ] Completar implementación real en `soil_moisture.py` — leer canal ADC vía `adafruit_ads1x15`
+- [ ] Completar implementación real en `mhz19c.py` — enviar comando de lectura por UART y parsear respuesta
+- [ ] Verificar cada sensor individualmente: ejecutar `python -c "from sensor_drivers.ds18b20 import DS18B20Driver; d=DS18B20Driver(); print(d.read())"`
+- [ ] Comparar lecturas contra instrumentos de referencia (termómetro, higrómetro)
+
+### 8.5 Calibración y Ajustes
+- [ ] Calibrar DS18B20: verificar offset de temperatura vs termómetro de referencia
+- [ ] Calibrar DHT22: verificar humedad vs higrómetro de referencia
+- [ ] Calibrar BH1750: verificar lux vs luxómetro (o referencia solar conocida)
+- [ ] Calibrar sensor de suelo: definir curva seco (0%) vs saturado (100%) con muestras reales
+- [ ] Calibrar MH-Z19C: ejecutar autocalibración ABC o calibración manual a 400ppm (aire exterior)
+- [ ] Ajustar intervalos de polling según estabilidad de lecturas
+- [ ] Documentar offsets y factores de corrección en configuración
+
+### 8.6 Testing de Integración con Hardware
+- [ ] Ejecutar `sensor_manager.py` con los 5 sensores reales conectados
+- [ ] Verificar que el polling lee todos los sensores sin errores durante 1 hora continua
+- [ ] Verificar almacenamiento local en SQLite (lecturas persistidas correctamente)
+- [ ] Verificar publicación MQTT (Mosquitto recibe los mensajes)
+- [ ] Verificar sincronización con backend cloud (datos llegan al API)
+- [ ] Verificar motor de alertas (generar condición de alerta real, ej: calentar sensor con mano)
+- [ ] Medir consumo de CPU/RAM del Raspberry Pi bajo carga
+- [ ] Configurar e iniciar servicio systemd (`echosmart-gateway.service`)
+- [ ] Verificar que el gateway sobrevive reinicios y desconexiones de red
+- [ ] Prueba de estrés: 24 horas continuas de operación con todos los sensores
 
 ---
 
