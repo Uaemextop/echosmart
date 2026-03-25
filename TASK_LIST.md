@@ -328,6 +328,82 @@ logger.info("sensor_reading_received",
 - [x] Acento verde: `#00E676`, Acento cyan: `#00BCD4`
 - [x] Sin líneas de grid, sin franjas verdes, sin patrones decorativos
 
+### 0.14 Normas de Diseño y Uso de Assets para Todas las Plataformas
+
+> 🎨 **OBLIGATORIO**: Todas las apps (Web, Android, iOS, Desktop) DEBEN seguir estas normas para que el resultado sea coherente con los mockups y el estilo Starlink.
+
+#### Paleta de Colores (Aplicar en TODAS las plataformas)
+
+| Token | Hex | Uso |
+|-------|-----|-----|
+| `bg-primary` | `#000000` | Fondo principal de la app |
+| `bg-surface` | `#111111` | Cards, contenedores, modales |
+| `bg-elevated` | `#1A1A1A` | Elementos elevados, headers, tooltips |
+| `bg-sidebar` | `#0A0A0A` | Sidebar, navigation drawer |
+| `bg-hover` | `#222222` | Hover state en elementos interactivos |
+| `bg-input` | `#1A1A1A` | Campos de texto, dropdowns |
+| `accent-green` | `#00E676` | Botones primarios, indicadores positivos, CTA |
+| `accent-cyan` | `#00BCD4` | Links, elementos secundarios, badges info |
+| `text-primary` | `#FFFFFF` | Texto principal |
+| `text-secondary` | `#B0BEC5` | Texto secundario, labels |
+| `text-muted` | `#616161` | Texto deshabilitado, placeholders |
+| `border` | `#2A2A2A` | Bordes sutiles entre secciones |
+| `sensor-temp` | `#FF5252` | Todo lo relacionado con temperatura |
+| `sensor-humidity` | `#42A5F5` | Todo lo relacionado con humedad |
+| `sensor-light` | `#FFD54F` | Todo lo relacionado con luminosidad |
+| `sensor-soil` | `#8D6E63` | Todo lo relacionado con suelo |
+| `sensor-co2` | `#78909C` | Todo lo relacionado con CO₂ |
+| `alert-critical` | `#FF1744` | Alertas críticas |
+| `alert-high` | `#FF9100` | Alertas altas |
+| `alert-medium` | `#FFD600` | Alertas medias |
+| `alert-low` | `#00E676` | Alertas bajas/info |
+| `status-online` | `#00E676` | Dispositivo online |
+| `status-offline` | `#FF5252` | Dispositivo offline |
+| `status-warning` | `#FFD600` | Dispositivo con warning |
+
+#### Tipografía
+
+| Fuente | Uso | Plataformas |
+|--------|-----|-------------|
+| **Inter** | UI principal (labels, botones, navegación) | Web, Desktop, Mobile |
+| **JetBrains Mono** | Datos numéricos, logs, código, lecturas de sensores | Web, Desktop, Mobile |
+| System (SF Pro / Roboto) | Fallback nativo | iOS / Android |
+
+#### Iconos y Assets — Reglas de Uso
+
+- [ ] **App Icons**: Usar assets de `assets/icons/png/` en resolución correcta por plataforma:
+  - Web favicon: `assets/icons/ico/favicon.ico`
+  - Web PWA: `assets/icons/png/app-icon-192.png`, `app-icon-512.png`
+  - Android: `assets/platform/android/adaptive-icon-foreground.png` + `background.png`
+  - iOS: `assets/platform/ios/app-icon-1024.png`
+  - Desktop: `assets/icons/ico/app.ico` (Windows), `assets/icons/png/app-icon-512.png` (macOS/Linux)
+  - Tray: `assets/platform/desktop/tray-icon-32.png` / `64.png` / `128.png`
+- [ ] **Sensor Icons**: Usar SVGs de `assets/icons/svg/sensors/` para UI inline:
+  - `temperature.svg`, `humidity.svg`, `light.svg`, `soil-moisture.svg`, `co2.svg`
+  - Colorear dinámicamente según estado (normal=sensor color, alert=alert color)
+- [ ] **Navigation Icons**: Usar SVGs de `assets/icons/svg/navigation/` para menús y tabs:
+  - `dashboard.svg`, `sensors.svg`, `alerts.svg`, `map.svg`, `reports.svg`, `settings.svg`, `users.svg`
+- [ ] **Logos**: Usar SVGs de `assets/icons/svg/logos/` en headers y splash:
+  - `logo-icon.svg` — Solo ícono (sidebar colapsado, app icon)
+  - `logo-full.svg` — Ícono + texto (header, splash, about)
+  - `logo-horizontal.svg` — Para headers anchos
+- [ ] **Splash Screens**: Usar PNGs de `assets/splash/png/` por resolución de pantalla
+- [ ] **Ilustraciones**: Usar SVGs de `assets/icons/svg/illustrations/` para empty states y onboarding
+- [ ] **Open Graph**: Usar `assets/platform/web/og-image.png` para metadata social
+
+#### Principios de Diseño Visual (Estilo Starlink)
+
+- [ ] **Fondo siempre negro puro** (#000000) — NUNCA usar gris, azul oscuro o verde oscuro como fondo
+- [ ] **Cards con superficie #111111** — Sin bordes visibles, solo sombra sutil
+- [ ] **Bordes mínimos** — Preferir separación por espaciado, no por líneas
+- [ ] **Sin decoraciones**: no grid lines, no stripes, no patterns en fondos
+- [ ] **Tipografía clara**: texto blanco (#FFF) sobre negro, con jerarquía de tamaños
+- [ ] **Datos numéricos grandes**: lecturas de sensores en font-size grande (24-48px) con unidad en texto pequeño
+- [ ] **Gráficas con colores vivos** sobre fondo negro — usar colores de sensor para series
+- [ ] **Animaciones sutiles**: transiciones de 200-300ms, no flashy
+- [ ] **Responsive**: adaptar layout a mobile-first, luego tablet, luego desktop
+- [ ] **Accesibilidad**: contrast ratio ≥ 4.5:1, focus indicators visibles, alt text en imágenes
+
 ---
 
 ## Fase 1: MVP — Gateway Local (Semanas 1–3)
@@ -1138,645 +1214,1672 @@ gateway/src/
 
 ---
 
-## Fase 3: Frontend Web — React (Semanas 8–10)
+## Fase 3: Frontend Web — React + TypeScript (Semanas 8–10)
 
 > 🏛️ **Clean Architecture en Frontend**: Separar UI (componentes) de lógica de negocio (hooks/store) y acceso a datos (API client). Los componentes NO deben hacer fetch directamente.
 
-### 3.1 Configuración del Proyecto y Tooling
+> 🎯 **Stack Definido**: React 18 + Vite + TypeScript + Tailwind CSS + Redux Toolkit + React Router v6 + Recharts + Vitest. El resultado debe ser visualmente idéntico a los mockups en `assets/mockups/web/`.
+
+### 3.1 Definición de Tecnologías y Justificación
+
+| Tecnología | Versión | Justificación |
+|------------|---------|---------------|
+| **React 18** | ^18.2.0 | Biblioteca UI más popular, amplio ecosistema, hooks, concurrent features |
+| **TypeScript** | ^5.3.0 | Type safety obligatorio para Clean Code, autocompletado, refactoring seguro |
+| **Vite** | ^5.0.0 | Build tool rápido (ESBuild + Rollup), HMR instantáneo, configuración mínima |
+| **Tailwind CSS** | ^3.4.0 | Utility-first CSS, design tokens, purge automático, responsive |
+| **Redux Toolkit** | ^2.0.0 | Estado global predecible, DevTools, middleware, createAsyncThunk |
+| **React Router** | ^6.20.0 | Routing declarativo, nested routes, lazy loading, data loaders |
+| **Recharts** | ^2.10.0 | Gráficas declarativas basadas en React, responsive, customizable |
+| **Axios** | ^1.6.0 | HTTP client con interceptors, cancel tokens, retry |
+| **React Query** | ^5.0.0 | Server state management, cache, refetch, pagination |
+| **Vitest** | ^1.0.0 | Testing rápido compatible con Vite, API compatible con Jest |
+| **Testing Library** | ^14.0.0 | Tests centrados en el usuario, no en implementación |
+| **Storybook** | ^7.6.0 | Documentación visual de componentes, design system |
+
+- [ ] Migrar proyecto de JSX a TSX (`.jsx` → `.tsx`, `.js` → `.ts`)
+- [ ] Configurar `tsconfig.json` con strict mode habilitado
+- [ ] Instalar y configurar Tailwind CSS con design tokens personalizados
+- [ ] Instalar React Query para server state (reemplazar fetch directo)
+- [ ] Instalar Storybook para design system
+
+### 3.2 Configuración del Proyecto y Tooling
 
 - [x] Inicializar proyecto React 18 con Vite en `frontend/`
 - [x] Configurar Redux Toolkit, React Router, i18n
+- [ ] Configurar TypeScript strict mode:
+  - [ ] `strict: true`, `noImplicitAny: true`, `strictNullChecks: true`
+  - [ ] `noUnusedLocals: true`, `noUnusedParameters: true`
 - [ ] Configurar Tailwind CSS con design tokens de EchoSmart:
-  - [ ] Colores: bg-black (#000), surface (#111), elevated (#1A1A1A), accent-green (#00E676), accent-cyan (#00BCD4)
-  - [ ] Tipografía: Inter (UI) / JetBrains Mono (datos/código)
-  - [ ] Spacing scale, border radius, shadows
+  - [ ] Colores: `bg-black` (#000), `surface` (#111), `elevated` (#1A1A1A), `accent-green` (#00E676), `accent-cyan` (#00BCD4)
+  - [ ] Colores de sensores: `sensor-temp` (#FF5252), `sensor-humidity` (#42A5F5), `sensor-light` (#FFD54F), `sensor-soil` (#8D6E63), `sensor-co2` (#78909C)
+  - [ ] Colores de alertas: `alert-critical` (#FF1744), `alert-high` (#FF9100), `alert-medium` (#FFD600), `alert-low` (#00E676)
+  - [ ] Tipografía: Inter (UI) / JetBrains Mono (datos)
+  - [ ] Spacing scale, border radius (`rounded-lg` = 12px), shadows
   - [ ] Dark mode como default (no toggle necesario)
 - [x] Configurar cliente HTTP (Axios) con JWT
 - [ ] Configurar ESLint con reglas estrictas:
+  - [ ] `@typescript-eslint/parser` — Parser TypeScript
+  - [ ] `@typescript-eslint/eslint-plugin` — Reglas TypeScript
   - [ ] `eslint-plugin-react` — Reglas de React
   - [ ] `eslint-plugin-react-hooks` — Reglas de hooks
   - [ ] `eslint-plugin-import` — Orden de imports
   - [ ] `eslint-plugin-jsx-a11y` — Accesibilidad
   - [ ] `no-console` en producción (solo `logger`)
+  - [ ] `no-any` — Prohibir `any` en TypeScript
 - [ ] Configurar Prettier (100 chars, single quotes, trailing comma)
 - [ ] Configurar `husky` + `lint-staged` para pre-commit
-- [ ] Configurar path aliases: `@/components`, `@/hooks`, `@/store`, `@/api`, `@/utils`
-- [ ] Configurar variables de entorno (`.env.development`, `.env.production`)
-- [ ] Configurar proxy para desarrollo (Vite → backend :8000)
+- [ ] Configurar path aliases en `tsconfig.json` y `vite.config.ts`:
+  - [ ] `@/components` → `src/shared/components`
+  - [ ] `@/hooks` → `src/shared/hooks`
+  - [ ] `@/store` → `src/store`
+  - [ ] `@/api` → `src/lib/api-client`
+  - [ ] `@/utils` → `src/shared/utils`
+  - [ ] `@/features` → `src/features`
+  - [ ] `@/assets` → `src/assets`
+  - [ ] `@/types` → `src/types`
+- [ ] Configurar variables de entorno (`.env.development`, `.env.production`):
+  - [ ] `VITE_API_URL` — URL del backend
+  - [ ] `VITE_WS_URL` — URL del WebSocket
+  - [ ] `VITE_APP_NAME` — Nombre de la app
+  - [ ] `VITE_APP_VERSION` — Versión
+- [ ] Configurar proxy para desarrollo en `vite.config.ts` (→ backend :8000)
+- [ ] Configurar PWA con `vite-plugin-pwa`:
+  - [ ] `manifest.json` con iconos de `assets/platform/web/`
+  - [ ] Service worker con cache-first strategy
+  - [ ] Offline fallback page
 
-### 3.2 Estructura de Archivos (Feature-Based)
+### 3.3 Estructura de Archivos (Feature-Based)
 
 ```
 frontend/src/
 ├── features/
 │   ├── auth/
-│   │   ├── components/         # LoginForm, ForgotPasswordForm
-│   │   ├── hooks/              # useAuth, useLogin
-│   │   ├── pages/              # LoginPage, ResetPasswordPage
-│   │   ├── api.js              # Auth API calls
-│   │   └── authSlice.js        # Redux slice
+│   │   ├── components/         # LoginForm.tsx, ForgotPasswordForm.tsx
+│   │   ├── hooks/              # useAuth.ts, useLogin.ts
+│   │   ├── pages/              # LoginPage.tsx, ResetPasswordPage.tsx
+│   │   ├── api.ts              # Auth API calls
+│   │   ├── auth.slice.ts       # Redux slice
+│   │   └── types.ts            # AuthUser, LoginRequest, etc.
 │   ├── dashboard/
-│   │   ├── components/         # MetricCard, SensorChart, AlertWidget
-│   │   ├── hooks/              # useDashboardData, useRealTimeReadings
-│   │   ├── pages/              # DashboardPage
-│   │   └── api.js
+│   │   ├── components/         # MetricCard.tsx, SensorChart.tsx, AlertWidget.tsx
+│   │   ├── hooks/              # useDashboardData.ts, useRealTimeReadings.ts
+│   │   ├── pages/              # DashboardPage.tsx
+│   │   ├── api.ts
+│   │   └── types.ts
 │   ├── sensors/
-│   │   ├── components/         # SensorGrid, SensorCard, SensorDetail, ReadingChart
-│   │   ├── hooks/              # useSensors, useSensorReadings
-│   │   ├── pages/              # SensorsPage, SensorDetailPage
-│   │   ├── api.js
-│   │   └── sensorSlice.js
+│   │   ├── components/         # SensorGrid.tsx, SensorCard.tsx, SensorDetail.tsx, ReadingChart.tsx
+│   │   ├── hooks/              # useSensors.ts, useSensorReadings.ts
+│   │   ├── pages/              # SensorsPage.tsx, SensorDetailPage.tsx
+│   │   ├── api.ts
+│   │   ├── sensor.slice.ts
+│   │   └── types.ts
 │   ├── alerts/
-│   │   ├── components/         # AlertList, AlertCard, RuleEditor
-│   │   ├── hooks/              # useAlerts, useAlertRules
-│   │   ├── pages/              # AlertsPage
-│   │   ├── api.js
-│   │   └── alertSlice.js
+│   │   ├── components/         # AlertList.tsx, AlertCard.tsx, RuleEditor.tsx
+│   │   ├── hooks/              # useAlerts.ts, useAlertRules.ts
+│   │   ├── pages/              # AlertsPage.tsx
+│   │   ├── api.ts
+│   │   ├── alert.slice.ts
+│   │   └── types.ts
 │   ├── map/
-│   │   ├── components/         # GreenhouseMap, SensorMarker, ZoneOverlay
-│   │   ├── hooks/              # useMapData
-│   │   └── pages/              # MapPage
+│   │   ├── components/         # GreenhouseMap.tsx, SensorMarker.tsx, ZoneOverlay.tsx, HeatmapLayer.tsx
+│   │   ├── hooks/              # useMapData.ts
+│   │   ├── pages/              # MapPage.tsx
+│   │   └── types.ts
 │   ├── reports/
-│   │   ├── components/         # ReportForm, ReportList, ReportPreview
-│   │   ├── hooks/              # useReports
-│   │   └── pages/              # ReportsPage
+│   │   ├── components/         # ReportForm.tsx, ReportList.tsx, ReportPreview.tsx
+│   │   ├── hooks/              # useReports.ts
+│   │   ├── pages/              # ReportsPage.tsx
+│   │   └── types.ts
+│   ├── gateways/
+│   │   ├── components/         # GatewayCard.tsx, GatewayDetail.tsx, GatewayStatus.tsx
+│   │   ├── hooks/              # useGateways.ts
+│   │   ├── pages/              # GatewaysPage.tsx, GatewayDetailPage.tsx
+│   │   └── types.ts
 │   ├── settings/
-│   │   ├── components/         # ProfileForm, NotificationPrefs, TenantSettings
-│   │   └── pages/              # SettingsPage
+│   │   ├── components/         # ProfileForm.tsx, NotificationPrefs.tsx, ThemeSettings.tsx
+│   │   ├── pages/              # SettingsPage.tsx
+│   │   └── types.ts
 │   └── admin/
-│       ├── components/         # UserTable, GatewayTable, TenantForm
-│       ├── hooks/              # useUsers, useGateways
-│       └── pages/              # UsersPage, GatewaysPage, TenantPage
+│       ├── components/         # UserTable.tsx, GatewayTable.tsx, TenantForm.tsx
+│       ├── hooks/              # useUsers.ts, useGateways.ts
+│       ├── pages/              # UsersPage.tsx, GatewaysPage.tsx, TenantPage.tsx
+│       └── types.ts
 ├── shared/
 │   ├── components/             # Button, Input, Modal, Table, Card, Badge, Spinner, Empty
+│   │   ├── Button.tsx
+│   │   ├── Input.tsx
+│   │   ├── Select.tsx
+│   │   ├── Modal.tsx
+│   │   ├── Table.tsx
+│   │   ├── Card.tsx
+│   │   ├── Badge.tsx
+│   │   ├── Spinner.tsx
+│   │   ├── EmptyState.tsx
+│   │   ├── Toast.tsx
+│   │   ├── Breadcrumb.tsx
+│   │   ├── Tabs.tsx
+│   │   ├── Tooltip.tsx
+│   │   ├── Avatar.tsx
+│   │   ├── Sidebar.tsx
+│   │   ├── Header.tsx
+│   │   ├── DataGrid.tsx
+│   │   ├── DatePicker.tsx
+│   │   ├── Chart.tsx
+│   │   ├── SensorIcon.tsx
+│   │   ├── StatusDot.tsx
+│   │   └── index.ts            # Barrel export
 │   ├── hooks/                  # useDebounce, usePagination, useLocalStorage
 │   ├── layouts/                # MainLayout, AuthLayout
 │   └── utils/                  # formatters, validators, constants
 ├── lib/
-│   ├── api-client.js           # Axios instance + interceptors
-│   ├── websocket.js            # WebSocket manager
-│   ├── storage.js              # LocalStorage helpers
-│   └── logger.js               # Frontend logger
+│   ├── api-client.ts           # Axios instance + interceptors
+│   ├── websocket.ts            # WebSocket manager
+│   ├── storage.ts              # LocalStorage helpers
+│   ├── logger.ts               # Frontend logger
+│   └── query-client.ts         # React Query config
 ├── store/                      # Redux store configuration
-├── i18n/                       # Traducciones
+├── types/                      # Shared TypeScript types
+│   ├── sensor.types.ts
+│   ├── alert.types.ts
+│   ├── user.types.ts
+│   ├── gateway.types.ts
+│   └── api.types.ts
+├── i18n/                       # Traducciones (es, en)
 ├── theme/                      # Design tokens
-└── App.jsx
+│   ├── tokens.ts               # Colores, tipografía, espaciado
+│   └── tailwind.config.ts      # Extensión Tailwind
+├── assets/                     # Copia de assets relevantes para build
+│   ├── icons/                  # SVGs de sensores, nav, logos
+│   └── images/                 # Ilustraciones
+└── App.tsx
 ```
 
 - [ ] Crear estructura de features según diagrama anterior
+- [ ] Crear archivo `types/` para cada entidad del dominio
 - [ ] Mover componentes existentes a estructura feature-based
-- [ ] Crear barrel exports (index.js) en cada directorio de feature
-- [ ] Verificar que no hay imports circulares
+- [ ] Crear barrel exports (`index.ts`) en cada directorio de feature
+- [ ] Verificar que no hay imports circulares con `eslint-plugin-import`
+- [ ] Copiar iconos SVG relevantes de `assets/icons/svg/` a `frontend/src/assets/`
 
-### 3.3 Componentes Compartidos (Design System)
+### 3.4 Design System — Componentes Compartidos con Storybook
 
-> 🏛️ Componentes reutilizables SIN lógica de negocio. Solo UI pura. Props → render.
+> 🏛️ Componentes reutilizables SIN lógica de negocio. Solo UI pura. Props → render. Cada componente tiene story en Storybook.
 
-- [ ] **Button** — Variantes: primary, secondary, danger, ghost, icon-only. Estados: loading, disabled
-- [ ] **Input** — Tipos: text, password, email, number, search. Con label, error, hint
-- [ ] **Select** — Dropdown con búsqueda, multi-select, clearable
-- [ ] **Modal** — Overlay con header, body, footer. Tamaños: sm, md, lg, fullscreen
-- [ ] **Table** — Sortable, filterable, selectable rows, paginación, empty state
-- [ ] **Card** — Surface container con header, body, footer. Hover effect
-- [ ] **Badge** — Status indicators: online, offline, warning, critical. Dot + text
-- [ ] **Spinner** — Loading indicator: spinner, skeleton, progress bar
-- [ ] **EmptyState** — Ilustración + mensaje + CTA cuando no hay datos
-- [ ] **Toast** — Notificaciones flotantes: success, error, warning, info. Auto-dismiss
-- [ ] **Breadcrumb** — Navegación jerárquica
-- [ ] **Tabs** — Tab navigation con indicador animado
-- [ ] **Tooltip** — Hover information
-- [ ] **Avatar** — User avatar con iniciales fallback
-- [ ] **Sidebar** — Navegación lateral colapsable con iconos
-- [ ] **Header** — Top bar con user menu, notifications bell, breadcrumb
-- [ ] **DataGrid** — Tabla avanzada con virtualización para muchas filas
-- [ ] **DatePicker** — Selector de fecha y rango de fechas
-- [ ] **Chart** — Wrapper de Recharts con estilos del design system
-- [ ] Crear Storybook (opcional) para documentar componentes
-- [ ] Tests para cada componente compartido (render, props, events)
+- [ ] **Configurar Storybook** para documentar el design system:
+  - [ ] Instalar `@storybook/react-vite`
+  - [ ] Configurar tema dark en Storybook (que coincida con la app)
+  - [ ] Crear stories para CADA componente compartido
+  - [ ] Documentar props, variantes y estados
+- [ ] **Button** (`Button.tsx`):
+  - [ ] Props: `variant` (primary/secondary/danger/ghost/icon-only), `size` (sm/md/lg), `loading`, `disabled`, `icon`, `fullWidth`
+  - [ ] Primary: bg `#00E676`, text black, hover más claro
+  - [ ] Secondary: bg `#1A1A1A`, border `#2A2A2A`, text white
+  - [ ] Danger: bg `#FF1744`, text white
+  - [ ] Ghost: bg transparent, text `#B0BEC5`, hover bg `#1A1A1A`
+  - [ ] Loading: spinner inline, deshabilitar click
+  - [ ] Story: todas las variantes y estados
+  - [ ] Tests: render, click, disabled, loading
+- [ ] **Input** (`Input.tsx`):
+  - [ ] Props: `type` (text/password/email/number/search), `label`, `error`, `hint`, `icon`, `clearable`
+  - [ ] Fondo: `#1A1A1A`, borde: `#2A2A2A`, focus border: `#00E676`
+  - [ ] Error: borde `#FF1744`, mensaje debajo en rojo
+  - [ ] Icon: ícono a la izquierda del input
+  - [ ] Tests: render, input, validation, clear
+- [ ] **Select** (`Select.tsx`):
+  - [ ] Props: `options`, `value`, `onChange`, `searchable`, `multi`, `clearable`, `placeholder`
+  - [ ] Dropdown con fondo `#111111`, items hover `#222222`
+  - [ ] Searchable: input de búsqueda en el dropdown
+  - [ ] Multi: chips con X para remover
+  - [ ] Tests: selección, búsqueda, multi-select
+- [ ] **Modal** (`Modal.tsx`):
+  - [ ] Props: `isOpen`, `onClose`, `title`, `size` (sm/md/lg/fullscreen), `footer`
+  - [ ] Overlay oscuro, card con fondo `#111111`
+  - [ ] Close: click overlay, tecla Escape, botón X
+  - [ ] Animación: fade in + scale
+  - [ ] Tests: open, close, overlay click, escape
+- [ ] **Table** (`Table.tsx`):
+  - [ ] Props: `columns`, `data`, `sortable`, `selectable`, `pagination`, `emptyMessage`
+  - [ ] Header: fondo `#1A1A1A`, texto `#B0BEC5`
+  - [ ] Rows: hover `#111111`, zebra striping sutil
+  - [ ] Sortable: click en header para ordenar, indicador ↑↓
+  - [ ] Selectable: checkbox en cada fila, selección batch
+  - [ ] Pagination: controls abajo con total, página actual, items/page
+  - [ ] Tests: render, sort, select, pagination
+- [ ] **Card** (`Card.tsx`):
+  - [ ] Props: `title`, `subtitle`, `actions`, `onClick`, `hoverable`, `padding`
+  - [ ] Fondo `#111111`, border-radius 12px, sin bordes visibles
+  - [ ] Hover: sombra sutil o bg `#1A1A1A`
+  - [ ] Tests: render, click, hover
+- [ ] **Badge** (`Badge.tsx`):
+  - [ ] Props: `variant` (success/warning/danger/info/neutral), `dot`, `count`
+  - [ ] Colores según variante, pill shape
+  - [ ] Dot: solo círculo de color sin texto
+  - [ ] Count: número dentro del badge (para notificaciones)
+- [ ] **Spinner** (`Spinner.tsx`):
+  - [ ] Props: `size` (sm/md/lg), `fullPage`, `text`
+  - [ ] Animación de rotación suave en `#00E676`
+  - [ ] fullPage: overlay con spinner centrado
+- [ ] **EmptyState** (`EmptyState.tsx`):
+  - [ ] Props: `icon` (SVG ilustración), `title`, `description`, `action` (CTA button)
+  - [ ] Usar ilustraciones de `assets/icons/svg/illustrations/`
+  - [ ] Centrado vertical y horizontal
+- [ ] **Toast** (`Toast.tsx` + `useToast` hook):
+  - [ ] Props: `variant` (success/error/warning/info), `message`, `duration`, `action`
+  - [ ] Stack de toasts en esquina superior derecha
+  - [ ] Auto-dismiss configurable (default 5s)
+  - [ ] Animación: slide in desde la derecha
+- [ ] **Breadcrumb** (`Breadcrumb.tsx`):
+  - [ ] Props: `items` array con `{label, href}`
+  - [ ] Separador: `/` en color `#616161`
+  - [ ] Último item sin link (página actual)
+- [ ] **Tabs** (`Tabs.tsx`):
+  - [ ] Props: `tabs`, `activeTab`, `onChange`
+  - [ ] Indicador animado debajo del tab activo en `#00E676`
+  - [ ] Contenido por tab
+- [ ] **Tooltip** (`Tooltip.tsx`):
+  - [ ] Props: `content`, `position` (top/bottom/left/right), `delay`
+  - [ ] Fondo `#1A1A1A`, texto blanco, arrow
+- [ ] **Avatar** (`Avatar.tsx`):
+  - [ ] Props: `src`, `name`, `size`, `status` (online/offline)
+  - [ ] Fallback: iniciales del nombre sobre fondo verde
+  - [ ] Status dot en esquina inferior derecha
+- [ ] **Sidebar** (`Sidebar.tsx`):
+  - [ ] Props: `items`, `collapsed`, `onToggle`
+  - [ ] Fondo `#0A0A0A`, items con iconos de `assets/icons/svg/navigation/`
+  - [ ] Active item: fondo `#111111`, borde izquierdo `#00E676`
+  - [ ] Collapsed: solo iconos, hover muestra tooltip con label
+  - [ ] Logo EchoSmart en la parte superior
+  - [ ] Tests: navigation, collapse, active state
+- [ ] **Header** (`Header.tsx`):
+  - [ ] Props: `user`, `notifications`
+  - [ ] Breadcrumb en la izquierda
+  - [ ] Campana de notificaciones con badge de conteo
+  - [ ] Avatar con dropdown: perfil, settings, logout
+  - [ ] Barra de búsqueda global (opcional)
+- [ ] **DataGrid** (`DataGrid.tsx`):
+  - [ ] Extensión de Table con virtualización (`react-window`)
+  - [ ] Para tablas con 1000+ filas sin lag
+  - [ ] Columnas resizables y reordenables
+- [ ] **DatePicker** (`DatePicker.tsx`):
+  - [ ] Selector de fecha individual y rango
+  - [ ] Presets: "Últimas 24h", "Última semana", "Último mes"
+  - [ ] Calendar dropdown con fondo `#111111`
+- [ ] **Chart** (`Chart.tsx`):
+  - [ ] Wrapper de Recharts con estilos del design system
+  - [ ] Fondo transparente (se usa sobre cards `#111111`)
+  - [ ] Colores de líneas/áreas: según tipo de sensor
+  - [ ] Tooltip personalizado con fondo `#1A1A1A`
+  - [ ] Eje X: fechas formateadas
+  - [ ] Eje Y: valores con unidad
+  - [ ] Grid: líneas muy sutiles (`#222222`) o sin grid
+- [ ] **SensorIcon** (`SensorIcon.tsx`):
+  - [ ] Props: `type` (temperature/humidity/light/soil/co2), `size`, `color`
+  - [ ] Renderizar SVG del sensor desde `assets/icons/svg/sensors/`
+  - [ ] Color por defecto según tipo, override con prop
+- [ ] **StatusDot** (`StatusDot.tsx`):
+  - [ ] Props: `status` (online/offline/warning), `pulse`
+  - [ ] Punto de color con animación de pulso opcional
+- [ ] Tests para CADA componente compartido (render, props, events, snapshots)
 
-### 3.4 Feature: Autenticación
+### 3.5 Layouts y Navegación
+
+- [ ] **MainLayout** (`layouts/MainLayout.tsx`):
+  - [ ] Sidebar izquierda (colapsable en mobile)
+  - [ ] Header superior con user info
+  - [ ] Content area con scroll
+  - [ ] Responsive: sidebar → hamburger menu en mobile
+  - [ ] Usar logo de `assets/icons/svg/logos/logo-icon.svg` en sidebar
+- [ ] **AuthLayout** (`layouts/AuthLayout.tsx`):
+  - [ ] Centrado vertical/horizontal
+  - [ ] Logo grande de `assets/icons/svg/logos/logo-full.svg`
+  - [ ] Card de formulario sobre fondo negro
+  - [ ] Diseño idéntico al mockup `mockup-web-login.png`
+- [ ] **Routing** (`App.tsx`):
+  - [ ] `/login` → LoginPage (AuthLayout)
+  - [ ] `/forgot-password` → ForgotPasswordPage (AuthLayout)
+  - [ ] `/reset-password/:token` → ResetPasswordPage (AuthLayout)
+  - [ ] `/` → redirect a `/dashboard`
+  - [ ] `/dashboard` → DashboardPage (MainLayout)
+  - [ ] `/sensors` → SensorsPage (MainLayout)
+  - [ ] `/sensors/:id` → SensorDetailPage (MainLayout)
+  - [ ] `/alerts` → AlertsPage (MainLayout)
+  - [ ] `/map` → MapPage (MainLayout)
+  - [ ] `/reports` → ReportsPage (MainLayout)
+  - [ ] `/gateways` → GatewaysPage (MainLayout)
+  - [ ] `/gateways/:id` → GatewayDetailPage (MainLayout)
+  - [ ] `/settings` → SettingsPage (MainLayout)
+  - [ ] `/admin/users` → UsersPage (MainLayout, admin only)
+  - [ ] `/admin/tenants` → TenantsPage (MainLayout, admin only)
+  - [ ] `*` → NotFoundPage (404 con ilustración)
+- [ ] Lazy loading de cada página con `React.lazy` + `Suspense`
+- [ ] Loading fallback con Spinner componente
+- [ ] Error boundary con página de error amigable
+- [ ] Tests: navegación entre rutas, guards, redirects, 404
+
+### 3.6 Feature: Autenticación
 
 - [x] Implementar Login básico
-- [ ] **LoginPage**:
-  - [ ] Formulario: email + password + remember me
-  - [ ] Validación en tiempo real (formato de email, longitud de password)
-  - [ ] Loading state durante request
-  - [ ] Mensajes de error específicos (credenciales inválidas, cuenta desactivada)
+- [ ] **LoginPage** (debe verse como `mockup-web-login.png`):
+  - [ ] Logo EchoSmart centrado arriba
+  - [ ] Card con fondo `#111111` centrada en pantalla
+  - [ ] Título: "Welcome Back" o "Iniciar Sesión"
+  - [ ] Input email con ícono de correo
+  - [ ] Input password con ícono de candado y toggle visibility
+  - [ ] Checkbox "Remember me"
+  - [ ] Botón "Iniciar Sesión" en verde `#00E676` con texto negro
+  - [ ] Link "Forgot password?" debajo
+  - [ ] Link "Don't have an account? Sign up" abajo
+  - [ ] Validación en tiempo real (formato email, longitud password ≥ 8)
+  - [ ] Loading state en botón durante request
+  - [ ] Mensajes de error: credenciales inválidas, cuenta desactivada, red
   - [ ] Redirect a dashboard después de login exitoso
-  - [ ] Guardar token en localStorage/httpOnly cookie
+  - [ ] Guardar tokens en localStorage con encriptación básica
 - [ ] **ForgotPasswordPage**:
-  - [ ] Formulario: email
+  - [ ] Input email + botón "Send Reset Link"
   - [ ] Confirmación: "Si el email existe, recibirás un enlace"
+  - [ ] Link "Back to login"
 - [ ] **ResetPasswordPage**:
   - [ ] Validar token de URL
-  - [ ] Formulario: nueva contraseña + confirmar
-  - [ ] Redirect a login después de reset
-- [ ] **ProtectedRoute** (HOC/wrapper):
+  - [ ] Inputs: nueva contraseña + confirmar (con indicador de fortaleza)
+  - [ ] Redirect a login después de reset exitoso
+- [ ] **ProtectedRoute** (wrapper):
   - [ ] Verificar token válido antes de renderizar
-  - [ ] Redirect a login si no autenticado
+  - [ ] Redirect a `/login` si no autenticado
   - [ ] Verificar rol para rutas de admin
-  - [ ] Refresh automático de token antes de expirar
+  - [ ] Refresh automático de token 5 min antes de expirar
 - [ ] **useAuth hook**:
-  - [ ] `login(email, password)` — Login y guardar tokens
-  - [ ] `logout()` — Limpiar tokens y redirect
-  - [ ] `isAuthenticated` — Boolean reactivo
-  - [ ] `user` — Datos del usuario actual
-  - [ ] `hasRole(role)` — Verificar permisos
-- [ ] Tests: login flow, token refresh, protected routes, role check
+  - [ ] `login(email, password): Promise<User>` — Login y guardar tokens
+  - [ ] `logout(): void` — Limpiar tokens, redirect a login
+  - [ ] `isAuthenticated: boolean` — Reactivo
+  - [ ] `user: User | null` — Datos del usuario actual
+  - [ ] `hasRole(role: string): boolean` — Verificar permisos
+  - [ ] `refreshToken(): Promise<void>` — Refresh automático
+- [ ] Tests: login flow, token refresh, protected routes, role check, error states
 
-### 3.5 Feature: Dashboard
+### 3.7 Feature: Dashboard (como `mockup-web-dashboard.png`)
 
 - [x] Dashboard básico con gráficas
-- [ ] **DashboardPage**:
-  - [ ] Grid de métricas principales (4 cards: temp, humidity, co2, light)
-  - [ ] Gráfica de lecturas últimas 24h (Recharts AreaChart)
-  - [ ] Widget de alertas activas (últimas 5)
-  - [ ] Widget de estado de gateways (online/offline)
-  - [ ] Widget de mapa mini del invernadero
+- [ ] **DashboardPage** — Layout idéntico al mockup:
+  - [ ] Fila superior: 4 MetricCards (Temperatura, Humedad, CO₂, Luminosidad)
+  - [ ] Sección central: gráfica de lecturas últimas 24h (AreaChart multi-series)
+  - [ ] Panel derecho: lista de alertas activas (últimas 5)
+  - [ ] Sección inferior: mini mapa del invernadero + estado de gateways
   - [ ] Selector de rango de tiempo (1h, 6h, 24h, 7d, 30d)
-  - [ ] Auto-refresh cada 30s (o WebSocket)
-- [ ] **MetricCard** component:
-  - [ ] Valor actual grande + unidad
-  - [ ] Indicador de tendencia (↑ ↓ →)
-  - [ ] Sparkline mini
-  - [ ] Color según estado (verde=normal, amarillo=warning, rojo=critical)
+  - [ ] Auto-refresh cada 30s con indicador de última actualización
+  - [ ] WebSocket para actualizaciones en tiempo real
+- [ ] **MetricCard** component (exacto al mockup):
+  - [ ] Ícono del sensor (SVG de `assets/icons/svg/sensors/`)
+  - [ ] Valor actual en fuente grande JetBrains Mono (ej: "24.5°C")
+  - [ ] Unidad en texto pequeño al lado
+  - [ ] Label del sensor (ej: "Temperature")
+  - [ ] Indicador de tendencia (↑ subiendo, ↓ bajando, → estable) con color
+  - [ ] Sparkline mini de últimas 6 horas
+  - [ ] Fondo: `#111111`, border-radius 12px
+  - [ ] Color del valor según estado: verde=normal, amarillo=warning, rojo=critical
   - [ ] Loading skeleton mientras carga
+  - [ ] Click → navegar a sensor detail
 - [ ] **SensorChart** component:
-  - [ ] Line/Area chart con Recharts
-  - [ ] Multi-series (varios sensores en misma gráfica)
-  - [ ] Tooltip con fecha, valor, unidad
-  - [ ] Zoom con brush (seleccionar rango)
-  - [ ] Líneas de umbral (min/max del invernadero)
-  - [ ] Responsive (adaptar a mobile)
+  - [ ] Line/Area chart con Recharts sobre fondo transparente
+  - [ ] Multi-series: múltiples sensores en misma gráfica con colores de sensor
+  - [ ] Tooltip custom: fecha formateada, valor, unidad, color del sensor
+  - [ ] Zoom con brush (seleccionar rango) en la parte inferior
+  - [ ] Líneas de umbral horizontal (min/max del invernadero) en punteado sutil
+  - [ ] Legend con nombre del sensor + último valor
+  - [ ] Responsive (adaptar a tamaño del container)
+  - [ ] Eje X: fechas con formato inteligente (HH:mm, DD MMM, etc.)
+  - [ ] Eje Y: valores con unidad
 - [ ] **AlertWidget** component:
-  - [ ] Lista compacta de alertas activas
-  - [ ] Indicador de severidad (color + ícono)
-  - [ ] Link a detalle de alerta
-  - [ ] Badge con conteo de alertas no leídas
-- [ ] WebSocket integration: actualizar métricas en tiempo real
-- [ ] Tests: renderizado, datos vacíos, loading, error states
+  - [ ] Lista compacta de alertas activas (máx 5)
+  - [ ] Cada alerta: indicador de severidad (color), mensaje, tiempo relativo
+  - [ ] Badge con conteo total de alertas activas
+  - [ ] Link "Ver todas las alertas" al final
+  - [ ] Click en alerta → navegar a detalle
+  - [ ] Empty state si no hay alertas: "All systems normal ✓"
+- [ ] **GatewayStatusWidget** component:
+  - [ ] Lista de gateways con status dot (online/offline)
+  - [ ] Nombre, última conexión, conteo de sensores
+  - [ ] Click → navegar a gateway detail
+- [ ] Tests: renderizado completo, datos vacíos, loading, error states, auto-refresh
 
-### 3.6 Feature: Gestión de Sensores
+### 3.8 Feature: Gestión de Sensores (como `mockup-web-sensors.png`)
 
 - [x] Sensores básicos
 - [ ] **SensorsPage**:
-  - [ ] Vista grid/lista toggle
-  - [ ] Filtros: tipo, estado (online/offline), gateway
-  - [ ] Búsqueda por nombre
-  - [ ] Botón "Agregar sensor"
-  - [ ] Paginación
+  - [ ] Vista grid (cards) / lista (tabla) toggle
+  - [ ] Filtros: tipo de sensor (chips horizontales con íconos), estado (online/offline), gateway
+  - [ ] Búsqueda por nombre con debounce 300ms
+  - [ ] Botón "Agregar sensor" (verde, top-right)
+  - [ ] Paginación o infinite scroll
+  - [ ] Conteo total: "Showing X of Y sensors"
+  - [ ] Diseño grid: 3 columnas desktop, 2 tablet, 1 mobile
 - [ ] **SensorCard** component:
-  - [ ] Ícono del tipo de sensor (color coded)
-  - [ ] Nombre del sensor
-  - [ ] Última lectura + hace cuánto tiempo
-  - [ ] Indicador online/offline
-  - [ ] Mini sparkline de las últimas horas
-  - [ ] Click → navegar a detalle
-- [ ] **SensorDetailPage**:
-  - [ ] Header con info del sensor (nombre, tipo, gateway, estado)
+  - [ ] Ícono SVG del tipo de sensor (coloreado según tipo)
+  - [ ] Nombre del sensor (bold)
+  - [ ] Tipo de sensor (label secundario)
+  - [ ] Última lectura: valor + unidad en fuente grande
+  - [ ] Tiempo relativo de última lectura ("hace 2 min")
+  - [ ] StatusDot: online (verde) / offline (rojo) / warning (amarillo)
+  - [ ] Mini sparkline de las últimas 6 horas
+  - [ ] Gateway asociado (texto pequeño)
+  - [ ] Click → navegar a `/sensors/:id`
+- [ ] **SensorDetailPage** (como `mockup-web-sensor-detail.png`):
+  - [ ] Header: breadcrumb (Sensors → DS18B20), nombre, tipo, gateway, estado
+  - [ ] Card de valor actual: lectura grande + unidad + tendencia
   - [ ] Gráfica principal de lecturas (configurable: 1h–30d)
-  - [ ] Tabla de lecturas recientes
-  - [ ] Estadísticas: min, max, avg, tendencia
-  - [ ] Historial de alertas de este sensor
-  - [ ] Configuración: nombre, umbrales, calibración
-  - [ ] Botón "Eliminar sensor" con confirmación
+  - [ ] Selector de rango de tiempo con presets
+  - [ ] Tabla de lecturas recientes (10 últimas) con timestamp, valor
+  - [ ] Estadísticas: min, max, avg, std dev (para rango seleccionado)
+  - [ ] Historial de alertas de este sensor (últimas 10)
+  - [ ] Configuración del sensor: nombre editable, umbrales de alerta
+  - [ ] Botón "Eliminar sensor" con modal de confirmación
+  - [ ] Tab: "Overview" / "History" / "Alerts" / "Config"
 - [ ] **AddSensorModal**:
-  - [ ] Step wizard: seleccionar gateway → tipo de sensor → configurar → confirmar
-  - [ ] Preview de la configuración antes de crear
-- [ ] Tests: CRUD de sensores, filtros, búsqueda, detalle
+  - [ ] Step wizard (3 pasos):
+    - [ ] Paso 1: Seleccionar gateway de la lista
+    - [ ] Paso 2: Seleccionar tipo de sensor (cards con íconos SVG)
+    - [ ] Paso 3: Configurar nombre, umbrales, ubicación en mapa
+  - [ ] Preview de la configuración antes de confirmar
+  - [ ] Botón "Create" en verde
+- [ ] Tests: lista, filtros, búsqueda, grid/list toggle, detalle, CRUD
 
-### 3.7 Feature: Centro de Alertas
+### 3.9 Feature: Centro de Alertas (como `mockup-web-alerts.png`)
 
 - [x] Alertas básicas
 - [ ] **AlertsPage**:
-  - [ ] Lista de alertas con filtros: severidad, estado, sensor, fecha
-  - [ ] Badge de conteo por severidad
-  - [ ] Acciones batch: acknowledge/resolve múltiples
-  - [ ] Timeline view (opcional)
+  - [ ] Fila de contadores por severidad: Critical (X), High (X), Medium (X), Low (X)
+  - [ ] Lista de alertas con filtros:
+    - [ ] Severidad: critical / high / medium / low (multi-select chips)
+    - [ ] Estado: active / acknowledged / resolved
+    - [ ] Sensor tipo: temperatura / humedad / etc.
+    - [ ] Rango de fecha
+  - [ ] Acciones batch: seleccionar múltiples + acknowledge/resolve
+  - [ ] Ordenar por: fecha, severidad, sensor
+  - [ ] Pagination: 20 por página
 - [ ] **AlertCard** component:
-  - [ ] Color de severidad (border left)
-  - [ ] Ícono de tipo de alerta
-  - [ ] Mensaje descriptivo
-  - [ ] Sensor y gateway afectados
+  - [ ] Borde izquierdo coloreado por severidad
+  - [ ] Ícono de tipo de alerta (según sensor)
+  - [ ] Mensaje descriptivo: "Temperature exceeded 35°C in Zone A"
+  - [ ] Sensor y gateway afectados (links)
   - [ ] Timestamp relativo ("hace 5 min")
-  - [ ] Botones: Acknowledge, Resolve, Ver detalle
-- [ ] **AlertRuleEditor**:
+  - [ ] Valor que disparó la alerta (ej: "37.2°C")
+  - [ ] Botones: Acknowledge (verde outline), Resolve (verde fill), Ver detalle (ícono)
+  - [ ] Estado visual: Active (borde vivo), Acknowledged (borde opaco), Resolved (gris)
+- [ ] **AlertRuleEditor** (modal/página):
   - [ ] Formulario para crear/editar reglas de alerta
-  - [ ] Selección de tipo: umbral, rango, tasa de cambio, sin datos
-  - [ ] Configuración de valores (min, max, duración)
-  - [ ] Selección de acciones: email, push, webhook
-  - [ ] Preview: "Si temperatura > 35°C por más de 5 minutos..."
-- [ ] Tests: lista, filtros, acknowledge, reglas
+  - [ ] Selección de tipo: umbral (>/<), rango (fuera de), tasa de cambio (Δ/min), sin datos (timeout)
+  - [ ] Selección de sensor(es) aplicables
+  - [ ] Configuración de valores (min, max, duración antes de trigger)
+  - [ ] Selección de severidad
+  - [ ] Selección de acciones: email, push notification, webhook
+  - [ ] Preview en lenguaje natural: "Si la temperatura supera 35°C durante más de 5 minutos, enviar alerta crítica por email"
+  - [ ] Lista de reglas existentes con toggle enable/disable
+- [ ] Tests: lista, filtros, acknowledge, batch actions, reglas
 
-### 3.8 Feature: Mapa del Invernadero
+### 3.10 Feature: Mapa del Invernadero (como `mockup-web-map.png`)
 
 - [ ] **MapPage**:
-  - [ ] Plano 2D del invernadero (SVG interactivo o Canvas)
-  - [ ] Sensores posicionados en el mapa (drag & drop para configurar)
-  - [ ] Color de cada sensor según estado actual
-  - [ ] Click en sensor → popup con última lectura
-  - [ ] Zonas del invernadero con promedios
-  - [ ] Heatmap opcional (gradiente de temperatura/humedad)
-  - [ ] Leyenda de colores
-- [ ] Tests: renderizado del mapa, interacción con sensores
+  - [ ] Plano 2D del invernadero (SVG interactivo o Canvas con Konva.js)
+  - [ ] Sensores posicionados como markers en el mapa
+  - [ ] Cada marker: ícono del sensor + color según estado
+  - [ ] Click en sensor → popup con: última lectura, estado, link a detalle
+  - [ ] Zonas del invernadero con promedios (color de fondo según condición)
+  - [ ] **Heatmap mode**: gradiente de temperatura/humedad sobre el plano
+  - [ ] **Edit mode**: drag & drop para reposicionar sensores en el mapa
+  - [ ] Leyenda de colores (por sensor o por estado)
+  - [ ] Zoom in/out y pan del mapa
+  - [ ] Fullscreen toggle
+  - [ ] Responsive: adaptable a mobile
+- [ ] Tests: renderizado del mapa, click en sensores, heatmap, edit mode
 
-### 3.9 Feature: Reportes
+### 3.11 Feature: Reportes (como `mockup-web-reports.png`)
 
 - [x] Reportes básicos
 - [ ] **ReportsPage**:
-  - [ ] Formulario de generación: tipo (diario/semanal/mensual/custom), rango de fechas, formato (PDF/Excel/CSV)
-  - [ ] Lista de reportes generados con estado (pendiente, generando, completado)
-  - [ ] Botón de descarga para reportes completados
-  - [ ] Preview del reporte antes de generar
-- [ ] Tests: formulario, lista, descarga
+  - [ ] Formulario de generación:
+    - [ ] Tipo: diario / semanal / mensual / custom
+    - [ ] Rango de fechas con DatePicker
+    - [ ] Sensores a incluir (multi-select)
+    - [ ] Formato de descarga: PDF / Excel (.xlsx) / CSV
+  - [ ] Lista de reportes generados:
+    - [ ] Nombre, fecha, tipo, estado (pendiente/generando/completado/error)
+    - [ ] Progreso de generación (barra de progreso)
+    - [ ] Botón de descarga para completados
+    - [ ] Botón de regenerar para errores
+  - [ ] Preview del reporte antes de generar (tabla + gráficas)
+  - [ ] Programación automática: "Generar reporte diario todos los lunes a las 8:00"
+- [ ] Tests: formulario de generación, descarga, programación
 
-### 3.10 Feature: Panel de Administración
+### 3.12 Feature: Gateways (como `mockup-web-gateway-detail.png`)
+
+- [ ] **GatewaysPage**:
+  - [ ] Lista de gateways con: nombre, serial, estado (online/offline), última conexión, # sensores
+  - [ ] Filtro por estado
+  - [ ] Botón "Add Gateway" con wizard de provisioning
+- [ ] **GatewayDetailPage**:
+  - [ ] Header: nombre, serial, estado, uptime, versión del firmware
+  - [ ] Métricas del gateway: CPU%, memoria%, disco%, red
+  - [ ] Lista de sensores conectados al gateway
+  - [ ] Logs del gateway en tiempo real (via WebSocket)
+  - [ ] Acciones: reiniciar, actualizar firmware, editar configuración, eliminar
+  - [ ] Historial de conexiones/desconexiones
+- [ ] Tests: lista, detalle, acciones
+
+### 3.13 Feature: Panel de Administración (como `mockup-web-users.png`)
 
 - [x] Admin panel básico
-- [ ] **UsersPage** (admin only):
-  - [ ] Tabla de usuarios con: nombre, email, rol, estado, último login
-  - [ ] Acciones: editar, cambiar rol, desactivar, eliminar
-  - [ ] Formulario de invitación (enviar email)
-- [ ] **GatewaysPage** (admin only):
-  - [ ] Tabla de gateways con: nombre, serial, estado, última conexión, sensores
-  - [ ] Detalle de gateway con logs y métricas
-  - [ ] Acciones: reiniciar, actualizar config, eliminar
+- [ ] **UsersPage** (admin only, como `mockup-web-users.png`):
+  - [ ] Contadores en cards: Total Users, Active, Admins, Pending
+  - [ ] Tabla de usuarios: nombre, email, rol (badge), estado (dot), último login, acciones
+  - [ ] Filtros: rol, estado
+  - [ ] Búsqueda por nombre/email
+  - [ ] Acciones por usuario: editar rol, desactivar, eliminar, reset password
+  - [ ] Modal de invitación: enviar email de invitación con rol asignado
+- [ ] **GatewaysAdminPage** (admin only):
+  - [ ] Tabla de TODOS los gateways del tenant
+  - [ ] Detalle con logs, métricas, configuración
+  - [ ] Acciones: reiniciar, actualizar, eliminar
 - [ ] **TenantSettingsPage** (admin only):
-  - [ ] Configuración del tenant: nombre, logo, plan, límites
+  - [ ] Configuración del tenant: nombre, logo personalizado, plan, límites
   - [ ] Estadísticas de uso: gateways, sensores, lecturas, almacenamiento
-- [ ] Tests: tablas, acciones, permisos (verificar que viewer no ve admin pages)
+  - [ ] Billing info (si aplica)
+- [ ] Tests: tablas, acciones, permisos (verificar que viewer no accede a admin)
 
-### 3.11 Feature: Configuración
+### 3.14 Feature: Configuración (como `mockup-web-settings.png`)
 
 - [ ] **SettingsPage**:
-  - [ ] Perfil: nombre, email, avatar
-  - [ ] Seguridad: cambiar contraseña, sesiones activas
-  - [ ] Notificaciones: preferencias de canales (email, push, in-app)
-  - [ ] Apariencia: idioma (es/en)
-  - [ ] API: generar API keys, webhooks
+  - [ ] Tabs: Profile / Security / Notifications / Appearance / API
+  - [ ] **Profile**: nombre, email, avatar upload, timezone
+  - [ ] **Security**: cambiar contraseña (current + new + confirm), sesiones activas, 2FA setup
+  - [ ] **Notifications**: preferencias por canal (email/push/in-app) y por tipo de alerta
+  - [ ] **Appearance**: idioma (es/en), formato de fecha, unidades (°C/°F)
+  - [ ] **API**: generar API keys, ver webhooks configurados
+- [ ] Tests: cada tab, guardado de preferencias
 
-### 3.12 API Client (Clean Architecture)
+### 3.15 API Client y Server State (Clean Architecture)
 
 - [x] Cliente HTTP básico
-- [ ] Refactorizar API client:
-  - [ ] Axios instance con baseURL, timeout, interceptors
-  - [ ] Request interceptor: agregar JWT header automáticamente
-  - [ ] Response interceptor: refresh token en 401, retry original request
-  - [ ] Error interceptor: parsear errores del backend a formato consistente
+- [ ] Refactorizar API client (`lib/api-client.ts`):
+  - [ ] Axios instance tipada con TypeScript generics
+  - [ ] Base URL desde env variable
+  - [ ] Timeout: 30s
+  - [ ] Request interceptor: agregar `Authorization: Bearer <token>` automáticamente
+  - [ ] Response interceptor: refresh token en 401, retry original request (max 1 retry)
+  - [ ] Error interceptor: parsear errores del backend a `ApiError` type consistente
   - [ ] Cancel tokens para requests in-flight cuando se cambia de página
-- [ ] Crear funciones API por feature (no un archivo monolítico):
-  - [ ] `features/auth/api.js` — `login()`, `register()`, `refreshToken()`
-  - [ ] `features/sensors/api.js` — `getSensors()`, `getSensor()`, `getReadings()`
-  - [ ] `features/alerts/api.js` — `getAlerts()`, `acknowledgeAlert()`
-  - [ ] etc.
-- [ ] Implementar caché de requests con React Query o SWR (alternativa a Redux para server state)
-- [ ] Tests: interceptors, retry, cancel
+- [ ] Configurar React Query (`lib/query-client.ts`):
+  - [ ] `staleTime: 5 * 60 * 1000` (5 min)
+  - [ ] `cacheTime: 30 * 60 * 1000` (30 min)
+  - [ ] `refetchOnWindowFocus: true`
+  - [ ] `retry: 2` para errores de red
+- [ ] Crear hooks de React Query por feature:
+  - [ ] `useSensors(filters)` — query con pagination
+  - [ ] `useSensor(id)` — query single sensor
+  - [ ] `useSensorReadings(id, range)` — query readings con refetch
+  - [ ] `useAlerts(filters)` — query alerts
+  - [ ] `useCreateSensor()` — mutation
+  - [ ] `useAcknowledgeAlert()` — mutation con optimistic update
+  - [ ] `useGateways()` — query gateways
+  - [ ] `useUsers()` — query users (admin)
+  - [ ] `useReports()` — query reports
+- [ ] Crear funciones API tipadas por feature:
+  - [ ] `features/auth/api.ts` — `login()`, `register()`, `refreshToken()`, `forgotPassword()`
+  - [ ] `features/sensors/api.ts` — `getSensors()`, `getSensor()`, `getReadings()`, `createSensor()`, `updateSensor()`, `deleteSensor()`
+  - [ ] `features/alerts/api.ts` — `getAlerts()`, `acknowledgeAlert()`, `resolveAlert()`, `createRule()`, `getRules()`
+  - [ ] `features/gateways/api.ts` — `getGateways()`, `getGateway()`, `restartGateway()`, `updateConfig()`
+  - [ ] `features/reports/api.ts` — `getReports()`, `generateReport()`, `downloadReport()`
+  - [ ] `features/admin/api.ts` — `getUsers()`, `inviteUser()`, `updateRole()`, `deactivateUser()`
+- [ ] Tests: interceptors, retry, cancel, tipado, error handling
 
-### 3.13 Estado Global (Redux Toolkit)
+### 3.16 Estado Global (Redux Toolkit)
 
 - [x] Store básico
-- [ ] Refactorizar slices por feature:
+- [ ] Reducir Redux a SOLO estado de UI (server state → React Query):
   - [ ] `authSlice` — usuario autenticado, tokens, permisos
-  - [ ] `uiSlice` — sidebar collapsed, theme, locale, toasts
-  - [ ] Considerar React Query/SWR para server state (sensores, alertas, etc.)
-- [ ] Implementar selectors memoizados con `createSelector`
+  - [ ] `uiSlice` — sidebar collapsed, locale, active toasts, breadcrumb
+- [ ] Implementar selectors memoizados con `createSelector`:
+  - [ ] `selectCurrentUser`, `selectIsAdmin`, `selectIsAuthenticated`
+  - [ ] `selectSidebarCollapsed`, `selectLocale`
 - [ ] Implementar middleware de logging en desarrollo
-- [ ] Tests: reducers, selectors, async thunks
+- [ ] Tests: reducers, selectors, middleware
 
-### 3.14 WebSocket Manager
+### 3.17 WebSocket Manager
 
-- [ ] Implementar `WebSocketManager` class:
-  - [ ] `connect(url, token)` — Conectar con autenticación
-  - [ ] `disconnect()` — Desconectar limpiamente
-  - [ ] `subscribe(channel, callback)` — Suscribirse a canal
-  - [ ] `unsubscribe(channel)` — Desuscribirse
-  - [ ] Auto-reconnect con backoff exponencial
-  - [ ] Heartbeat cada 30s
+- [ ] Implementar `WebSocketManager` class (`lib/websocket.ts`):
+  - [ ] `connect(url: string, token: string): void` — Conectar con autenticación
+  - [ ] `disconnect(): void` — Desconectar limpiamente
+  - [ ] `subscribe(channel: string, callback: (data: T) => void): () => void` — Suscribirse, retorna unsub
+  - [ ] `send(channel: string, data: unknown): void` — Enviar mensaje
+  - [ ] Auto-reconnect con backoff exponencial (1s, 2s, 4s, 8s, max 30s)
+  - [ ] Heartbeat cada 30s (ping/pong)
+  - [ ] Buffer de mensajes durante desconexión
+  - [ ] Event emitter pattern: `onConnect`, `onDisconnect`, `onError`
 - [ ] Implementar `useWebSocket` hook:
-  - [ ] Conectar al montar, desconectar al desmontar
-  - [ ] Devolver estado de conexión (connecting, connected, disconnected)
-  - [ ] Devolver última lectura recibida por sensor
-- [ ] Integrar WebSocket con dashboard para actualizaciones en tiempo real
-- [ ] Tests: conexión, reconexión, suscripción
+  - [ ] Conectar al montar MainLayout, desconectar al desmontar
+  - [ ] Estado de conexión: `connecting`, `connected`, `disconnected`
+  - [ ] `useSubscription(channel)` — Devolver últimos datos del canal
+  - [ ] Integrar con React Query para invalidar queries al recibir update
+- [ ] Channels de WebSocket:
+  - [ ] `readings:{sensor_id}` — Lecturas en tiempo real por sensor
+  - [ ] `alerts` — Nuevas alertas
+  - [ ] `gateways:{gateway_id}:status` — Estado del gateway
+  - [ ] `notifications:{user_id}` — Notificaciones del usuario
+- [ ] Tests: conexión, reconexión, suscripción, heartbeat
 
-### 3.15 Optimización y Performance
+### 3.18 Optimización y Performance
 
-- [ ] Implementar code splitting con `React.lazy()` y `Suspense`
-- [ ] Implementar route-based code splitting (cada página es lazy)
-- [ ] Implementar memoización con `React.memo`, `useMemo`, `useCallback`
-- [ ] Implementar virtualización de listas grandes (`react-virtual` / `react-window`)
-- [ ] Implementar debounce en búsquedas y filtros (300ms)
-- [ ] Implementar infinite scroll o paginación en tablas grandes
-- [ ] Optimizar imágenes: lazy loading, WebP format, responsive images
-- [ ] Configurar Service Worker para PWA (cache-first strategy)
-- [ ] Lograr Lighthouse score ≥ 90 en todas las métricas
-- [ ] Bundle analysis: verificar que no hay dependencias innecesarias
+- [ ] Code splitting con `React.lazy()` + `Suspense` por cada página
+- [ ] Prefetch de rutas probables (ej: si está en sensors, prefetch dashboard)
+- [ ] Memoización con `React.memo`, `useMemo`, `useCallback` donde sea necesario
+- [ ] Virtualización de listas grandes con `@tanstack/react-virtual`
+- [ ] Debounce en búsquedas y filtros (300ms) con `useDebounce` hook
+- [ ] Infinite scroll en tablas con muchos registros
+- [ ] Optimizar imágenes: lazy loading (`loading="lazy"`), WebP format, responsive `srcset`
+- [ ] Comprimir SVGs con SVGO
+- [ ] Configurar Service Worker con `vite-plugin-pwa`:
+  - [ ] Cache-first para assets estáticos
+  - [ ] Network-first para API calls
+  - [ ] Offline fallback page con logo EchoSmart
+- [ ] Lograr **Lighthouse score ≥ 90** en: Performance, Accessibility, Best Practices, SEO
+- [ ] Bundle analysis con `rollup-plugin-visualizer`: verificar tamaño < 500KB gzipped
+- [ ] Tree shaking verificado: no importar todo lodash, solo funciones individuales
 
-### 3.16 Frontend — Tests Completos
+### 3.19 Internacionalización (i18n)
 
-- [ ] Tests unitarios para CADA componente compartido
+- [ ] Configurar `react-i18next` con lazy loading de namespaces
+- [ ] Crear archivos de traducción:
+  - [ ] `i18n/es/common.json` — Botones, labels, errores genéricos
+  - [ ] `i18n/es/dashboard.json` — Textos del dashboard
+  - [ ] `i18n/es/sensors.json` — Textos de sensores
+  - [ ] `i18n/es/alerts.json` — Textos de alertas
+  - [ ] `i18n/en/common.json` — English translations
+  - [ ] `i18n/en/dashboard.json`, etc.
+- [ ] Selector de idioma en Settings
+- [ ] Formateo de fechas según locale (`date-fns/locale`)
+- [ ] Formateo de números según locale (decimal separator)
+- [ ] Tests: cambio de idioma, formateo, fallback
+
+### 3.20 PWA (Progressive Web App)
+
+- [ ] `manifest.json` con:
+  - [ ] `name: "EchoSmart"`, `short_name: "EchoSmart"`
+  - [ ] `theme_color: "#000000"`, `background_color: "#000000"`
+  - [ ] Icons: usar `assets/platform/web/pwa-icon-192.png` y `pwa-icon-512.png`
+  - [ ] `display: "standalone"`
+  - [ ] `start_url: "/dashboard"`
+- [ ] Service worker con Workbox (via vite-plugin-pwa):
+  - [ ] Precache de shell de la app (HTML, CSS, JS)
+  - [ ] Runtime cache para API con stale-while-revalidate
+  - [ ] Offline fallback page
+- [ ] Install prompt: banner para instalar como app
+- [ ] Meta tags: `apple-touch-icon`, `apple-mobile-web-app-capable`
+- [ ] Tests: instalación, offline mode, cache
+
+### 3.21 Frontend — Tests Completos
+
+- [ ] Tests unitarios para CADA componente compartido (20+ componentes × 3+ tests cada uno)
 - [ ] Tests unitarios para CADA hook personalizado
-- [ ] Tests de integración por feature (renderizar página completa con mocks)
-- [ ] Tests de formularios: validación, submit, error handling
-- [ ] Tests de routing: navegación, guards, redirects
-- [ ] Tests de responsive: verificar breakpoints principales
-- [ ] Tests de accesibilidad: keyboard navigation, screen reader
-- [ ] Configurar `testing-library` con custom renders (providers, router)
+- [ ] Tests de integración por feature:
+  - [ ] Auth: login → redirect → dashboard
+  - [ ] Sensors: list → filter → detail → edit → delete
+  - [ ] Alerts: list → acknowledge → resolve
+  - [ ] Dashboard: render all widgets con datos mock
+- [ ] Tests de formularios: validación, submit, error handling, loading states
+- [ ] Tests de routing: navegación, guards, redirects, 404
+- [ ] Tests de responsive: verificar breakpoints (mobile, tablet, desktop)
+- [ ] Tests de accesibilidad: keyboard navigation, screen reader labels, ARIA roles
+- [ ] Configurar `testing-library` con custom renders (providers, router, query client)
 - [ ] Verificar cobertura ≥ 80% con `vitest --coverage`
+- [ ] Snapshots tests para componentes estables (Card, Badge, EmptyState)
 
-### 3.17 Frontend — Calidad de Código
+### 3.22 Frontend — Calidad de Código
 
-- [ ] Configurar ESLint strict mode
-- [ ] Configurar Prettier
-- [ ] Configurar TypeScript (migrar de JSX a TSX gradualmente — o mantener JSX con JSDoc types)
-- [ ] Configurar `husky` pre-commit hooks
-- [ ] Agregar prop-types o TypeScript interfaces a TODOS los componentes
-- [ ] Eliminar `console.log` — usar logger dedicado
-- [ ] Crear `frontend/README.md` con guía de desarrollo
+- [ ] Configurar ESLint strict mode con zero warnings
+- [ ] Configurar Prettier y verificar formato en CI
+- [ ] TypeScript strict mode con `noImplicitAny`, `strictNullChecks`
+- [ ] Configurar `husky` pre-commit: lint + type-check + test affected
+- [ ] TODAS las interfaces y types exportados y documentados
+- [ ] CERO `any` en todo el codebase (usar `unknown` o types específicos)
+- [ ] CERO `console.log` — usar `lib/logger.ts` dedicado
+- [ ] Crear `frontend/README.md` con:
+  - [ ] Guía de setup de desarrollo
+  - [ ] Estructura del proyecto explicada
+  - [ ] Convenciones de naming y código
+  - [ ] Guía de testing
+  - [ ] Design system reference
 
 ---
 
-## Fase 4: Aplicación Móvil — React Native (Semanas 11–16)
+## Fase 4: Aplicación Móvil — React Native + Expo (Semanas 11–16)
 
 > 🏛️ **Clean Architecture en Mobile**: Misma separación que en web. Features → componentes, hooks, API, store. Componentes nativos de cada plataforma donde sea necesario.
 
-### 4.1 Configuración y Arquitectura del Proyecto
+> 📱 **Stack Definido**: React Native 0.73 + Expo SDK 50 + TypeScript. Compilación a **APK (Android)** vía Expo EAS Build y a **IPA (iOS)** vía Expo EAS Build. La app se escribe UNA VEZ en React Native/TypeScript y se compila nativamente para ambas plataformas.
+
+### 4.1 Definición de Tecnologías y Justificación de Plataforma
+
+| Decisión | Elección | Justificación |
+|----------|----------|---------------|
+| **Framework** | React Native + Expo | Code sharing con web (mismos hooks, API client, tipos). Una codebase → 2 plataformas. Expo simplifica builds y acceso a APIs nativas |
+| **Lenguaje** | TypeScript | Type safety, consistencia con frontend web, autocompletado, refactoring seguro |
+| **NO Flutter/Dart** | Descartado | El equipo ya usa React/TypeScript en web. Flutter requeriría aprender Dart y duplicar lógica de negocio |
+| **NO Kotlin/Java nativo** | Descartado | Duplicaría el desarrollo para iOS (Swift). React Native permite una codebase para ambas plataformas |
+| **NO Swift nativo** | Descartado | Solo cubre iOS. React Native cubre ambas plataformas con una codebase |
+| **Build Android** | EAS Build → APK / AAB | Expo EAS compila en la nube sin necesidad de Android Studio local |
+| **Build iOS** | EAS Build → IPA | Expo EAS compila en la nube sin necesidad de Xcode local (necesita Apple Developer account) |
+| **Navegación** | React Navigation v6 | Estándar de facto para React Native, gestos nativos, deep linking |
+| **Estado** | Zustand + React Query | Zustand más ligero que Redux para mobile. React Query para server state con cache |
+| **Gráficas** | react-native-chart-kit o Victory Native | Charts nativos optimizados para mobile |
+| **Mapas** | react-native-maps | Maps nativos (Google Maps Android, Apple Maps iOS) |
+| **Push** | expo-notifications + FCM | Firebase Cloud Messaging para Android, APNs para iOS |
+| **Storage** | AsyncStorage + MMKV | AsyncStorage para datos simples, MMKV para datos sensibles con encriptación |
+
+### 4.2 Configuración y Arquitectura del Proyecto
 
 - [x] Configurar proyecto Expo en `mobile/`
-- [ ] Configurar EAS Build para Android e iOS
-- [ ] Configurar variables de entorno (`.env.development`, `.env.production`)
-- [ ] Configurar path aliases: `@/screens`, `@/components`, `@/hooks`, `@/api`
-- [ ] Configurar ESLint + Prettier para React Native
-- [ ] Estructurar proyecto por features:
-  ```
-  mobile/src/
-  ├── features/
-  │   ├── auth/         # LoginScreen, useAuth
-  │   ├── dashboard/    # DashboardScreen, MetricCards
-  │   ├── sensors/      # SensorsScreen, SensorDetail
-  │   ├── alerts/       # AlertsScreen, AlertCard
-  │   ├── map/          # MapScreen, SensorMarker
-  │   ├── settings/     # SettingsScreen, ProfileForm
-  │   └── notifications/ # NotificationsScreen
-  ├── shared/
-  │   ├── components/   # Button, Card, Input, Badge, Spinner
-  │   ├── hooks/        # useApi, useLocation, useNotifications
-  │   ├── navigation/   # Navigators, linking config
-  │   └── utils/        # formatters, validators
-  ├── lib/
-  │   ├── api-client.js # Axios + auth interceptor
-  │   ├── storage.js    # AsyncStorage helpers
-  │   └── push.js       # Push notifications
-  └── store/            # Redux/Zustand
-  ```
+- [ ] Migrar de JavaScript a TypeScript:
+  - [ ] Renombrar archivos `.js` → `.ts` / `.tsx`
+  - [ ] Configurar `tsconfig.json` con strict mode
+  - [ ] Instalar `@types/react-native`
+- [ ] Configurar EAS Build:
+  - [ ] `eas.json` con profiles: development, preview, production
+  - [ ] Configurar `app.json` / `app.config.ts` con:
+    - [ ] `name: "EchoSmart"`
+    - [ ] `slug: "echosmart"`
+    - [ ] `version: "1.0.0"`
+    - [ ] `icon: "../assets/platform/ios/app-icon-1024.png"` (iOS)
+    - [ ] `splash.image: "../assets/splash/png/splash-1242x2688.png"`
+    - [ ] `splash.backgroundColor: "#000000"`
+    - [ ] `android.adaptiveIcon.foregroundImage: "../assets/platform/android/adaptive-icon-foreground.png"`
+    - [ ] `android.adaptiveIcon.backgroundColor: "#000000"`
+    - [ ] `android.package: "com.echosmart.app"`
+    - [ ] `ios.bundleIdentifier: "com.echosmart.app"`
+    - [ ] `ios.supportsTablet: true`
+- [ ] Configurar variables de entorno (`.env.development`, `.env.production`):
+  - [ ] `API_URL` — URL del backend
+  - [ ] `WS_URL` — URL del WebSocket
+- [ ] Configurar path aliases con `babel-plugin-module-resolver`:
+  - [ ] `@/screens` → `src/features/*/screens`
+  - [ ] `@/components` → `src/shared/components`
+  - [ ] `@/hooks` → `src/shared/hooks`
+  - [ ] `@/api` → `src/lib/api-client`
+  - [ ] `@/store` → `src/store`
+  - [ ] `@/assets` → `src/assets`
+  - [ ] `@/types` → `src/types`
+- [ ] Configurar ESLint + Prettier para React Native + TypeScript
+- [ ] Instalar dependencias core:
+  - [ ] `react-navigation` (native, native-stack, bottom-tabs, drawer)
+  - [ ] `react-native-safe-area-context`, `react-native-screens`
+  - [ ] `@tanstack/react-query` (React Query para server state)
+  - [ ] `zustand` (client state)
+  - [ ] `axios` (HTTP client)
+  - [ ] `react-native-mmkv` (secure storage)
+  - [ ] `expo-notifications` (push)
+  - [ ] `expo-local-authentication` (biometría)
+  - [ ] `expo-haptics` (feedback táctil)
+  - [ ] `@react-native-community/netinfo` (estado de red)
+  - [ ] `react-native-reanimated` (animaciones)
+  - [ ] `react-native-gesture-handler` (gestos)
+  - [ ] `react-native-svg` (iconos SVG)
 
-### 4.2 Navegación (React Navigation)
+### 4.3 Estructura del Proyecto Mobile
+
+```
+mobile/src/
+├── features/
+│   ├── auth/
+│   │   ├── screens/            # LoginScreen.tsx, ForgotPasswordScreen.tsx
+│   │   ├── components/         # LoginForm.tsx, BiometricButton.tsx
+│   │   ├── hooks/              # useAuth.ts, useBiometric.ts
+│   │   ├── api.ts              # Auth API calls
+│   │   └── types.ts
+│   ├── dashboard/
+│   │   ├── screens/            # DashboardScreen.tsx
+│   │   ├── components/         # MetricCard.tsx, MiniChart.tsx, AlertBanner.tsx
+│   │   ├── hooks/              # useDashboardData.ts
+│   │   └── types.ts
+│   ├── sensors/
+│   │   ├── screens/            # SensorsScreen.tsx, SensorDetailScreen.tsx, ChartFullscreenScreen.tsx, AddSensorScreen.tsx
+│   │   ├── components/         # SensorCard.tsx, SensorList.tsx, ReadingChart.tsx
+│   │   ├── hooks/              # useSensors.ts, useSensorReadings.ts
+│   │   └── types.ts
+│   ├── alerts/
+│   │   ├── screens/            # AlertsScreen.tsx
+│   │   ├── components/         # AlertCard.tsx, SwipeableAlert.tsx
+│   │   ├── hooks/              # useAlerts.ts
+│   │   └── types.ts
+│   ├── map/
+│   │   ├── screens/            # MapScreen.tsx
+│   │   ├── components/         # GreenhouseMap.tsx, SensorMarker.tsx
+│   │   └── hooks/              # useMapData.ts
+│   ├── settings/
+│   │   ├── screens/            # SettingsScreen.tsx, ProfileScreen.tsx, NotificationsScreen.tsx, AboutScreen.tsx
+│   │   └── components/         # SettingsRow.tsx, ProfileAvatar.tsx
+│   └── notifications/
+│       ├── screens/            # NotificationsScreen.tsx
+│       └── hooks/              # useNotifications.ts
+├── shared/
+│   ├── components/             # Button, Input, Card, Badge, Spinner, EmptyState, BottomSheet, SwipeableRow
+│   │   ├── Button.tsx
+│   │   ├── Input.tsx
+│   │   ├── Card.tsx
+│   │   ├── Badge.tsx
+│   │   ├── Spinner.tsx
+│   │   ├── EmptyState.tsx
+│   │   ├── BottomSheet.tsx
+│   │   ├── SwipeableRow.tsx
+│   │   ├── RefreshControl.tsx
+│   │   ├── SkeletonLoader.tsx
+│   │   ├── Avatar.tsx
+│   │   ├── SensorIcon.tsx
+│   │   ├── StatusDot.tsx
+│   │   ├── Toast.tsx
+│   │   └── index.ts
+│   ├── hooks/
+│   │   ├── useApi.ts
+│   │   ├── useLocation.ts
+│   │   ├── useNotifications.ts
+│   │   ├── useNetworkStatus.ts
+│   │   ├── useDebounce.ts
+│   │   └── useRefresh.ts
+│   ├── navigation/
+│   │   ├── AppNavigator.tsx     # Root navigator
+│   │   ├── AuthStack.tsx        # Login, Forgot
+│   │   ├── MainTabs.tsx         # Bottom tabs
+│   │   ├── SensorStack.tsx      # Sensor list → detail → chart
+│   │   ├── AlertStack.tsx       # Alert list → detail
+│   │   └── SettingsStack.tsx    # Settings → sub-screens
+│   └── utils/
+│       ├── formatters.ts
+│       ├── validators.ts
+│       └── constants.ts
+├── lib/
+│   ├── api-client.ts            # Axios + auth interceptor (compartido con web)
+│   ├── storage.ts               # MMKV helpers
+│   ├── push.ts                  # Push notifications setup
+│   ├── websocket.ts             # WebSocket manager (compartido con web)
+│   └── logger.ts                # Mobile logger
+├── store/
+│   ├── auth.store.ts            # Zustand auth store
+│   └── ui.store.ts              # Zustand UI store
+├── types/                       # Shared types (idealmente importar de shared/)
+├── assets/                      # Copia de assets para build
+│   ├── icons/                   # SVGs de sensores y navegación
+│   └── images/                  # Ilustraciones para empty states
+└── App.tsx
+```
+
+- [ ] Crear estructura de features completa
+- [ ] Crear tipos compartidos (importar de `shared/` donde sea posible)
+- [ ] Crear barrel exports en cada feature
+
+### 4.4 Tema y Design System Mobile
+
+> 🎨 Los colores y estilos DEBEN ser idénticos a los mockups en `assets/mockups/mobile/`
+
+- [ ] Crear `theme/tokens.ts` con constantes de diseño:
+  - [ ] Colores: misma paleta que web (bg-primary #000, surface #111, etc.)
+  - [ ] Tipografía: Inter (text) + JetBrains Mono (datos numéricos)
+  - [ ] Spacing: 4, 8, 12, 16, 20, 24, 32, 48 (scale de 4px)
+  - [ ] Border radius: 8 (small), 12 (medium), 16 (large), 24 (pill)
+  - [ ] Shadows: sombra sutil para cards elevadas
+- [ ] Crear `theme/GlobalStyles.ts` con estilos base:
+  - [ ] Default font family
+  - [ ] Background color negro (#000)
+  - [ ] Text color blanco
+- [ ] Configurar fuentes personalizadas con `expo-font`:
+  - [ ] Descargar Inter (Regular, Medium, Bold) y JetBrains Mono (Regular)
+  - [ ] Pre-cargar fuentes antes de mostrar app
+
+### 4.5 Navegación (React Navigation)
 
 - [ ] Configurar React Navigation v6:
-  - [ ] `AuthStack` — Login, ForgotPassword, ResetPassword
-  - [ ] `MainTabs` — Dashboard, Sensors, Alerts, Map, Settings
-  - [ ] `SensorStack` — SensorList → SensorDetail → ChartFullscreen
-  - [ ] `AlertStack` — AlertList → AlertDetail
-  - [ ] `SettingsStack` — Settings → Profile → Notifications → About
-- [ ] Configurar deep linking (URLs: `echosmart://sensors/123`)
-- [ ] Implementar transiciones animadas entre pantallas
-- [ ] Implementar gesture-based navigation (swipe back)
-- [ ] Configurar splash screen nativo con `expo-splash-screen`
-- [ ] Tests: navegación entre todas las pantallas
+  - [ ] **AuthStack** (Stack Navigator):
+    - [ ] `LoginScreen` — Formulario de login
+    - [ ] `ForgotPasswordScreen` — Recuperar contraseña
+    - [ ] `ResetPasswordScreen` — Nueva contraseña
+  - [ ] **MainTabs** (Bottom Tab Navigator):
+    - [ ] Tab 1: `DashboardScreen` — Ícono: dashboard.svg
+    - [ ] Tab 2: `SensorsScreen` — Ícono: sensors.svg
+    - [ ] Tab 3: `AlertsScreen` — Ícono: alerts.svg, badge con conteo
+    - [ ] Tab 4: `MapScreen` — Ícono: map.svg
+    - [ ] Tab 5: `SettingsScreen` — Ícono: settings.svg
+  - [ ] **SensorStack** (Stack Navigator, dentro de Tab 2):
+    - [ ] `SensorsScreen` → `SensorDetailScreen` → `ChartFullscreenScreen`
+  - [ ] **AlertStack** (Stack Navigator, dentro de Tab 3):
+    - [ ] `AlertsScreen` → `AlertDetailScreen`
+  - [ ] **SettingsStack** (Stack Navigator, dentro de Tab 5):
+    - [ ] `SettingsScreen` → `ProfileScreen` → `NotificationsScreen` → `AboutScreen`
+- [ ] Tab bar estilizado:
+  - [ ] Fondo: `#0A0A0A` (casi negro)
+  - [ ] Íconos inactivos: `#616161` (gris)
+  - [ ] Ícono activo: `#00E676` (verde)
+  - [ ] Label activo: `#00E676`
+  - [ ] Badge en Alerts tab: círculo rojo con número
+  - [ ] Usar SVGs de `assets/icons/svg/navigation/`
+- [ ] Configurar deep linking (URLs: `echosmart://sensors/123`, `echosmart://alerts`)
+- [ ] Configurar splash screen nativo con `expo-splash-screen`:
+  - [ ] Usar imagen de `assets/splash/png/` según resolución
+  - [ ] Background: `#000000`
+  - [ ] Mantener splash hasta que se carguen fuentes y auth check
+- [ ] Transiciones animadas entre pantallas (slide, fade)
+- [ ] Gesture-based navigation (swipe back en iOS, edge swipe en Android)
+- [ ] Tests: navegación entre todas las pantallas, deep linking
 
-### 4.3 Pantallas Principales
+### 4.6 Pantallas Principales (cada una debe coincidir con mockups mobile)
 
-- [ ] **DashboardScreen**:
-  - [ ] Grid de métricas (2×2) con valores actuales
-  - [ ] Gráfica simplificada de las últimas 6 horas
-  - [ ] Lista compacta de alertas activas
+- [ ] **LoginScreen** (como `mockup-mobile-login.png`):
+  - [ ] Logo EchoSmart centrado arriba (de `assets/icons/svg/logos/`)
+  - [ ] Card de formulario con fondo `#111111`
+  - [ ] Input email con ícono, validación de formato
+  - [ ] Input password con toggle visibility
+  - [ ] Checkbox "Remember me"
+  - [ ] Botón "Iniciar Sesión" en verde `#00E676`
+  - [ ] Link "Forgot password?"
+  - [ ] Biometric login button (Face ID / Fingerprint) si está habilitado
+  - [ ] KeyboardAvoidingView para que el teclado no tape inputs
+  - [ ] Loading state durante request
+  - [ ] Error messages: shake animation + texto rojo
+
+- [ ] **DashboardScreen** (como `mockup-mobile-home.png`):
+  - [ ] Header con logo + nombre de la app
+  - [ ] Grid 2×2 de métricas (Temperature, Humidity, CO₂, Light):
+    - [ ] Cada card: ícono SVG, valor grande en JetBrains Mono, unidad, tendencia
+    - [ ] Colores según tipo de sensor
+    - [ ] Touch → navegar a sensor detail
+  - [ ] Gráfica simplificada de últimas 6 horas (mini area chart)
+  - [ ] Sección "Recent Alerts": 3 alertas más recientes
+    - [ ] Cada alerta: ícono de severidad, mensaje, tiempo relativo
+    - [ ] Touch → navegar a alerta
+  - [ ] Pull-to-refresh con RefreshControl personalizado
+  - [ ] Loading skeletons durante primera carga
+  - [ ] WebSocket: actualizar métricas en tiempo real
+
+- [ ] **SensorsScreen** (como `mockup-mobile-sensors.png`):
+  - [ ] Barra de búsqueda en la parte superior
+  - [ ] Chips de filtro horizontal: All, Temperature, Humidity, Light, Soil, CO₂
+  - [ ] Lista de sensores (FlatList con virtualización):
+    - [ ] SensorCard: ícono, nombre, última lectura, tiempo, status dot
+    - [ ] Touch → navegar a detail
+  - [ ] FAB "+" verde en esquina inferior derecha → AddSensorScreen
   - [ ] Pull-to-refresh
-  - [ ] Loading skeletons
-- [ ] **SensorsScreen**:
-  - [ ] Lista de sensores con SensorCard
-  - [ ] Filtro rápido por tipo (chips horizontales)
-  - [ ] Búsqueda por nombre
-  - [ ] Pull-to-refresh
-  - [ ] FAB "+" para agregar sensor
-- [ ] **SensorDetailScreen**:
-  - [ ] Header con info del sensor
-  - [ ] Gráfica interactiva con zoom/pan (victory-native o react-native-chart-kit)
-  - [ ] Selector de rango de tiempo
-  - [ ] Estadísticas: min, max, avg
-  - [ ] Lista de alertas recientes
-  - [ ] Botón fullscreen para gráfica
-- [ ] **AlertsScreen**:
-  - [ ] Lista de alertas con indicadores de severidad
-  - [ ] Filtros: severidad, estado
-  - [ ] Swipe para acknowledge/resolve
+  - [ ] Empty state: ilustración de `assets/icons/svg/illustrations/` + "No sensors yet"
+  - [ ] Animated transitions: cards con fade in staggered
+
+- [ ] **SensorDetailScreen** (como `mockup-mobile-sensor-detail.png`):
+  - [ ] Header: nombre del sensor, tipo (badge), estado (dot)
+  - [ ] Card grande: valor actual en font enorme + unidad + tendencia
+  - [ ] Gráfica de lecturas con selector de rango (1h, 6h, 24h, 7d)
+  - [ ] Touch en gráfica → ChartFullscreenScreen
+  - [ ] Estadísticas: Min, Max, Avg en 3 mini cards
+  - [ ] Lista de alertas recientes de este sensor
+  - [ ] Botón "Settings" para configurar nombre y umbrales
+
+- [ ] **AlertsScreen** (como `mockup-mobile-alerts.png`):
+  - [ ] Contadores por severidad en la parte superior
+  - [ ] Lista de alertas con SwipeableRow:
+    - [ ] Swipe right → Acknowledge (verde)
+    - [ ] Swipe left → Resolve (azul)
+  - [ ] Filtros: chips de severidad (Critical, High, Medium, Low)
   - [ ] Badge en tab con conteo de no leídas
-- [ ] **MapScreen**:
-  - [ ] Mapa del invernadero (react-native-maps o SVG)
-  - [ ] Markers de sensores con colores de estado
-  - [ ] Popup al tocar sensor con última lectura
-- [ ] **SettingsScreen**:
-  - [ ] Perfil de usuario
-  - [ ] Preferencias de notificaciones
-  - [ ] Idioma
-  - [ ] Información de la app (versión, licencias)
-  - [ ] Logout
-- [ ] **NotificationsScreen**:
+  - [ ] Pull-to-refresh
+  - [ ] Haptic feedback al acknowledge/resolve
+
+- [ ] **MapScreen** (como `mockup-mobile-map.png`):
+  - [ ] Mapa del invernadero (react-native-maps o SVG):
+    - [ ] Markers de sensores con colores de estado
+    - [ ] Touch en marker → popup con última lectura
+  - [ ] Leyenda de colores
+  - [ ] Zoom in/out con pinch gesture
+
+- [ ] **SettingsScreen** (como `mockup-mobile-settings.png`):
+  - [ ] Secciones con SettingsRow components:
+    - [ ] Perfil: nombre, email, avatar
+    - [ ] Notificaciones: toggle por tipo (email, push, in-app)
+    - [ ] Biometría: toggle Face ID / Fingerprint
+    - [ ] Idioma: selector es/en
+    - [ ] Información: versión, licencias, soporte
+    - [ ] Logout: botón rojo
+
+- [ ] **NotificationsScreen** (como `mockup-mobile-notifications.png`):
   - [ ] Lista de notificaciones push recibidas
-  - [ ] Marcar como leída
+  - [ ] Marcar como leída (touch)
   - [ ] Navegar al recurso relacionado al tocar
-- [ ] **AddSensorScreen**:
-  - [ ] Formulario step-by-step
-  - [ ] Escaneo de QR/código del sensor (expo-barcode-scanner)
-- [ ] **ChartFullscreenScreen**:
-  - [ ] Gráfica a pantalla completa en landscape
+  - [ ] Empty state si no hay notificaciones
+
+- [ ] **AddSensorScreen** (como `mockup-mobile-add-sensor.png`):
+  - [ ] Step wizard (3 pasos con indicador de progreso):
+    - [ ] Paso 1: Seleccionar gateway (lista de gateways online)
+    - [ ] Paso 2: Seleccionar tipo de sensor (cards con ícono SVG)
+    - [ ] Paso 3: Nombre + configuración (umbrales)
+  - [ ] Opción: escanear QR/código del sensor con `expo-barcode-scanner`
+  - [ ] Botón "Create" en verde
+
+- [ ] **ChartFullscreenScreen** (como `mockup-mobile-chart-fullscreen.png`):
+  - [ ] Gráfica a pantalla completa en landscape (forzar orientación)
   - [ ] Pinch to zoom
-  - [ ] Exportar como imagen
+  - [ ] Selector de rango de tiempo
+  - [ ] Botón "Export as image" (capturar view como PNG)
+  - [ ] Botón "Back" para volver a portrait
 
-### 4.4 Componentes Compartidos (Mobile)
+### 4.7 Componentes Compartidos (Mobile Design System)
 
-- [ ] **Button** — Primary, secondary, danger, outline, FAB. Loading state
-- [ ] **Input** — Text, password, search. Con label y error message
-- [ ] **Card** — Elevated card con sombra nativa
-- [ ] **Badge** — Status dot + conteo (para alertas)
-- [ ] **Spinner** — Loading overlay + inline spinner
-- [ ] **EmptyState** — Ilustración + mensaje + CTA
-- [ ] **Avatar** — Con iniciales y badge de estado
-- [ ] **BottomSheet** — Modal desde abajo (para filtros, acciones)
-- [ ] **SwipeableRow** — Swipe left/right para acciones (acknowledge, delete)
-- [ ] **RefreshControl** — Pull-to-refresh estilizado
-- [ ] **SkeletonLoader** — Placeholder animado mientras carga
+> Cada componente usa colores de `theme/tokens.ts` y es visualmente consistente con los mockups mobile.
+
+- [ ] **Button** — Primary (verde), secondary (#1A1A1A), danger (rojo), outline, FAB:
+  - [ ] Loading state con ActivityIndicator
+  - [ ] Disabled state (opacidad 0.5)
+  - [ ] Haptic feedback al tocar
+  - [ ] Tests: render, press, loading, disabled
+- [ ] **Input** — Text, password (toggle visibility), search (ícono lupa):
+  - [ ] Label encima del input
+  - [ ] Error message debajo en rojo
+  - [ ] Fondo `#1A1A1A`, borde `#2A2A2A`, focus `#00E676`
+  - [ ] Tests: input, validation, clear
+- [ ] **Card** — Surface container con fondo `#111111`, border-radius 12px:
+  - [ ] Sombra nativa (iOS shadow, Android elevation)
+  - [ ] Touch feedback (opacity)
+- [ ] **Badge** — Status dot + conteo:
+  - [ ] Variantes: success (verde), warning (amarillo), danger (rojo), info (cyan)
+- [ ] **Spinner** — Loading overlay + inline:
+  - [ ] Fullscreen overlay con fondo semitransparente
+  - [ ] Inline spinner para botones y listas
+- [ ] **EmptyState** — Ilustración SVG + mensaje + CTA button:
+  - [ ] Usar ilustraciones de `assets/icons/svg/illustrations/`
+  - [ ] Centrado vertical en contenedor
+- [ ] **Avatar** — Con iniciales y badge de estado:
+  - [ ] Imagen de perfil o iniciales sobre fondo verde
+  - [ ] Status dot en esquina
+- [ ] **BottomSheet** — Modal desde abajo:
+  - [ ] Para filtros, acciones rápidas, opciones
+  - [ ] Gesture: swipe down para cerrar
+  - [ ] Fondo `#111111`, handle bar en `#333333`
+- [ ] **SwipeableRow** — Swipe left/right para acciones:
+  - [ ] Reveal action buttons detrás de la fila
+  - [ ] Haptic feedback al completar swipe
+- [ ] **RefreshControl** — Pull-to-refresh estilizado:
+  - [ ] Spinner en verde `#00E676`
+- [ ] **SkeletonLoader** — Placeholder animado:
+  - [ ] Shimmer animation sobre fondo `#111111`
+  - [ ] Shapes: rectangle, circle, text line
+- [ ] **SensorIcon** — Renderizar SVG del sensor:
+  - [ ] Props: type, size, color
+  - [ ] Usar `react-native-svg`
+- [ ] **StatusDot** — Online/offline indicator:
+  - [ ] Pulse animation para online
+- [ ] **Toast** — Notificación in-app:
+  - [ ] Slide down desde top
+  - [ ] Auto-dismiss
+  - [ ] Variantes: success, error, warning, info
 - [ ] Tests para cada componente
 
-### 4.5 Funcionalidades Nativas
+### 4.8 Funcionalidades Nativas
 
 - [ ] **Push Notifications** (Firebase Cloud Messaging):
-  - [ ] Configurar `expo-notifications`
-  - [ ] Registrar device token en backend al login
-  - [ ] Manejar notificaciones en foreground (in-app banner)
-  - [ ] Manejar notificaciones en background (sistema operativo)
-  - [ ] Deep linking desde notificación → pantalla relevante
-  - [ ] Canales de notificación por severidad de alerta (Android)
-- [ ] **Modo Offline**:
-  - [ ] Cache de última lectura de cada sensor en AsyncStorage
-  - [ ] Detectar estado de red (`@react-native-community/netinfo`)
-  - [ ] Mostrar banner "Sin conexión" cuando offline
-  - [ ] Sincronizar al reconectar
-  - [ ] Cola de acciones offline (acknowledge alerts)
-- [ ] **Biometría** (iOS/Android):
-  - [ ] Login con Face ID / Touch ID / Fingerprint
-  - [ ] Configurar en Settings
-  - [ ] `expo-local-authentication`
-- [ ] **Haptic Feedback**:
-  - [ ] Feedback táctil en acciones importantes (acknowledge, alert)
-  - [ ] `expo-haptics`
+  - [ ] Configurar `expo-notifications`:
+    - [ ] Solicitar permisos al usuario
+    - [ ] Obtener device push token (FCM para Android, APNs para iOS)
+    - [ ] Enviar token al backend: `POST /api/v1/users/me/push-token`
+  - [ ] Manejar notificaciones en foreground: in-app Toast banner
+  - [ ] Manejar notificaciones en background: notificación del sistema
+  - [ ] Deep linking desde notificación:
+    - [ ] Alerta → AlertDetailScreen
+    - [ ] Sensor → SensorDetailScreen
+    - [ ] Gateway offline → GatewayScreen
+  - [ ] Canales de notificación por severidad (Android):
+    - [ ] "Critical Alerts" — Sound + vibration
+    - [ ] "General Alerts" — Sound only
+    - [ ] "Info" — Silent
+  - [ ] Tests: registro, recepción, deep link
 
-### 4.6 Android — Build y Distribución
+- [ ] **Modo Offline**:
+  - [ ] Cache de última lectura de cada sensor en MMKV:
+    - [ ] Key: `sensor:{id}:last_reading`
+    - [ ] Value: `{value, timestamp, unit}`
+  - [ ] Detectar estado de red con `@react-native-community/netinfo`
+  - [ ] Mostrar banner "Sin conexión" cuando offline (sticky top)
+  - [ ] En offline: mostrar datos cacheados con indicador "Cached X min ago"
+  - [ ] Queue de acciones offline (acknowledge alerts) con retry al reconectar
+  - [ ] Sincronizar datos acumulados al reconectar
+  - [ ] Tests: offline mode, cache, queue, sync
+
+- [ ] **Biometría** (Face ID / Touch ID / Fingerprint):
+  - [ ] `expo-local-authentication`:
+    - [ ] Verificar hardware disponible: `hasHardwareAsync()`
+    - [ ] Verificar biometría enrolled: `isEnrolledAsync()`
+    - [ ] Autenticar: `authenticateAsync({ promptMessage: 'Acceder a EchoSmart' })`
+  - [ ] Toggle en Settings para habilitar/deshabilitar
+  - [ ] Auto-login con biometría si token válido en MMKV
+  - [ ] Fallback a login con contraseña si biometría falla
+  - [ ] Tests: check hardware, authenticate, fallback
+
+- [ ] **Haptic Feedback**:
+  - [ ] `expo-haptics`:
+    - [ ] `impactAsync(ImpactFeedbackStyle.Light)` — Tab switches, swipes
+    - [ ] `impactAsync(ImpactFeedbackStyle.Medium)` — Button press, acknowledge
+    - [ ] `notificationAsync(NotificationFeedbackType.Success)` — Acción completada
+    - [ ] `notificationAsync(NotificationFeedbackType.Error)` — Error
+  - [ ] Configurar haptics en: swipe actions, pull-to-refresh complete, FAB press, login success/error
+
+- [ ] **Orientación de Pantalla**:
+  - [ ] Portrait lock por defecto para todas las pantallas
+  - [ ] Landscape solo para ChartFullscreenScreen
+  - [ ] Detectar orientación y adaptar layout
+
+### 4.9 API Client Mobile (Compartido con Web)
+
+- [ ] Configurar Axios instance (`lib/api-client.ts`):
+  - [ ] Base URL desde env variable
+  - [ ] Auth interceptor: token desde MMKV secure storage
+  - [ ] Refresh token en 401
+  - [ ] Error handler: mapear a tipo consistente
+  - [ ] Timeout: 15s (mobile puede tener conexión lenta)
+- [ ] React Query config para mobile:
+  - [ ] `staleTime: 2 * 60 * 1000` (2 min, más agresivo que web)
+  - [ ] `cacheTime: 60 * 60 * 1000` (1 hora, para offline)
+  - [ ] `refetchOnReconnect: true` (refetch al reconectar)
+  - [ ] Persistir cache en MMKV con `@tanstack/query-sync-storage-persister`
+- [ ] Hooks por feature (mismos que web, adaptados):
+  - [ ] `useSensors()`, `useSensor(id)`, `useSensorReadings(id, range)`
+  - [ ] `useAlerts()`, `useAcknowledgeAlert()`
+  - [ ] `useDashboardData()`
+  - [ ] `useGateways()`
+- [ ] WebSocket manager (compartido con web):
+  - [ ] Conectar/desconectar según estado de la app (foreground/background)
+  - [ ] Desconectar en background para ahorrar batería
+  - [ ] Reconectar al volver a foreground
+
+### 4.10 Android — Configuración, Build y Assets
 
 - [ ] Configurar `eas.json` para Android:
-  - [ ] Profile: development (APK debug), preview (APK release), production (AAB)
-- [ ] Configurar splash screen nativo
-- [ ] Configurar adaptive icon (foreground + background layers)
-- [ ] Generar APK de desarrollo: `eas build --platform android --profile preview`
-- [ ] Probar en emulador Android (Android Studio)
-- [ ] Probar en dispositivos Android reales (3+ dispositivos)
-- [ ] Configurar Google Play Console
-- [ ] Publicar en Google Play Store (internal testing → production)
+  - [ ] Profile `development`: APK debug para testing
+  - [ ] Profile `preview`: APK release para testers
+  - [ ] Profile `production`: AAB (Android App Bundle) para Google Play
+- [ ] Configurar `app.json` para Android:
+  - [ ] `android.package: "com.echosmart.app"`
+  - [ ] `android.versionCode: 1` (incrementar en cada build)
+  - [ ] `android.adaptiveIcon.foregroundImage`: usar `assets/platform/android/adaptive-icon-foreground.png`
+  - [ ] `android.adaptiveIcon.backgroundColor: "#000000"`
+  - [ ] `android.permissions: ["INTERNET", "ACCESS_NETWORK_STATE", "RECEIVE_BOOT_COMPLETED", "VIBRATE"]`
+  - [ ] `android.splash.image`: usar `assets/platform/android/splash-xxxhdpi.png`
+  - [ ] `android.splash.backgroundColor: "#000000"`
+- [ ] Generar Keystore para firma:
+  - [ ] `keytool -genkey -v -keystore echosmart.keystore -alias echosmart -keyalg RSA -keysize 2048 -validity 10000`
+  - [ ] Guardar keystore de forma segura (nunca en git)
+  - [ ] Configurar en EAS Secrets
+- [ ] Build APK de desarrollo: `eas build --platform android --profile development`
+- [ ] Build APK de preview: `eas build --platform android --profile preview`
+- [ ] Build AAB de producción: `eas build --platform android --profile production`
+- [ ] Probar en emulador Android (Android Studio AVD):
+  - [ ] Pixel 4 API 33 (Android 13)
+  - [ ] Pixel 7 API 34 (Android 14)
+  - [ ] Samsung Galaxy S21 (si disponible)
+- [ ] Probar en dispositivos Android reales (3+ dispositivos, diferentes marcas):
+  - [ ] Verificar que UI se ve como mockups
+  - [ ] Verificar push notifications
+  - [ ] Verificar biometría (fingerprint)
+  - [ ] Verificar offline mode
+  - [ ] Verificar performance (60fps en listas, scroll suave)
+- [ ] Configurar Google Play Console:
+  - [ ] Crear app "EchoSmart" con screenshots de `assets/mockups/mobile/`
+  - [ ] Upload feature graphic de `assets/platform/android/feature-graphic.png`
+  - [ ] Configurar internal testing track
+  - [ ] Upload AAB
+- [ ] Publicar en Google Play:
+  - [ ] Internal testing → closed beta → open beta → production
 
-### 4.7 iOS — Build y Distribución
+### 4.11 iOS — Configuración, Build y Assets
 
 - [ ] Configurar `eas.json` para iOS:
-  - [ ] Profile: development (simulator), preview (ad-hoc), production (App Store)
-- [ ] Configurar provisioning profiles y certificates
-- [ ] Configurar splash screen y app icon para iOS
-- [ ] Adaptar UI para convenciones iOS (Safe Area, large titles, gestos)
-- [ ] Generar build: `eas build --platform ios --profile preview`
-- [ ] Probar en simulador iOS (Xcode)
-- [ ] Probar en dispositivos iOS reales
-- [ ] Configurar App Store Connect
-- [ ] Publicar en App Store (TestFlight → production)
+  - [ ] Profile `development`: build para simulador
+  - [ ] Profile `preview`: ad-hoc IPA para testers (con provisioning profile)
+  - [ ] Profile `production`: App Store build
+- [ ] Configurar `app.json` para iOS:
+  - [ ] `ios.bundleIdentifier: "com.echosmart.app"`
+  - [ ] `ios.buildNumber: "1"` (incrementar en cada build)
+  - [ ] `ios.supportsTablet: true`
+  - [ ] `ios.icon`: usar `assets/platform/ios/app-icon-1024.png`
+  - [ ] `ios.splash.image`: usar `assets/platform/ios/splash-super-retina.png`
+  - [ ] `ios.splash.backgroundColor: "#000000"`
+  - [ ] `ios.infoPlist`: configurar permisos con mensajes:
+    - [ ] `NSCameraUsageDescription: "Para escanear códigos QR de sensores"`
+    - [ ] `NSFaceIDUsageDescription: "Para login seguro con Face ID"`
+  - [ ] `ios.config.usesNonExemptEncryption: false`
+- [ ] Configurar Apple Developer account:
+  - [ ] Crear App ID: `com.echosmart.app`
+  - [ ] Crear provisioning profiles (development + distribution)
+  - [ ] Configurar Push Notification capability (APNs key)
+  - [ ] Configurar en EAS Credentials
+- [ ] Adaptar UI para convenciones iOS:
+  - [ ] SafeAreaView en todas las pantallas
+  - [ ] Large titles en navigation bar (estilo iOS moderno)
+  - [ ] Swipe from edge to go back (nativo de React Navigation)
+  - [ ] Bottom tab bar con SafeArea (iPhone con notch/Dynamic Island)
+  - [ ] Action sheets en vez de dropdowns (estilo iOS)
+- [ ] Build para simulador: `eas build --platform ios --profile development`
+- [ ] Build IPA ad-hoc: `eas build --platform ios --profile preview`
+- [ ] Build App Store: `eas build --platform ios --profile production`
+- [ ] Probar en simulador iOS (Xcode):
+  - [ ] iPhone 15 Pro (iOS 17)
+  - [ ] iPhone SE 3 (pantalla pequeña)
+  - [ ] iPad Pro (tablet layout)
+- [ ] Probar en dispositivo iOS real:
+  - [ ] Verificar Face ID / Touch ID
+  - [ ] Verificar push notifications via APNs
+  - [ ] Verificar UI idéntica a mockups
+  - [ ] Verificar SafeArea en diferentes modelos
+- [ ] Configurar App Store Connect:
+  - [ ] Crear app "EchoSmart" con screenshots de `assets/mockups/mobile/`
+  - [ ] Configurar TestFlight
+  - [ ] Upload build
+- [ ] Publicar en App Store:
+  - [ ] TestFlight internal → external → App Store review → release
 
-### 4.8 Mobile — Tests
+### 4.12 Mobile — Tests Completos
 
-- [ ] Tests unitarios para hooks personalizados
-- [ ] Tests de componentes con React Native Testing Library
-- [ ] Tests de navegación (screen mounting, params)
-- [ ] Tests de integración: flujo login → dashboard → sensor detail
-- [ ] Tests de offline: cache hit, queue actions, sync
-- [ ] Verificar performance: 60fps en listas, scroll suave
-- [ ] Verificar accesibilidad: labels, roles, focus order
+- [ ] Configurar testing:
+  - [ ] Jest + React Native Testing Library
+  - [ ] Mock de módulos nativos: `@react-native-community/netinfo`, `expo-notifications`, etc.
+  - [ ] Mock de `react-navigation`: `@react-navigation/native/testing`
+- [ ] Tests unitarios para CADA hook personalizado
+- [ ] Tests de componentes con React Native Testing Library:
+  - [ ] Todos los componentes compartidos (Button, Input, Card, etc.)
+  - [ ] SensorCard, MetricCard, AlertCard
+- [ ] Tests de pantallas:
+  - [ ] LoginScreen: input, validation, submit, error, biometric
+  - [ ] DashboardScreen: render metrics, pull-to-refresh
+  - [ ] SensorsScreen: list, filter, search, empty state
+  - [ ] SensorDetailScreen: render chart, stats
+  - [ ] AlertsScreen: list, swipe actions
+- [ ] Tests de navegación:
+  - [ ] Auth flow: Login → Dashboard
+  - [ ] Sensor flow: Sensors → Detail → Fullscreen Chart
+  - [ ] Deep linking: URL → correct screen
+- [ ] Tests de integración:
+  - [ ] Login → Dashboard → Sensor Detail (full flow)
+  - [ ] Offline mode: cache, queue, reconnect sync
+  - [ ] Push notification → deep link to screen
+- [ ] Performance:
+  - [ ] 60fps en FlatList con 100+ items (usar Flashlight)
+  - [ ] App launch < 3 seconds
+  - [ ] Memory: no leaks en navegación entre pantallas
 
-### 4.9 Mobile — Calidad de Código
+### 4.13 Mobile — Calidad de Código
 
-- [ ] ESLint + Prettier para React Native
-- [ ] Remover `console.log` — usar logger
-- [ ] Agregar prop-types/TypeScript a todos los componentes
-- [ ] Crear `mobile/README.md` con guía de desarrollo y testing
+- [ ] ESLint + Prettier strict mode para React Native + TypeScript
+- [ ] CERO `any` en TypeScript
+- [ ] CERO `console.log` — usar `lib/logger.ts`
+- [ ] Type-safe navigation con `@react-navigation/native` generic types
+- [ ] Crear `mobile/README.md` con:
+  - [ ] Guía de setup de desarrollo (Expo Go + EAS)
+  - [ ] Estructura del proyecto explicada
+  - [ ] Cómo compilar APK y IPA
+  - [ ] Cómo probar push notifications
+  - [ ] Cómo probar en emuladores y dispositivos reales
+  - [ ] Design system: tokens, componentes, colores
 
 ---
 
-## Fase 5: Aplicación de Escritorio — Electron (Semanas 17–20)
+## Fase 5: Aplicación de Escritorio — Electron + React (Semanas 17–20)
 
 > 🏛️ **Clean Architecture en Electron**: Separar main process (Node.js) de renderer process (React). Comunicación exclusivamente vía IPC con preload scripts seguros.
 
-### 5.1 Arquitectura Electron
+> 🖥️ **Stack Definido**: Electron 28 + React 18 (mismo frontend/) + TypeScript. Compila a **EXE (Windows)** vía electron-builder NSIS, **DMG (macOS)** vía electron-builder DMG, y **AppImage (Linux)** vía electron-builder AppImage.
+
+### 5.1 Definición de Tecnologías y Justificación
+
+| Decisión | Elección | Justificación |
+|----------|----------|---------------|
+| **Framework** | Electron 28 | Permite reutilizar el frontend React web como renderer. Acceso a APIs del sistema (tray, menú, notificaciones nativas, filesystem) |
+| **Renderer** | React 18 (mismo frontend/) | Reutilizar 100% del frontend web. Sin duplicar UI |
+| **Lenguaje** | TypeScript | Consistencia con web y mobile. Type safety para IPC channels |
+| **NO Tauri** | Descartado | Aunque más ligero, requiere Rust para el backend y no es tan maduro para nuestro uso |
+| **NO .NET MAUI / WPF** | Descartado | Solo para Windows. Electron cubre las 3 plataformas |
+| **NO Qt / C++** | Descartado | Complejidad excesiva, no permite reutilizar frontend React |
+| **Builder** | electron-builder | Más maduro que electron-forge, soporta NSIS, DMG, AppImage, auto-update |
+| **Auto-Update** | electron-updater | Integrado con electron-builder, soporta GitHub Releases como update server |
+| **Storage** | electron-store | JSON encriptado en disco, API simple key-value |
+| **IPC** | contextBridge | Exposición segura de APIs del main al renderer. NUNCA nodeIntegration: true |
+
+### 5.2 Arquitectura Electron
 
 ```
-desktop/src/
-├── main/
-│   ├── main.js              # Entry point, ventana principal
-│   ├── menu.js              # Menú nativo por plataforma
-│   ├── tray.js              # Icono en bandeja del sistema
-│   ├── ipc-handlers.js      # Manejadores IPC (main ↔ renderer)
-│   ├── auto-updater.js      # Auto-actualización
-│   ├── local-gateway.js     # Conexión directa al gateway (LAN)
-│   └── store.js             # Configuración persistente (electron-store)
-├── preload/
-│   └── preload.js           # Exposición segura de APIs al renderer
-├── renderer/                # Frontend React (el mismo de frontend/)
-│   └── index.html
-└── assets/
-    ├── icon.png             # Icono de la app
-    └── tray-icon.png        # Icono de la bandeja
+desktop/
+├── src/
+│   ├── main/                    # Main process (Node.js)
+│   │   ├── main.ts              # Entry point, BrowserWindow, lifecycle
+│   │   ├── menu.ts              # Menú nativo por plataforma
+│   │   ├── tray.ts              # Icono en bandeja del sistema
+│   │   ├── ipc-handlers.ts      # Manejadores IPC tipados
+│   │   ├── auto-updater.ts      # Auto-actualización vía GitHub Releases
+│   │   ├── local-gateway.ts     # Descubrimiento y conexión a gateways LAN
+│   │   ├── store.ts             # Configuración persistente (electron-store)
+│   │   ├── notifications.ts     # Notificaciones nativas del OS
+│   │   ├── protocol.ts          # Custom protocol handler (echosmart://)
+│   │   └── logger.ts            # Logger para main process
+│   ├── preload/
+│   │   └── preload.ts           # contextBridge: exponer APIs seguras al renderer
+│   ├── renderer/                # Frontend React (symlink o copy de frontend/dist)
+│   │   └── index.html           # Entry point del renderer
+│   └── shared/
+│       └── ipc-channels.ts      # Constantes de IPC channels compartidas
+├── assets/
+│   ├── icon.ico                 # Windows icon (de assets/icons/ico/app.ico)
+│   ├── icon.icns                # macOS icon (generado desde PNG 512px)
+│   ├── icon.png                 # Linux icon (512px)
+│   ├── tray-icon.png            # Tray icon 32px (de assets/platform/desktop/)
+│   ├── tray-icon@2x.png         # Tray icon 64px (Retina)
+│   ├── dmg-background.png       # DMG background (de assets/platform/desktop/)
+│   └── installer-banner.bmp     # NSIS banner (de assets/platform/desktop/)
+├── electron-builder.yml         # Configuración de build
+├── package.json
+├── tsconfig.json
+└── README.md
 ```
+
+### 5.3 Configuración del Proyecto
 
 - [x] Configurar proyecto Electron
 - [x] Implementar main process básico
 - [x] Implementar preload scripts
 - [x] Integrar frontend React como renderer
-- [ ] Refactorizar main process con separación de responsabilidades
-- [ ] Implementar IPC handlers tipados
+- [ ] Migrar main process a TypeScript:
+  - [ ] `main.js` → `main.ts`
+  - [ ] `preload.js` → `preload.ts`
+  - [ ] Configurar `tsconfig.json` para main process (target: Node.js)
+  - [ ] Configurar bundling con `electron-vite` o `esbuild`
+- [ ] Configurar `electron-builder.yml`:
+  ```yaml
+  appId: "com.echosmart.desktop"
+  productName: "EchoSmart"
+  directories:
+    output: "dist"
+  files:
+    - "src/**/*"
+    - "assets/**/*"
+  win:
+    target: ["nsis"]
+    icon: "assets/icon.ico"
+  mac:
+    target: ["dmg", "zip"]
+    icon: "assets/icon.icns"
+    category: "public.app-category.utilities"
+  linux:
+    target: ["AppImage", "deb"]
+    icon: "assets/icon.png"
+    category: "Utility"
+  nsis:
+    oneClick: false
+    allowToChangeInstallationDirectory: true
+    installerIcon: "assets/icon.ico"
+    installerSidebar: "assets/installer-banner.bmp"
+  dmg:
+    background: "assets/dmg-background.png"
+    iconSize: 128
+    contents:
+      - x: 130
+        y: 220
+      - x: 410
+        y: 220
+        type: "link"
+        path: "/Applications"
+  ```
+- [ ] Copiar assets necesarios desde `assets/`:
+  - [ ] `assets/icons/ico/app.ico` → `desktop/assets/icon.ico`
+  - [ ] Generar `icon.icns` desde PNG 512px (con `png2icns` o script)
+  - [ ] `assets/icons/png/app-icon-512.png` → `desktop/assets/icon.png`
+  - [ ] `assets/platform/desktop/tray-icon-32.png` → `desktop/assets/tray-icon.png`
+  - [ ] `assets/platform/desktop/tray-icon-64.png` → `desktop/assets/tray-icon@2x.png`
+  - [ ] `assets/platform/desktop/dmg-background.png` → `desktop/assets/dmg-background.png`
+  - [ ] `assets/platform/desktop/installer-banner.png` → convertir a BMP
 
-### 5.2 Funcionalidades Compartidas (Desktop)
+### 5.4 Main Process — Ventana Principal
 
-- [ ] **Window Management**:
-  - [ ] Ventana principal con tamaño mínimo (1024×768)
-  - [ ] Guardar posición y tamaño de ventana al cerrar
-  - [ ] Splash screen nativo al iniciar
-  - [ ] Prevent multiple instances (single instance lock)
-- [ ] **Menú Nativo**:
-  - [ ] Crear menú por plataforma (Windows, macOS, Linux)
-  - [ ] File → Export Data, Import Config
-  - [ ] View → Reload, DevTools (solo dev), Fullscreen
-  - [ ] Help → About, Check for Updates, Documentation
-  - [ ] Shortcuts: Ctrl+R, Ctrl+Shift+I, F11
-- [ ] **System Tray**:
-  - [ ] Icono en bandeja con estado (verde=online, rojo=alerta)
-  - [ ] Context menu: Open, Status, Quit
-  - [ ] Minimize to tray (no cerrar al hacer click en X)
-  - [ ] Notificaciones nativas del sistema operativo
-- [ ] **Auto-Update** (`electron-updater`):
-  - [ ] Check for updates al iniciar y periódicamente
-  - [ ] Notificar al usuario si hay actualización
-  - [ ] Descargar e instalar en background
-  - [ ] Configurar GitHub Releases como update server
-- [ ] **Almacenamiento Local** (`electron-store`):
-  - [ ] Configuración persistente (tema, idioma, ventana)
-  - [ ] Cache de credenciales con encriptación
-  - [ ] Cache de últimas lecturas para acceso offline
-- [ ] **Conexión Directa al Gateway**:
-  - [ ] Descubrimiento de gateways en red local (mDNS/SSDP)
-  - [ ] Conexión HTTP directa para lecturas sin cloud
-  - [ ] Indicador de modo: "Directo" vs "Cloud"
-  - [ ] Fallback a cloud si gateway no accesible
-- [ ] **IPC (Inter-Process Communication)**:
-  - [ ] Definir channels tipados: `gateway:discover`, `gateway:connect`, `app:update-check`
-  - [ ] Exponer APIs seguras vía `contextBridge`
-  - [ ] Nunca exponer `require`, `fs`, o `child_process` al renderer
+- [ ] **BrowserWindow** configuración:
+  - [ ] Tamaño por defecto: 1280×800
+  - [ ] Tamaño mínimo: 1024×768
+  - [ ] Frame: `true` (usar frame nativo del OS)
+  - [ ] titleBarStyle: `'hidden'` en macOS para look moderno
+  - [ ] Background color: `#000000` (evitar flash blanco)
+  - [ ] webPreferences: `{ nodeIntegration: false, contextIsolation: true, preload: './preload.ts' }`
+  - [ ] Icon: `assets/icon.ico` (Windows) / `assets/icon.png` (Linux)
+- [ ] **Window state persistence** (electron-store):
+  - [ ] Guardar posición (x, y) y tamaño (width, height) al cerrar
+  - [ ] Restaurar posición y tamaño al abrir
+  - [ ] Guardar si estaba maximizada
+  - [ ] Verificar que la ventana está en un monitor visible (multi-monitor)
+- [ ] **Single instance lock**:
+  - [ ] `app.requestSingleInstanceLock()`
+  - [ ] Si segunda instancia: focus en la primera, no abrir nueva
+  - [ ] Pasar argumentos de CLI de segunda instancia a primera
+- [ ] **Splash screen al iniciar**:
+  - [ ] Ventana pequeña con logo de EchoSmart durante carga
+  - [ ] Cerrar splash y mostrar main window cuando renderer está listo
+  - [ ] Timeout: máximo 5 segundos
+- [ ] **Lifecycle events**:
+  - [ ] `will-quit`: guardar estado, desconectar
+  - [ ] `before-quit`: confirmar si hay datos no guardados
+  - [ ] macOS: `activate` → mostrar ventana si está oculta
+  - [ ] macOS: `window-all-closed` → NO quit (keep in dock)
 
-### 5.3 Windows
+### 5.5 IPC (Inter-Process Communication) — Tipado y Seguro
 
-- [ ] Configurar electron-builder para Windows (NSIS installer)
-- [ ] Desktop shortcut, start menu entry
-- [ ] Generar instalador `.exe`
-- [ ] Firmar ejecutable con certificado de código
-- [ ] Probar en Windows 10 y Windows 11
-- [ ] Probar instalación, actualización, desinstalación
+- [ ] Definir IPC channels tipados (`shared/ipc-channels.ts`):
+  ```typescript
+  export const IPC_CHANNELS = {
+    // Gateway
+    'gateway:discover': 'gateway:discover',        // () => Gateway[]
+    'gateway:connect': 'gateway:connect',          // (gatewayId: string) => boolean
+    'gateway:status': 'gateway:status',            // () => GatewayStatus
+    // App
+    'app:get-version': 'app:get-version',          // () => string
+    'app:check-update': 'app:check-update',        // () => UpdateInfo | null
+    'app:install-update': 'app:install-update',    // () => void
+    'app:open-external': 'app:open-external',      // (url: string) => void
+    // Store
+    'store:get': 'store:get',                      // (key: string) => any
+    'store:set': 'store:set',                      // (key: string, value: any) => void
+    // Notifications
+    'notification:show': 'notification:show',      // (title: string, body: string) => void
+    // Export
+    'export:csv': 'export:csv',                    // (data: any[], filename: string) => string
+    'export:pdf': 'export:pdf',                    // (html: string, filename: string) => string
+  } as const;
+  ```
+- [ ] Implementar IPC handlers en main (`ipc-handlers.ts`):
+  - [ ] Cada handler tipado con input/output
+  - [ ] Error handling: envolver en try/catch, devolver resultado o error
+  - [ ] Validación de inputs (no confiar en renderer)
+- [ ] Implementar preload bridge (`preload.ts`):
+  - [ ] `contextBridge.exposeInMainWorld('electronAPI', { ... })`
+  - [ ] Solo exponer funciones específicas, NUNCA `require`, `fs`, `child_process`
+  - [ ] Cada función expuesta es un wrapper de `ipcRenderer.invoke`
+- [ ] TypeScript declaration para `window.electronAPI`:
+  - [ ] `global.d.ts` con tipo `ElectronAPI` para autocompletado en renderer
+- [ ] Tests de seguridad:
+  - [ ] Verificar que `nodeIntegration` es `false`
+  - [ ] Verificar que `contextIsolation` es `true`
+  - [ ] Verificar que renderer NO tiene acceso a `require`
 
-### 5.4 macOS
+### 5.6 Menú Nativo
 
-- [ ] Configurar electron-builder para macOS (DMG + ZIP)
-- [ ] Configurar DMG con fondo personalizado y drag-to-Applications
-- [ ] Adaptar menú nativo y dock
-- [ ] Firmar con Apple Developer certificate
-- [ ] Notarización de la app
-- [ ] Probar en macOS Ventura/Sonoma
+- [ ] **Windows/Linux menú**:
+  - [ ] File → Export Data (CSV/PDF), Preferences, Exit
+  - [ ] View → Reload, Toggle DevTools (dev only), Fullscreen, Zoom In/Out/Reset
+  - [ ] Gateway → Discover Gateways, Connect, Disconnect
+  - [ ] Help → About EchoSmart, Check for Updates, Documentation (open URL), Report Bug
+  - [ ] Shortcuts: Ctrl+R (reload), Ctrl+Shift+I (devtools), F11 (fullscreen), Ctrl+Q (quit)
+- [ ] **macOS menú** (adaptar a convenciones):
+  - [ ] EchoSmart → About, Preferences (Cmd+,), Services, Hide, Quit
+  - [ ] File → Export, Close Window (Cmd+W)
+  - [ ] Edit → Undo, Redo, Cut, Copy, Paste, Select All
+  - [ ] View → Reload, Toggle DevTools, Fullscreen, Zoom
+  - [ ] Gateway → Discover, Connect, Disconnect
+  - [ ] Window → Minimize, Zoom, Close
+  - [ ] Help → Search, About, Updates, Documentation
+  - [ ] Shortcuts: Cmd+R, Cmd+Opt+I, Ctrl+Cmd+F, Cmd+Q
+- [ ] Context menu: right-click en elements del renderer
 
-### 5.5 Linux
+### 5.7 System Tray
 
-- [ ] Configurar electron-builder: AppImage, `.deb`, `.snap`
-- [ ] Desktop entry (`.desktop` file) con ícono
-- [ ] Adaptar notificaciones para GNOME/KDE
-- [ ] Probar en Ubuntu 22.04+
+- [ ] **Tray icon**:
+  - [ ] Usar `assets/tray-icon.png` (32px) y `tray-icon@2x.png` (64px Retina)
+  - [ ] macOS: template icon (monocromo, adapta a dark/light menu bar)
+  - [ ] Color del ícono según estado: normal (verde), alerta (rojo), offline (gris)
+- [ ] **Context menu** del tray:
+  - [ ] "Open EchoSmart" → mostrar ventana
+  - [ ] "Status: X sensors online" (info, no clickeable)
+  - [ ] Separator
+  - [ ] "Alerts: X active" → abrir ventana en página de alertas
+  - [ ] "Gateways: X online" → abrir ventana en página de gateways
+  - [ ] Separator
+  - [ ] "Check for Updates..."
+  - [ ] "Quit EchoSmart"
+- [ ] **Minimize to tray**:
+  - [ ] Al cerrar ventana (click X): minimizar a tray, no quit
+  - [ ] Para quit: usar tray menu → Quit, o File → Exit
+  - [ ] Notificación en primera vez: "EchoSmart sigue corriendo en la bandeja"
+- [ ] **Notificaciones nativas**:
+  - [ ] Usar `Notification` API del OS
+  - [ ] Mostrar notificaciones de alertas críticas incluso si la app está en tray
+  - [ ] Click en notificación → abrir ventana en la página relevante
+  - [ ] Sonido de notificación (opcional, configurable)
 
-### 5.6 Desktop — Tests y Calidad
+### 5.8 Auto-Update
 
-- [ ] Tests de IPC handlers
-- [ ] Tests de preload scripts (seguridad)
-- [ ] Tests de menú nativo y tray
-- [ ] Security audit: renderer sin acceso a Node.js APIs
-- [ ] Configurar CSP (Content Security Policy)
-- [ ] ESLint para main process
-- [ ] Crear `desktop/README.md`
+- [ ] Configurar `electron-updater`:
+  - [ ] Update server: GitHub Releases del repositorio
+  - [ ] Check for updates al iniciar la app
+  - [ ] Check periódico: cada 4 horas
+  - [ ] Si hay update disponible: notificar al usuario con dialog
+  - [ ] Dialog: "New version X.Y.Z available. Download now?"
+  - [ ] Descargar en background con progress bar
+  - [ ] Una vez descargado: "Restart to install?" o instalar al cerrar
+  - [ ] Auto-download para updates de seguridad (patch versions)
+- [ ] Configurar firma de código:
+  - [ ] Windows: code signing certificate
+  - [ ] macOS: Apple Developer certificate + notarización
+  - [ ] Sin firma: warning de seguridad al instalar (no ideal, pero funcional)
+
+### 5.9 Conexión Directa al Gateway (LAN)
+
+- [ ] **Descubrimiento de gateways** en red local:
+  - [ ] mDNS/Bonjour discovery (`bonjour-service` package)
+  - [ ] Buscar servicios `_echosmart._tcp`
+  - [ ] Listar gateways encontrados con nombre, IP, versión
+- [ ] **Conexión HTTP directa**:
+  - [ ] Conectar a gateway por IP local (ej: `http://192.168.1.100:5000`)
+  - [ ] Obtener lecturas en tiempo real sin cloud
+  - [ ] Indicador en UI: "Modo Directo" (ícono LAN) vs "Modo Cloud" (ícono nube)
+  - [ ] Menor latencia: < 100ms vs cloud ~500ms
+- [ ] **Fallback**:
+  - [ ] Si gateway no accesible en LAN → fallback a cloud automáticamente
+  - [ ] Reconectar a LAN cuando gateway vuelva a ser accesible
+  - [ ] Priority: LAN > Cloud
+
+### 5.10 Almacenamiento Local
+
+- [ ] **electron-store** para configuración:
+  - [ ] Credenciales: token encriptado
+  - [ ] Preferencias: idioma, tema, units
+  - [ ] Window state: posición, tamaño, maximizada
+  - [ ] Gateway config: última conexión, modo (LAN/Cloud)
+  - [ ] Cache de últimas lecturas (para acceso offline rápido)
+- [ ] Encriptar store con clave derivada del OS keychain
+
+### 5.11 Windows — Build y Distribución
+
+- [ ] Build NSIS installer:
+  - [ ] `electron-builder --win --publish never`
+  - [ ] Installer con sidebar banner personalizado
+  - [ ] Opciones: directorio de instalación, crear shortcut, auto-start
+  - [ ] Output: `EchoSmart-Setup-{version}.exe`
+- [ ] Generar MSI installer (alternativo):
+  - [ ] Para deployment empresarial
+- [ ] Desktop shortcut con ícono personalizado
+- [ ] Start menu entry
+- [ ] Auto-start con Windows (opcional, configurable)
+- [ ] Probar en:
+  - [ ] Windows 10 (21H2+)
+  - [ ] Windows 11 (22H2+)
+- [ ] Verificar: instalación, primera ejecución, auto-update, desinstalación
+
+### 5.12 macOS — Build y Distribución
+
+- [ ] Build DMG:
+  - [ ] `electron-builder --mac --publish never`
+  - [ ] DMG con fondo personalizado y drag-to-Applications
+  - [ ] Output: `EchoSmart-{version}.dmg`
+- [ ] Build ZIP (para auto-update):
+  - [ ] `electron-builder --mac --publish never -c.mac.target=zip`
+- [ ] Configurar Info.plist:
+  - [ ] `LSMinimumSystemVersion: "10.15"` (Catalina+)
+  - [ ] `CFBundleDocumentTypes` para archivos `.echosmart`
+- [ ] Firmar con Apple Developer certificate:
+  - [ ] Code signing con `codesign`
+  - [ ] Notarización con `xcrun notarytool`
+- [ ] Adaptar para convenciones macOS:
+  - [ ] Menú en menu bar (no en ventana)
+  - [ ] Dock icon con badge de alertas
+  - [ ] Cmd+, para preferences
+  - [ ] Traffic lights (close/minimize/maximize)
+- [ ] Probar en:
+  - [ ] macOS Ventura (13)
+  - [ ] macOS Sonoma (14)
+  - [ ] Apple Silicon (M1/M2) — verificar build arm64
+
+### 5.13 Linux — Build y Distribución
+
+- [ ] Build AppImage:
+  - [ ] `electron-builder --linux --publish never`
+  - [ ] Output: `EchoSmart-{version}.AppImage`
+  - [ ] Portable, sin instalación
+- [ ] Build .deb (Debian/Ubuntu):
+  - [ ] `electron-builder --linux deb`
+  - [ ] Desktop entry (`.desktop` file) con ícono
+  - [ ] Integración con menú de aplicaciones
+- [ ] Build .snap (opcional):
+  - [ ] Para Snap Store
+- [ ] Adaptar para Linux:
+  - [ ] Notificaciones: libnotify (GNOME) / KDE
+  - [ ] Tray icon: AppIndicator
+- [ ] Probar en:
+  - [ ] Ubuntu 22.04 LTS
+  - [ ] Ubuntu 24.04 LTS
+  - [ ] Fedora 39+ (opcional)
+
+### 5.14 Desktop — Tests y Calidad
+
+- [ ] Tests de IPC handlers:
+  - [ ] Cada handler: input válido, input inválido, error handling
+- [ ] Tests de preload scripts:
+  - [ ] Verificar que SOLO expone funciones permitidas
+  - [ ] Verificar que NO expone require, fs, child_process
+- [ ] Tests de menú nativo:
+  - [ ] Verificar items de menú por plataforma
+  - [ ] Verificar shortcuts
+- [ ] Tests de tray:
+  - [ ] Minimize to tray
+  - [ ] Context menu items
+  - [ ] Notification click
+- [ ] Tests de auto-update:
+  - [ ] Check for updates
+  - [ ] Download progress
+  - [ ] Install and restart
+- [ ] Security audit:
+  - [ ] `nodeIntegration: false` ✓
+  - [ ] `contextIsolation: true` ✓
+  - [ ] `sandbox: true` (si posible) ✓
+  - [ ] CSP (Content Security Policy) configurado
+  - [ ] No `eval()` en renderer
+  - [ ] Validar URLs antes de `shell.openExternal`
+- [ ] ESLint para main process + renderer
+- [ ] Crear `desktop/README.md` con:
+  - [ ] Guía de setup de desarrollo
+  - [ ] Arquitectura main/renderer/preload explicada
+  - [ ] Cómo compilar para cada plataforma
+  - [ ] Cómo configurar auto-update
+  - [ ] Cómo firmar y notarizar
 
 ---
 
