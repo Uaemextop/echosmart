@@ -1780,85 +1780,650 @@ desktop/src/
 
 ---
 
-## Fase 6: Infraestructura y DevOps (Continuo)
+## Fase 6: Infraestructura Local de Desarrollo (Semanas 17–18)
 
-> 🏛️ **Infrastructure as Code**: Toda la infraestructura definida en archivos versionados. Reproducible al 100%.
+> 🏗️ **PRIORIDAD**: La infraestructura local se despliega ANTES del testing. Se debe poder levantar todo el entorno de desarrollo con UN SOLO comando, incluyendo emuladores de sensores.
 
-### 6.1 Docker — Containerización
+### 6.1 Script de Despliegue Local — `setup-dev.sh`
 
-- [ ] **Backend Dockerfile** (`infra/docker/backend.Dockerfile`):
-  - [ ] Multi-stage build: builder → runner (slim image < 200MB)
-  - [ ] Non-root user
-  - [ ] Health check endpoint
-  - [ ] Optimizar layer caching
-- [ ] **Frontend Dockerfile** (`infra/docker/frontend.Dockerfile`):
-  - [ ] Multi-stage: node (build) → nginx (serve)
-  - [ ] SPA fallback config en nginx
-  - [ ] Imagen final < 50MB
-- [x] `docker-compose.yml` para desarrollo
-- [ ] `docker-compose.dev.yml` con hot-reload para backend y frontend
-- [ ] `docker-compose.prod.yml` con gunicorn, SSL, resource limits
-- [ ] `docker-compose.test.yml` para CI
+- [ ] Crear script principal `infra/scripts/setup-dev.sh` (idempotente, re-ejecutable)
+- [ ] Detectar sistema operativo (Linux/macOS/Windows WSL2)
+- [ ] Verificar prerequisitos: Docker, Docker Compose, Python 3.11+, Node.js 18+, Git
+- [ ] Instalar prerequisitos faltantes automáticamente (apt/brew/choco)
+- [ ] Crear directorio de trabajo `/opt/echosmart-dev/` o `$HOME/.echosmart/`
+- [ ] Generar archivos `.env` desde templates `.env.example` con valores de desarrollo
+- [ ] Generar claves JWT (RS256) automáticamente para desarrollo
+- [ ] Generar certificados SSL self-signed para desarrollo local
+- [ ] Ejecutar `docker-compose -f docker-compose.dev.yml up -d`
+- [ ] Esperar a que todos los servicios estén healthy (health checks)
+- [ ] Ejecutar migraciones de base de datos (Alembic)
+- [ ] Ejecutar seed de datos iniciales (tenant, admin user, demo gateways/sensors)
+- [ ] Iniciar emuladores de sensores (contenedor Docker)
+- [ ] Verificar conectividad entre todos los servicios
+- [ ] Imprimir resumen con URLs de acceso y credenciales de desarrollo
+- [ ] Crear script `infra/scripts/teardown-dev.sh` para limpiar todo
+
+### 6.2 Docker Compose para Desarrollo — `docker-compose.dev.yml`
+
+- [ ] **PostgreSQL 16** (puerto 5432):
+  - [ ] Volumen persistente para datos
+  - [ ] Init script para crear bases de datos (`echosmart_dev`, `echosmart_test`)
+  - [ ] Configuración de performance para desarrollo (shared_buffers, work_mem)
+  - [ ] Health check: `pg_isready`
+- [ ] **InfluxDB 2.7** (puerto 8086):
+  - [ ] Setup automático: org `echosmart`, bucket `sensor_readings`
+  - [ ] Retention policy: 30 días para desarrollo
+  - [ ] Health check: `/health`
+- [ ] **Redis 7** (puerto 6379):
+  - [ ] Configuración: maxmemory 256MB, eviction policy allkeys-lru
+  - [ ] Health check: `redis-cli ping`
+- [ ] **Mosquitto MQTT** (puertos 1883, 9001 WebSocket):
+  - [ ] Config: anonymous access para desarrollo
+  - [ ] Listener WebSocket para frontend
+  - [ ] Log de mensajes para debugging
+  - [ ] Health check: `mosquitto_sub -t '$SYS/broker/version' -C 1`
+- [ ] **Backend FastAPI** (puerto 8000):
+  - [ ] Hot-reload con `--reload`
+  - [ ] Volumen bind mount para código fuente
+  - [ ] Depends on: postgres, redis, influxdb, mosquitto
+  - [ ] Health check: `GET /health`
+- [ ] **Frontend React** (puerto 3000):
+  - [ ] Vite dev server con HMR
+  - [ ] Volumen bind mount para código fuente
+  - [ ] Proxy a backend para `/api/*`
+- [ ] **Nginx** (puertos 80, 443):
+  - [ ] Reverse proxy: `/` → frontend, `/api/` → backend, `/ws/` → backend WebSocket
+  - [ ] SSL con certificados self-signed
+  - [ ] Config de desarrollo (sin cache, logs verbose)
+- [ ] **Mailhog** (puertos 1025 SMTP, 8025 UI):
+  - [ ] Capturar emails de desarrollo (verificación, alertas, reportes)
+  - [ ] UI web para visualizar emails
+- [ ] **Adminer** (puerto 8080):
+  - [ ] UI web para inspeccionar PostgreSQL en desarrollo
+- [ ] Red Docker interna `echosmart-dev` (bridge)
 - [ ] `.dockerignore` para cada servicio
 
-### 6.2 Kubernetes — Orquestación
+### 6.3 Emulador de Sensores para Desarrollo
 
-- [x] Manifiestos básicos en `infra/k8s/`
-- [ ] Backend Deployment (2+ replicas, readiness/liveness probes)
-- [ ] Frontend Deployment (Nginx serving static)
-- [ ] PostgreSQL StatefulSet con PVC
-- [ ] InfluxDB StatefulSet con PVC
-- [ ] Redis Deployment
-- [ ] Mosquitto Deployment
-- [x] Ingress con TLS (cert-manager)
-- [ ] HPA (auto-scale backend basado en CPU)
-- [ ] NetworkPolicy (segmentación de red)
-- [ ] Kustomize para ambientes (dev/staging/prod)
+- [ ] Crear `gateway/emulator/` — Emulador de sensores como servicio independiente
+- [ ] `sensor_emulator.py` — Proceso que genera lecturas realistas:
+  - [ ] Temperatura: 18–32°C con variación diurna sinusoidal (frío noche, calor día)
+  - [ ] Humedad: 55–85% inversamente correlacionada con temperatura
+  - [ ] Luminosidad: 0–50,000 lux con ciclo día/noche
+  - [ ] Humedad suelo: 30–80% con degradación gradual (simular secado)
+  - [ ] CO₂: 350–1200 ppm con picos durante noche
+- [ ] Publicar lecturas vía MQTT a topics `echosmart/gw-emulator/sensor/{type}`
+- [ ] Soporte para múltiples gateways emulados simultáneamente
+- [ ] Parámetros configurables: intervalo de polling, ruido, drift, eventos especiales
+- [ ] Modo "escenarios": simular condiciones específicas:
+  - [ ] Escenario `heat-wave`: temperatura sube gradualmente a 45°C
+  - [ ] Escenario `frost`: temperatura baja a -2°C en 2 horas
+  - [ ] Escenario `sensor-failure`: sensor deja de responder
+  - [ ] Escenario `network-outage`: gateway se desconecta 10 minutos y reconecta
+  - [ ] Escenario `normal-day`: ciclo completo de 24 horas comprimido en 10 minutos
+- [ ] Dockerfile para emulador: `infra/docker/emulator.Dockerfile`
+- [ ] Incluir emulador en `docker-compose.dev.yml`
+- [ ] API REST del emulador para cambiar escenarios en runtime
+- [ ] Tests: emulador genera datos dentro de rangos esperados
 
-### 6.3 CI/CD (GitHub Actions)
+### 6.4 Scripts de Datos y Migración
 
-- [ ] **CI Pipeline** (`ci.yml`):
-  - [ ] Trigger: push + PR to main
-  - [ ] Jobs: lint-backend, lint-frontend, test-backend, test-frontend, test-gateway, security-scan
-  - [ ] Reportar cobertura como comentario en PR
-  - [ ] Bloquear merge si cobertura < 80% o lint falla
-- [ ] **CD Pipeline** (`deploy.yml`):
-  - [ ] Build Docker images multi-arch
-  - [ ] Push a Container Registry
-  - [ ] Deploy a staging (auto) y producción (manual approval)
-- [ ] **Mobile Build** (`mobile.yml`): EAS Build Android + iOS en tag `mobile-v*`
-- [ ] **Desktop Build** (`desktop.yml`): Electron build Win/Mac/Linux en tag `desktop-v*`
-- [ ] **Dependabot**: Python + Node.js + GitHub Actions, semanal
+- [ ] `infra/scripts/seed-data.sh` — Poblar datos de demo:
+  - [ ] Crear tenant `EchoSmart Demo`
+  - [ ] Crear usuarios: admin (`admin@echosmart.local`), operator, viewer
+  - [ ] Crear gateway `gw-emulator-01` asociado al tenant
+  - [ ] Crear 5 sensores asociados al gateway
+  - [ ] Generar 7 días de lecturas históricas (una lectura/minuto por sensor)
+  - [ ] Crear alertas de ejemplo (3 activas, 5 resueltas)
+  - [ ] Crear reportes de ejemplo (PDF de la última semana)
+- [ ] `infra/scripts/reset-dev.sh` — Resetear base de datos a estado limpio
+- [ ] `infra/scripts/backup-dev.sh` — Backup del estado actual de desarrollo
+- [ ] `infra/scripts/migrate.sh` — Ejecutar migraciones de Alembic
+- [ ] `infra/scripts/generate-keys.sh` — Generar JWT keys, API keys, etc.
+- [ ] `infra/scripts/check-health.sh` — Verificar estado de todos los servicios
+- [ ] `infra/scripts/logs.sh` — Ver logs de todos los servicios (o uno específico)
+- [ ] Todos los scripts documentados con `--help` y mensajes de error claros
 
-### 6.4 Monitoreo y Observabilidad
+### 6.5 Makefile para Desarrollo
 
-- [ ] Logging centralizado (structlog → ELK/Loki)
-- [ ] Métricas Prometheus (`/metrics` en backend)
-- [ ] Grafana dashboards
-- [ ] Alertas de infraestructura (CPU, memory, error rate)
-- [ ] Health checks para todos los servicios
-
-### 6.5 Scripts de Automatización
-
-- [ ] `setup-dev.sh` — Setup completo del entorno de desarrollo
-- [ ] `backup-db.sh` — Backup PostgreSQL + InfluxDB con rotación
-- [ ] `deploy.sh` — Deploy con zero-downtime y rollback
-- [ ] `seed-data.sh` — Datos de demo (tenant, users, gateways, sensors, readings)
-
-### 6.6 Seguridad de Infraestructura
-
-- [ ] HTTPS en todos los endpoints
-- [ ] Firewall: solo puertos 80, 443, 8883
-- [ ] Rate limiting a nivel de Nginx/Ingress
-- [ ] Secrets management (no hardcoded)
-- [ ] Backups encriptados
-- [ ] Procedimiento de incident response documentado
+- [ ] Crear `Makefile` en la raíz del proyecto:
+  - [ ] `make setup` — Ejecutar setup-dev.sh completo
+  - [ ] `make up` — Levantar todos los servicios
+  - [ ] `make down` — Detener todos los servicios
+  - [ ] `make restart` — Reiniciar todos los servicios
+  - [ ] `make logs` — Ver logs en tiempo real
+  - [ ] `make test` — Ejecutar TODOS los tests (backend + frontend + gateway)
+  - [ ] `make test-backend` — Solo tests de backend con coverage
+  - [ ] `make test-frontend` — Solo tests de frontend con coverage
+  - [ ] `make test-gateway` — Solo tests de gateway con coverage
+  - [ ] `make lint` — Linting de todos los componentes
+  - [ ] `make format` — Formatear código (black + prettier)
+  - [ ] `make migrate` — Ejecutar migraciones
+  - [ ] `make seed` — Seed de datos de demo
+  - [ ] `make reset` — Resetear todo el entorno
+  - [ ] `make clean` — Limpiar volúmenes, cache, imágenes huérfanas
+  - [ ] `make emulator-scenario SCENARIO=heat-wave` — Cambiar escenario del emulador
+  - [ ] `make build` — Build de producción de todos los componentes
+  - [ ] `make iso-server` — Generar ISO del servidor
+  - [ ] `make iso-gateway` — Generar ISO del Raspberry Pi
+  - [ ] Documentar cada target con `make help`
 
 ---
 
-## Fase 7: Features Avanzadas (Semanas 21+)
+## Fase 7: Infraestructura de Producción y DevOps (Semanas 19–22)
 
-### 7.1 Control de Actuadores
+> 🏛️ **Infrastructure as Code**: Toda la infraestructura definida en archivos versionados. Reproducible al 100%.
+
+### 7.1 Docker — Containerización para Producción
+
+- [ ] **Backend Dockerfile** (`infra/docker/backend.Dockerfile`):
+  - [ ] Multi-stage build: builder (pip install) → runner (slim image < 200MB)
+  - [ ] Non-root user (`echosmart:echosmart`, UID 1000)
+  - [ ] Health check: `curl -f http://localhost:8000/health`
+  - [ ] Optimizar layer caching (COPY requirements.txt primero)
+  - [ ] Labels: version, commit SHA, build date
+  - [ ] Security: no root, read-only filesystem donde sea posible
+- [ ] **Frontend Dockerfile** (`infra/docker/frontend.Dockerfile`):
+  - [ ] Multi-stage: node (build) → nginx:alpine (serve)
+  - [ ] SPA fallback config en nginx (`try_files $uri /index.html`)
+  - [ ] Gzip compression habilitado
+  - [ ] Cache headers para assets estáticos (1 año)
+  - [ ] Imagen final < 50MB
+  - [ ] Build args para API_URL en tiempo de build
+- [ ] **Gateway Dockerfile** (`infra/docker/gateway.Dockerfile`):
+  - [ ] Para testing en contenedor (sin GPIO real)
+  - [ ] Modo simulación por defecto
+  - [ ] Health check: `python -c "import gateway; print('ok')"`
+- [ ] `docker-compose.prod.yml`:
+  - [ ] Backend: gunicorn con 4 workers + uvicorn
+  - [ ] Frontend: nginx optimizado
+  - [ ] PostgreSQL: configuración de producción (16GB RAM)
+  - [ ] SSL termination en Nginx (Let's Encrypt)
+  - [ ] Restart policies: `unless-stopped`
+  - [ ] Resource limits (CPU, memory) para cada servicio
+  - [ ] Logging driver: json-file con rotation (10MB, 5 archivos)
+  - [ ] Networks separadas: frontend, backend, data
+- [ ] `docker-compose.test.yml` para CI/CD
+- [ ] `.dockerignore` optimizado para cada servicio
+
+### 7.2 Kubernetes — Orquestación
+
+- [x] Manifiestos básicos en `infra/k8s/`
+- [ ] **Namespace**: `echosmart-prod`, `echosmart-staging`
+- [ ] **Backend Deployment**:
+  - [ ] 3 réplicas (min 2, max 10)
+  - [ ] Readiness probe: `GET /health` cada 10s
+  - [ ] Liveness probe: `GET /health` cada 30s
+  - [ ] Startup probe: 60s max
+  - [ ] Resource requests: 256Mi RAM, 250m CPU
+  - [ ] Resource limits: 512Mi RAM, 500m CPU
+  - [ ] Rolling update strategy (maxSurge=1, maxUnavailable=0)
+  - [ ] Anti-affinity: no dos pods en el mismo nodo
+- [ ] **Frontend Deployment** (Nginx serving static)
+- [ ] **PostgreSQL StatefulSet**:
+  - [ ] PVC 50GB (expandable)
+  - [ ] Backup CronJob diario (pg_dump → S3)
+  - [ ] Resource limits: 1Gi RAM, 1 CPU
+- [ ] **InfluxDB StatefulSet** con PVC 100GB
+- [ ] **Redis Deployment** (256Mi memory limit)
+- [ ] **Mosquitto Deployment** (configuración de producción)
+- [x] **Ingress** con TLS:
+  - [ ] cert-manager con Let's Encrypt
+  - [ ] Redirect HTTP → HTTPS
+  - [ ] Rate limiting annotations
+  - [ ] WebSocket passthrough
+- [ ] **HPA** (Horizontal Pod Autoscaler): backend scale basado en CPU (target 70%)
+- [ ] **NetworkPolicy**: segmentación de red (frontend → backend → data)
+- [ ] **ConfigMap**: configuraciones no sensibles
+- [ ] **Secret**: credenciales encriptadas (sealed-secrets)
+- [ ] **PodDisruptionBudget**: mínimo 1 pod backend siempre disponible
+- [ ] Kustomize overlays para `dev`, `staging`, `prod`
+- [ ] Helm chart para deployment simplificado
+
+### 7.3 CI/CD — GitHub Actions
+
+- [ ] **CI Pipeline** (`.github/workflows/ci.yml`):
+  - [ ] Trigger: push a cualquier branch + PR a main
+  - [ ] Matrix: Python 3.11/3.12, Node 18/20
+  - [ ] Jobs paralelos:
+    - [ ] `lint-backend`: black + isort + ruff + mypy
+    - [ ] `lint-frontend`: ESLint + Prettier + TypeScript check
+    - [ ] `lint-gateway`: black + isort + ruff
+    - [ ] `test-backend`: pytest con PostgreSQL service container + coverage
+    - [ ] `test-frontend`: vitest con coverage
+    - [ ] `test-gateway`: pytest con coverage
+    - [ ] `security-scan`: bandit (Python) + npm audit (Node.js) + trivy (Docker)
+  - [ ] Reportar cobertura como comentario en PR (codecov/coveralls)
+  - [ ] Bloquear merge si cobertura < 80% o lint falla
+  - [ ] Cache de dependencias (pip, npm) entre ejecuciones
+- [ ] **CD Pipeline** (`.github/workflows/deploy.yml`):
+  - [ ] Trigger: push a `main` (staging) o tag `v*` (producción)
+  - [ ] Build Docker images multi-arch (amd64 + arm64)
+  - [ ] Push a GitHub Container Registry (ghcr.io)
+  - [ ] Tag: commit SHA + latest + semver
+  - [ ] Deploy a staging automáticamente
+  - [ ] Deploy a producción con manual approval
+  - [ ] Rollback automático si health check falla post-deploy
+  - [ ] Notificación Slack/Discord de deploy exitoso/fallido
+- [ ] **Mobile Build** (`.github/workflows/mobile.yml`):
+  - [ ] Trigger: tag `mobile-v*`
+  - [ ] EAS Build Android (APK + AAB) + iOS (IPA)
+  - [ ] Upload a GitHub Releases
+  - [ ] Notificar a testers (TestFlight / Firebase App Distribution)
+- [ ] **Desktop Build** (`.github/workflows/desktop.yml`):
+  - [ ] Trigger: tag `desktop-v*`
+  - [ ] Electron build: Windows (.exe, .msi), macOS (.dmg), Linux (.AppImage, .deb)
+  - [ ] Code signing (Windows + macOS)
+  - [ ] Upload a GitHub Releases
+  - [ ] Auto-update feed (electron-updater)
+- [ ] **ISO Build** (`.github/workflows/iso.yml`):
+  - [ ] Trigger: tag `iso-v*`
+  - [ ] Build ISO del servidor (Ubuntu 22.04 base)
+  - [ ] Build ISO del Raspberry Pi (RPi OS Lite base)
+  - [ ] Upload artefactos a GitHub Releases
+- [ ] **Dependabot** (`.github/dependabot.yml`):
+  - [ ] Python (pip): semanal
+  - [ ] Node.js (npm): semanal
+  - [ ] GitHub Actions: semanal
+  - [ ] Docker: mensual
+  - [ ] Auto-merge para patches de seguridad
+
+### 7.4 Monitoreo y Observabilidad
+
+- [ ] **Logging centralizado**:
+  - [ ] Backend: structlog → JSON → stdout → Docker logs
+  - [ ] Loki + Promtail para agregación de logs
+  - [ ] Grafana Loki dashboards
+  - [ ] Log retention: 30 días
+- [ ] **Métricas**:
+  - [ ] Prometheus scraping backend `/metrics`
+  - [ ] Node Exporter para métricas del sistema
+  - [ ] Custom metrics: requests/s, latency P50/P95/P99, error rate
+  - [ ] Sensor readings/min, active gateways, alert rate
+- [ ] **Dashboards Grafana**:
+  - [ ] Dashboard: overview del sistema (CPU, RAM, disk, network)
+  - [ ] Dashboard: API performance (latency, throughput, errors)
+  - [ ] Dashboard: sensores (readings/min, valores actuales, tendencias)
+  - [ ] Dashboard: gateways (online/offline, sync lag, errors)
+  - [ ] Dashboard: alertas (activas, rate, tiempo de resolución)
+- [ ] **Alertas de infraestructura** (Alertmanager):
+  - [ ] CPU > 80% por 5 minutos
+  - [ ] Memory > 85% por 5 minutos
+  - [ ] Disk > 90%
+  - [ ] API error rate > 5% por 2 minutos
+  - [ ] API latency P99 > 2 segundos
+  - [ ] Gateway offline > 10 minutos
+  - [ ] PostgreSQL connection pool > 80%
+  - [ ] Notificación vía email + Slack
+- [ ] **Uptime monitoring**: Healthchecks.io o UptimeRobot
+- [ ] **Error tracking**: Sentry (backend + frontend)
+
+### 7.5 Seguridad de Infraestructura
+
+- [ ] HTTPS obligatorio en todos los endpoints (redirect HTTP → HTTPS)
+- [ ] Certificados SSL automáticos (Let's Encrypt + cert-manager)
+- [ ] Firewall: solo puertos 22 (SSH), 80, 443, 8883 (MQTT TLS)
+- [ ] SSH hardening: solo key-based auth, no root login, fail2ban
+- [ ] Rate limiting a nivel de Nginx/Ingress (100 req/min general, 10/min login)
+- [ ] WAF básico: bloquear ataques comunes (SQL injection, XSS, path traversal)
+- [ ] Secrets management: Kubernetes Secrets + sealed-secrets (no hardcoded)
+- [ ] Backups encriptados (GPG) con rotación (7 diarios, 4 semanales, 12 mensuales)
+- [ ] Vulnerability scanning automático (Trivy en CI)
+- [ ] CORS: solo dominios permitidos explícitamente
+- [ ] Security headers: HSTS, X-Frame-Options, X-Content-Type-Options, CSP
+- [ ] Procedimiento de incident response documentado
+- [ ] Rotación de credenciales cada 90 días (automatizado)
+
+### 7.6 Nginx — Configuración de Producción
+
+- [ ] `infra/nginx/nginx.conf` — Configuración principal:
+  - [ ] Worker processes: auto (basado en CPU cores)
+  - [ ] Worker connections: 1024
+  - [ ] Gzip compression para text, CSS, JS, JSON, SVG
+  - [ ] Client max body size: 10MB
+  - [ ] Proxy buffer sizes optimizados
+- [ ] `infra/nginx/sites/echosmart.conf` — Virtual host:
+  - [ ] Server block para HTTP (redirect a HTTPS)
+  - [ ] Server block para HTTPS (SSL/TLS)
+  - [ ] Location `/` → Frontend (React static files)
+  - [ ] Location `/api/` → Backend (FastAPI proxy_pass)
+  - [ ] Location `/ws/` → Backend WebSocket (proxy_pass con upgrade)
+  - [ ] Location `/mqtt/` → Mosquitto WebSocket
+  - [ ] Location `/grafana/` → Grafana dashboard
+  - [ ] Location `/adminer/` → Adminer (solo en dev/staging)
+  - [ ] Cache de assets estáticos (1 año para hashed files)
+  - [ ] Security headers
+  - [ ] Rate limiting zones
+- [ ] SSL: protocolos TLSv1.2 y TLSv1.3 únicamente
+- [ ] OCSP stapling
+- [ ] Tests: verificar todas las rutas, SSL score A+ en SSL Labs
+
+### 7.7 DNS y Dominios
+
+- [ ] Configurar dominio principal: `echosmart.io` (o el dominio elegido)
+- [ ] Subdominio API: `api.echosmart.io`
+- [ ] Subdominio app web: `app.echosmart.io`
+- [ ] Subdominio MQTT: `mqtt.echosmart.io`
+- [ ] Subdominio Grafana: `monitor.echosmart.io`
+- [ ] Subdominio de documentación: `docs.echosmart.io`
+- [ ] Registros DNS: A, AAAA, CNAME, MX, TXT (SPF, DKIM, DMARC)
+- [ ] Configurar CDN (CloudFlare o AWS CloudFront) para frontend
+- [ ] DNS failover configurado
+
+### 7.8 SMTP y Correo Electrónico
+
+- [ ] Configurar servidor SMTP para envío de emails:
+  - [ ] Opción A: Postfix local + DKIM + SPF
+  - [ ] Opción B: Servicio externo (SendGrid / Amazon SES / Mailgun)
+- [ ] Configurar registros DNS para email:
+  - [ ] MX records
+  - [ ] SPF: `v=spf1 include:_spf.google.com ~all`
+  - [ ] DKIM: clave pública en TXT record
+  - [ ] DMARC: `v=DMARC1; p=quarantine; rua=mailto:dmarc@echosmart.io`
+- [ ] Templates de email HTML (Jinja2):
+  - [ ] Email de verificación de cuenta
+  - [ ] Email de reset de contraseña
+  - [ ] Email de alerta de sensor
+  - [ ] Email de reporte diario/semanal
+  - [ ] Email de invitación a tenant
+  - [ ] Email de bienvenida
+- [ ] Cola de emails (Celery + Redis) para envío asíncrono
+- [ ] Rate limiting de emails (no más de 100/hora por tenant)
+- [ ] Logs de envío y bounce handling
+- [ ] Tests: envío, templates, cola, SPF/DKIM validation
+
+---
+
+## Fase 8: ISO Personalizado del Servidor (Semanas 23–25)
+
+> 💿 **El ISO del servidor contiene TODO el software necesario para desplegar EchoSmart en producción.** Un administrador solo necesita flashear el ISO, responder 5 preguntas de configuración, y el servidor queda 100% funcional.
+
+### 8.1 Definición del ISO del Servidor
+
+- [ ] Base: Ubuntu Server 22.04 LTS (64-bit, minimal)
+- [ ] Nombre del ISO: `echosmart-server-v{VERSION}-amd64.iso`
+- [ ] Tamaño objetivo: < 4GB
+- [ ] Arquitectura soportada: amd64 (x86_64)
+- [ ] Boot: UEFI + Legacy BIOS
+- [ ] Particionamiento automático: 
+  - [ ] `/` — 20GB (sistema operativo)
+  - [ ] `/var/lib/docker` — 50GB+ (volúmenes Docker)
+  - [ ] `/var/backups/echosmart` — 20GB+ (backups)
+  - [ ] swap — 4GB
+
+### 8.2 Software Pre-instalado en el ISO
+
+- [ ] **Sistema operativo**: Ubuntu Server 22.04 LTS con actualizaciones de seguridad
+- [ ] **Docker Engine** 24+ (CE, instalado desde repo oficial)
+- [ ] **Docker Compose** v2 (plugin)
+- [ ] **Nginx** como reverse proxy (instalado y pre-configurado)
+- [ ] **Certbot** (Let's Encrypt) para certificados SSL automáticos
+- [ ] **UFW** (firewall) pre-configurado: solo 22, 80, 443, 8883
+- [ ] **fail2ban** para protección contra brute force SSH
+- [ ] **unattended-upgrades** para actualizaciones de seguridad automáticas
+- [ ] **logrotate** para rotación de logs
+- [ ] **cron** jobs pre-configurados:
+  - [ ] Backup de PostgreSQL diario a las 02:00
+  - [ ] Backup de InfluxDB diario a las 03:00
+  - [ ] Limpieza de Docker images cada semana
+  - [ ] Renovación de certificados SSL (certbot renew)
+  - [ ] Check de salud del sistema cada 5 minutos
+- [ ] **Python 3.11+** para scripts de gestión
+- [ ] **Node.js 18 LTS** (para frontend build en el servidor)
+- [ ] **Git** para actualizaciones del código
+- [ ] **htop**, **iotop**, **ncdu**, **tmux** para diagnóstico
+
+### 8.3 Contenedores Docker Pre-configurados
+
+- [ ] Imágenes Docker de EchoSmart pre-descargadas e incluidas en el ISO:
+  - [ ] `echosmart-backend:latest`
+  - [ ] `echosmart-frontend:latest`
+  - [ ] `postgres:16-alpine`
+  - [ ] `influxdb:2.7`
+  - [ ] `redis:7-alpine`
+  - [ ] `eclipse-mosquitto:2`
+  - [ ] `grafana/grafana:latest`
+  - [ ] `prom/prometheus:latest`
+  - [ ] `grafana/loki:latest`
+  - [ ] `grafana/promtail:latest`
+- [ ] `docker-compose.prod.yml` listo para usar en `/opt/echosmart/`
+- [ ] Volúmenes pre-creados con permisos correctos
+- [ ] Red Docker `echosmart-prod` pre-creada
+
+### 8.4 Script de Configuración Inicial — `echosmart-server-setup`
+
+- [ ] Crear script interactivo `echosmart-server-setup` (wizard de configuración):
+  - [ ] **Paso 1: Dominio** — Preguntar dominio principal (ej: `echosmart.miempresa.com`)
+  - [ ] **Paso 2: Email admin** — Email del administrador (para SSL y cuenta admin)
+  - [ ] **Paso 3: Contraseña admin** — Contraseña del usuario administrador (validar fortaleza)
+  - [ ] **Paso 4: SMTP** — Configurar servidor de correo:
+    - [ ] Host SMTP (ej: `smtp.gmail.com`)
+    - [ ] Puerto (587 TLS / 465 SSL)
+    - [ ] Usuario SMTP
+    - [ ] Contraseña SMTP
+    - [ ] Email "From" (ej: `noreply@echosmart.io`)
+  - [ ] **Paso 5: Red** — Configurar IP estática o DHCP
+  - [ ] **Paso 6: Timezone** — Seleccionar zona horaria
+- [ ] Generar todas las credenciales automáticamente:
+  - [ ] Contraseña PostgreSQL (32 chars random)
+  - [ ] Contraseña InfluxDB (32 chars random)
+  - [ ] Contraseña Redis (32 chars random)
+  - [ ] JWT Secret Key (64 chars random)
+  - [ ] MQTT password (32 chars random)
+  - [ ] API keys iniciales
+  - [ ] Grafana admin password
+- [ ] Guardar credenciales en `/opt/echosmart/credentials.env` (permisos 600, solo root)
+- [ ] Configurar Nginx con el dominio proporcionado
+- [ ] Solicitar certificado SSL con Let's Encrypt (o self-signed si no hay dominio público)
+- [ ] Configurar DNS registros (mostrar instrucciones al admin)
+- [ ] Configurar SMTP en el backend
+- [ ] Crear usuario administrador en la base de datos
+- [ ] Crear tenant predeterminado
+- [ ] Iniciar todos los servicios Docker
+- [ ] Verificar que todos los servicios están healthy
+- [ ] Enviar email de prueba al admin
+- [ ] Imprimir resumen de la instalación con URLs
+
+### 8.5 Gestión del Servidor — Scripts de Administración
+
+- [ ] `echosmart-ctl status` — Estado de todos los servicios
+- [ ] `echosmart-ctl start` — Iniciar todos los servicios
+- [ ] `echosmart-ctl stop` — Detener todos los servicios
+- [ ] `echosmart-ctl restart` — Reiniciar todos los servicios
+- [ ] `echosmart-ctl logs [servicio]` — Ver logs (todos o uno específico)
+- [ ] `echosmart-ctl backup` — Ejecutar backup manual
+- [ ] `echosmart-ctl restore [archivo]` — Restaurar desde backup
+- [ ] `echosmart-ctl update` — Actualizar a la última versión (pull images + restart)
+- [ ] `echosmart-ctl reset-password [email]` — Resetear contraseña de usuario
+- [ ] `echosmart-ctl add-user [email] [role]` — Crear usuario
+- [ ] `echosmart-ctl ssl-renew` — Renovar certificado SSL
+- [ ] `echosmart-ctl health` — Verificación completa de salud del sistema
+- [ ] `echosmart-ctl config` — Re-ejecutar wizard de configuración
+- [ ] `echosmart-ctl diagnostics` — Generar reporte de diagnóstico (para soporte)
+- [ ] Instalar como servicio systemd: `echosmart.service`
+- [ ] Auto-inicio al boot del servidor
+
+### 8.6 Generación del ISO — Build System
+
+- [ ] Crear `infra/iso/server/` — Directorio de build del ISO
+- [ ] Script de build: `infra/iso/server/build-iso.sh`
+- [ ] Usar `cubic` o `live-build` para personalizar Ubuntu ISO
+- [ ] Preseed file (`preseed.cfg`) para instalación desatendida:
+  - [ ] Idioma: español (configurable)
+  - [ ] Teclado: latam/español
+  - [ ] Particionamiento automático
+  - [ ] Usuario del sistema: `echosmart`
+  - [ ] Instalar OpenSSH server
+  - [ ] Post-install: ejecutar script de provisioning
+- [ ] Script de provisioning que se ejecuta en primer boot:
+  - [ ] Instalar Docker, Docker Compose
+  - [ ] Copiar archivos de EchoSmart a `/opt/echosmart/`
+  - [ ] Cargar imágenes Docker pre-descargadas (`docker load`)
+  - [ ] Instalar `echosmart-ctl` en `/usr/local/bin/`
+  - [ ] Configurar cron jobs
+  - [ ] Configurar firewall (UFW)
+  - [ ] Configurar fail2ban
+  - [ ] Configurar logrotate
+  - [ ] Mostrar wizard de configuración en primer login
+- [ ] Validación del ISO:
+  - [ ] Test en VirtualBox: instalación completa en < 15 minutos
+  - [ ] Test en VMware: instalación completa
+  - [ ] Test en hardware físico (servidor real)
+  - [ ] Verificar que todos los servicios inician correctamente
+  - [ ] Verificar acceso web al dashboard
+  - [ ] Verificar recepción de datos del emulador
+- [ ] Documentar el proceso de build del ISO
+- [ ] CI/CD: GitHub Action para build automático del ISO en cada release
+
+### 8.7 Actualización Remota del Servidor
+
+- [ ] Mecanismo de actualización Over-The-Air (OTA):
+  - [ ] `echosmart-ctl update` descarga nuevas imágenes Docker
+  - [ ] Verificar compatibilidad de versiones antes de actualizar
+  - [ ] Ejecutar migraciones de base de datos automáticamente
+  - [ ] Rollback automático si health check falla post-update
+  - [ ] Notificar al admin por email del resultado de la actualización
+- [ ] Versionado semántico del servidor (major.minor.patch)
+- [ ] Changelog automático entre versiones
+- [ ] Política de soporte: LTS para versiones major
+
+---
+
+## Fase 9: ISO Personalizado del Raspberry Pi Gateway (Semanas 26–28)
+
+> 💿 **El ISO del Raspberry Pi contiene el gateway pre-configurado.** El usuario final solo necesita flashear la microSD, conectar los sensores, encender el RPi, y el gateway se conecta automáticamente al servidor.
+
+### 9.1 Definición del ISO del Gateway
+
+- [ ] Base: Raspberry Pi OS Lite 64-bit (Bookworm, sin desktop)
+- [ ] Nombre del ISO: `echosmart-gateway-v{VERSION}-arm64.img`
+- [ ] Tamaño objetivo: < 2GB (comprimido .xz < 500MB)
+- [ ] Arquitectura: arm64 (aarch64) para RPi 3B+/4/5
+- [ ] Boot: automático, sin intervención del usuario
+- [ ] Filesystem: ext4, auto-expand en primer boot
+
+### 9.2 Software Pre-instalado en el Gateway
+
+- [ ] **Raspberry Pi OS Lite** con actualizaciones de seguridad
+- [ ] **Python 3.11+** con virtualenv
+- [ ] **Mosquitto client** (paho-mqtt)
+- [ ] **SQLite3** para almacenamiento local
+- [ ] **Git** para actualizaciones
+- [ ] **Interfaces habilitadas**: I2C, 1-Wire, UART, SPI
+- [ ] **Device tree overlays** configurados:
+  - [ ] `dtoverlay=w1-gpio,gpiopin=4` (DS18B20)
+  - [ ] `enable_uart=1` (MH-Z19C)
+  - [ ] `dtparam=i2c_arm=on` (BH1750, ADS1115)
+  - [ ] `dtoverlay=disable-bt` (liberar UART principal)
+  - [ ] `gpu_mem=16` (mínima GPU, es headless)
+- [ ] **Dependencias Python pre-instaladas** en virtualenv `/opt/echosmart/venv/`:
+  - [ ] `RPi.GPIO`, `adafruit-circuitpython-dht`, `adafruit-circuitpython-bh1750`
+  - [ ] `adafruit-circuitpython-ads1x15`, `smbus2`, `pyserial`
+  - [ ] `paho-mqtt`, `requests`, `structlog`, `schedule`
+- [ ] **Código del gateway** en `/opt/echosmart/gateway/`
+- [ ] **Watchdog de hardware** habilitado (reinicio automático si se congela)
+- [ ] **Servicios systemd**:
+  - [ ] `echosmart-gateway.service` — Servicio principal del gateway
+  - [ ] `echosmart-watchdog.service` — Monitor de salud
+  - [ ] `echosmart-updater.timer` — Actualización automática diaria
+
+### 9.3 Script de Configuración del Gateway — `echosmart-gateway-setup`
+
+- [ ] Crear script de configuración de primer boot:
+  - [ ] **Paso 1: Nombre del gateway** — Identificador único (ej: `invernadero-norte-01`)
+  - [ ] **Paso 2: URL del servidor** — Dirección del servidor EchoSmart (ej: `https://api.echosmart.io`)
+  - [ ] **Paso 3: API Key** — Clave de autenticación del gateway (generada en el servidor)
+  - [ ] **Paso 4: WiFi** (opcional) — SSID y contraseña de la red WiFi
+  - [ ] **Paso 5: IP** — DHCP (default) o IP estática
+- [ ] Auto-registro del gateway en el servidor:
+  - [ ] POST `/api/v1/gateways/register` con API key
+  - [ ] Recibir y guardar `gateway_id` y `mqtt_credentials`
+  - [ ] Configurar conexión MQTT con credenciales recibidas
+- [ ] Verificar conectividad con el servidor
+- [ ] Verificar que los sensores son detectados (I2C, 1-Wire, UART)
+- [ ] Iniciar servicio del gateway
+- [ ] LED indicator (si RPi tiene LED): parpadeo lento = conectando, fijo = conectado
+
+### 9.4 Auto-Conexión al Servidor
+
+- [ ] Implementar auto-discovery del servidor en red local (mDNS/Bonjour)
+- [ ] Fallback: el gateway busca `echosmart-server.local` en la red
+- [ ] Si no encuentra, usar la URL configurada manualmente
+- [ ] Reconexión automática si pierde conexión al servidor:
+  - [ ] Retry con backoff exponencial (1s, 2s, 4s, 8s... max 5min)
+  - [ ] Almacenar lecturas en SQLite local durante desconexión
+  - [ ] Sincronizar datos acumulados al reconectar (batch upload)
+  - [ ] Notificar al servidor que hubo desconexión (con timestamps)
+- [ ] Heartbeat: ping al servidor cada 30 segundos
+- [ ] Si el servidor cambia de IP (DNS dinámico), actualizar automáticamente
+
+### 9.5 Gestión Remota del Gateway
+
+- [ ] Actualización OTA del software del gateway:
+  - [ ] El servidor envía comando MQTT `echosmart/gw/{id}/update`
+  - [ ] El gateway descarga nueva versión desde servidor o GitHub
+  - [ ] Aplica actualización y reinicia servicio
+  - [ ] Reporta versión nueva al servidor
+  - [ ] Rollback si la nueva versión falla
+- [ ] Reinicio remoto:
+  - [ ] Comando MQTT `echosmart/gw/{id}/reboot`
+  - [ ] El gateway hace reboot limpio (flush datos, stop service, reboot)
+- [ ] Configuración remota:
+  - [ ] Cambiar intervalo de polling vía MQTT
+  - [ ] Habilitar/deshabilitar sensores específicos
+  - [ ] Cambiar nivel de logging
+- [ ] Diagnóstico remoto:
+  - [ ] Comando MQTT `echosmart/gw/{id}/diagnostics`
+  - [ ] El gateway responde con: CPU, RAM, disk, uptime, sensor status, network, versión
+- [ ] SSH tunneling inverso (opcional, para soporte remoto)
+
+### 9.6 Generación del ISO del Gateway — Build System
+
+- [ ] Crear `infra/iso/gateway/` — Directorio de build
+- [ ] Script de build: `infra/iso/gateway/build-gateway-image.sh`
+- [ ] Usar `pi-gen` (herramienta oficial de RPi Foundation) para customizar imagen
+- [ ] Customizaciones de pi-gen:
+  - [ ] Stage 0: Bootstrap Debian
+  - [ ] Stage 1: Mínimo OS (sin desktop)
+  - [ ] Stage 2: Sistema base con networking
+  - [ ] Stage 3: Dependencias EchoSmart (Python, libs, gateway code)
+  - [ ] Stage 4: Configuración final (services, config, first-boot script)
+- [ ] First-boot script (`/opt/echosmart/first-boot.sh`):
+  - [ ] Expandir filesystem a toda la SD
+  - [ ] Generar hostname único basado en MAC address
+  - [ ] Generar SSH host keys únicos
+  - [ ] Verificar y habilitar interfaces de hardware
+  - [ ] Iniciar wizard de configuración (en consola serial o SSH)
+  - [ ] Iniciar servicio del gateway
+  - [ ] Marcar first-boot como completado
+- [ ] Comprimir imagen con `xz` para distribución
+- [ ] Checksum SHA256 para verificación de integridad
+- [ ] Validación:
+  - [ ] Test en RPi 4 (hardware real)
+  - [ ] Test en QEMU (emulación ARM)
+  - [ ] Verificar boot < 30 segundos
+  - [ ] Verificar que los sensores son detectados
+  - [ ] Verificar conexión automática al servidor
+  - [ ] Verificar transmisión de datos de sensores
+- [ ] CI/CD: GitHub Action para build automático de la imagen
+
+### 9.7 Documentación del Usuario Final
+
+- [ ] Guía rápida (1 página) incluida en caja del producto:
+  - [ ] Paso 1: Flashear la microSD con Balena Etcher
+  - [ ] Paso 2: Insertar SD en Raspberry Pi
+  - [ ] Paso 3: Conectar sensores según diagrama incluido
+  - [ ] Paso 4: Conectar alimentación y cable de red
+  - [ ] Paso 5: Acceder a `http://echosmart-gw-XXXX.local` para configurar
+- [ ] Diagrama de conexión de sensores (impreso, a color)
+- [ ] FAQ de problemas comunes
+- [ ] QR code que lleva a documentación online
+
+---
+
+## Fase 10: Features Avanzadas (Semanas 29+)
+
+### 10.1 Control de Actuadores
 
 - [ ] Modelo de datos: `Actuator(id, name, type, gpio_pin, state, gateway_id)`
 - [ ] Driver de relés en gateway: `RelayDriver` (On/Off via GPIO)
@@ -1869,59 +2434,86 @@ desktop/src/
   - [ ] `IF soil_moisture < 40% THEN riego ON por 10 min`
   - [ ] `IF light < 5000 lux THEN iluminación ON`
 - [ ] API REST para control remoto
-- [ ] UI en frontend
-- [ ] Tests: drivers, scheduling, automatización
+- [ ] UI en frontend para gestión de actuadores
+- [ ] UI en mobile para control rápido
+- [ ] Tests: drivers, scheduling, automatización, UI
 
-### 7.2 Analítica Predictiva (ML)
+### 10.2 Analítica Predictiva (ML)
 
-- [ ] Dataset de entrenamiento (30+ días de datos)
-- [ ] Predicción de temperatura (LSTM/Prophet, 1h/6h/24h)
-- [ ] Detección de anomalías (Isolation Forest)
-- [ ] Recomendaciones de riego
-- [ ] API de predicciones
-- [ ] Visualización en dashboard
-- [ ] Tests con datos históricos
+- [ ] Dataset de entrenamiento (30+ días de datos reales)
+- [ ] Predicción de temperatura (LSTM/Prophet, horizontes: 1h/6h/24h)
+- [ ] Predicción de humedad del suelo (para optimizar riego)
+- [ ] Detección de anomalías (Isolation Forest / Autoencoders)
+- [ ] Recomendaciones automáticas de riego basadas en predicción
+- [ ] API de predicciones: `GET /api/v1/predictions/{sensor_id}`
+- [ ] Visualización en dashboard: gráfica con predicción + intervalo de confianza
+- [ ] Re-entrenamiento periódico del modelo (cada semana)
+- [ ] Tests con datos históricos (backtesting)
 
-### 7.3 Integraciones Externas
+### 10.3 Integraciones Externas
 
-- [ ] WhatsApp Business API para alertas
-- [ ] Telegram Bot (@EchoSmartBot)
-- [ ] Slack / Microsoft Teams webhooks
-- [ ] API Meteorológica (OpenWeatherMap) — pronóstico + correlación
-- [ ] Tests con APIs mockeadas
+- [ ] **WhatsApp Business API** para alertas críticas
+- [ ] **Telegram Bot** (`@EchoSmartBot`):
+  - [ ] Comandos: `/status`, `/sensors`, `/alerts`, `/photo`
+  - [ ] Notificaciones push de alertas
+- [ ] **Slack / Microsoft Teams** webhooks para alertas
+- [ ] **API Meteorológica** (OpenWeatherMap):
+  - [ ] Pronóstico 5 días para ubicación del invernadero
+  - [ ] Correlación automática: clima externo vs lecturas internas
+  - [ ] Alerta proactiva: "Helada prevista en 6 horas"
+- [ ] **Google Sheets** export de datos
+- [ ] Tests con APIs mockeadas (responses/httpretty)
 
-### 7.4 Administración Avanzada
+### 10.4 Administración Avanzada
 
-- [ ] Audit Log: registrar TODA acción con old_value/new_value
-- [ ] SSO: Google OAuth2, Microsoft Azure AD, SAML 2.0
-- [ ] 2FA: TOTP con Google Authenticator + backup codes
-- [ ] Suscripciones: Free/Pro/Enterprise con Stripe
-- [ ] Tests: audit trail, SSO flow, 2FA setup
+- [ ] **Audit Log** completo:
+  - [ ] Registrar TODA acción: login, CRUD, config changes
+  - [ ] Campos: user_id, action, resource, old_value, new_value, ip, timestamp
+  - [ ] UI para buscar y filtrar audit trail
+  - [ ] Retención configurable (90 días default)
+- [ ] **SSO** (Single Sign-On):
+  - [ ] Google OAuth2
+  - [ ] Microsoft Azure AD
+  - [ ] SAML 2.0 para enterprise
+- [ ] **2FA** (Two-Factor Authentication):
+  - [ ] TOTP con Google Authenticator / Authy
+  - [ ] Backup codes (10 códigos de un solo uso)
+  - [ ] Forzar 2FA para admins
+- [ ] **Suscripciones y Billing**:
+  - [ ] Planes: Free (1 gateway, 5 sensors) / Pro (10 gw, 50 sensors) / Enterprise (ilimitado)
+  - [ ] Stripe integration para pagos
+  - [ ] UI de billing, facturas, upgrade/downgrade
+- [ ] Tests: audit trail, SSO flow, 2FA setup, billing
 
-### 7.5 API Pública y Documentación
+### 10.5 API Pública y Documentación para Desarrolladores
 
-- [ ] API keys con scopes (read, write, admin)
-- [ ] Rate limiting por API key
-- [ ] Portal de desarrolladores con guías
-- [ ] Webhooks salientes configurables
-- [ ] Documentación OpenAPI interactiva
+- [ ] API keys con scopes granulares (read:sensors, write:config, admin)
+- [ ] Rate limiting por API key (100 req/min free, 1000 pro, ilimitado enterprise)
+- [ ] Portal de desarrolladores (`developers.echosmart.io`)
+- [ ] Documentación OpenAPI 3.1 interactiva (Swagger UI + ReDoc)
+- [ ] SDKs oficiales: Python, JavaScript, cURL examples
+- [ ] Webhooks salientes configurables (sensor reading, alert, gateway status)
+- [ ] Sandbox environment para testing de integraciones
+- [ ] Tests: API keys, rate limiting, webhooks delivery
 
-### 7.6 Internacionalización y Accesibilidad
+### 10.6 Internacionalización y Accesibilidad
 
-- [ ] Traducciones completas español/inglés/portugués
+- [ ] Traducciones completas: español, inglés, portugués, francés
+- [ ] Sistema de traducciones: react-i18next (frontend) + gettext (backend)
 - [ ] WCAG 2.1 AA en frontend web
-- [ ] VoiceOver/TalkBack en mobile
+- [ ] VoiceOver (iOS) / TalkBack (Android) en mobile
 - [ ] Modo alto contraste
-- [ ] Tests de accesibilidad automatizados (axe-core)
+- [ ] Keyboard navigation completa (no mouse-only interactions)
+- [ ] Tests de accesibilidad automatizados (axe-core, Lighthouse)
 
 ---
 
-## Fase 8: Testing con Hardware Real (Final)
+## Fase 11: Testing con Hardware Real (Final)
 
-> 🔧 **Esta fase se ejecuta ÚNICAMENTE cuando todo el software está completo y probado en modo simulación.** Aquí se adquiere el hardware físico y se validan los drivers contra sensores reales.
+> 🔧 **Esta fase se ejecuta ÚNICAMENTE cuando todo el software está completo, probado en modo simulación, y la infraestructura está desplegada.** Aquí se adquiere el hardware físico y se validan los drivers contra sensores reales.
 
-### 8.1 Adquisición de Hardware
-- [ ] Adquirir Raspberry Pi 4 Model B (2GB+ RAM)
+### 11.1 Adquisición de Hardware
+- [ ] Adquirir Raspberry Pi 4 Model B (4GB+ RAM)
 - [ ] Adquirir fuente de alimentación oficial RPi (5V 3A USB-C)
 - [ ] Adquirir tarjeta microSD (32GB+ clase 10)
 - [ ] Adquirir sensor DS18B20 (versión encapsulada impermeable)
@@ -1930,58 +2522,55 @@ desktop/src/
 - [ ] Adquirir sensor capacitivo de humedad de suelo v1.2
 - [ ] Adquirir módulo ADC ADS1115 (16-bit, 4 canales)
 - [ ] Adquirir sensor MH-Z19C (CO₂ NDIR)
-- [ ] Adquirir protoboard, cables jumper, resistencias pull-up (4.7kΩ para 1-Wire)
+- [ ] Adquirir protoboard, cables jumper, resistencias pull-up (4.7kΩ para 1-Wire, 10kΩ para DHT22)
+- [ ] Adquirir carcasa/case para RPi con ventilación
 - [ ] Verificar que todos los componentes sean compatibles con RPi 3.3V/5V
 
-### 8.2 Configuración del Raspberry Pi
-- [ ] Instalar Raspberry Pi OS 64-bit (Lite o Desktop)
-- [ ] Habilitar interfaces: I2C (`raspi-config` → Interfacing → I2C)
-- [ ] Habilitar interfaces: 1-Wire (`dtoverlay=w1-gpio` en `/boot/config.txt`)
-- [ ] Habilitar interfaces: UART (`enable_uart=1` en `/boot/config.txt`, deshabilitar consola serial)
-- [ ] Instalar dependencias del sistema: `python3-pip`, `python3-venv`, `i2c-tools`, `git`
-- [ ] Verificar bus I2C: `i2cdetect -y 1` (debe mostrar dirección 0x23 del BH1750 y 0x48 del ADS1115)
-- [ ] Verificar bus 1-Wire: `ls /sys/bus/w1/devices/` (debe mostrar dispositivo 28-xxxx del DS18B20)
+### 11.2 Flashear ISO del Gateway
+- [ ] Descargar `echosmart-gateway-v{VERSION}-arm64.img`
+- [ ] Flashear con Balena Etcher o RPi Imager
+- [ ] Insertar microSD en Raspberry Pi
+- [ ] Conectar alimentación y red
+- [ ] Ejecutar wizard de configuración (`echosmart-gateway-setup`)
+- [ ] Verificar que el gateway aparece en el dashboard del servidor
 
-### 8.3 Conexión Física de Sensores
+### 11.3 Conexión Física de Sensores
 - [ ] Conectar DS18B20 a GPIO 4 con resistencia pull-up de 4.7kΩ entre DATA y VCC (3.3V)
 - [ ] Conectar DHT22 a GPIO 17 con resistencia pull-up de 10kΩ (si el módulo no la incluye)
 - [ ] Conectar BH1750 a bus I2C (SDA → GPIO 2, SCL → GPIO 3), alimentar a 3.3V
-- [ ] Conectar ADS1115 a bus I2C (SDA → GPIO 2, SCL → GPIO 3), dirección por defecto 0x48
+- [ ] Conectar ADS1115 a bus I2C (SDA → GPIO 2, SCL → GPIO 3), dirección 0x48
 - [ ] Conectar sensor de humedad de suelo al canal A0 del ADS1115
 - [ ] Conectar MH-Z19C a UART (TX sensor → RX RPi GPIO 15, RX sensor → TX RPi GPIO 14), alimentar a 5V
-- [ ] Verificar pinout con diagrama antes de encender (evitar daños)
+- [ ] Verificar pinout con diagrama incluido antes de encender
 
-### 8.4 Validación de Drivers con Hardware Real
+### 11.4 Validación de Drivers con Hardware Real
 - [ ] Cambiar configuración del gateway a `simulation=False`
-- [ ] Instalar librerías de hardware: `pip install RPi.GPIO adafruit-circuitpython-dht adafruit-circuitpython-ads1x15 smbus2 pyserial`
-- [ ] Completar implementación real en `ds18b20.py` — leer `/sys/bus/w1/devices/28-*/w1_slave`
-- [ ] Completar implementación real en `dht22.py` — usar `adafruit_dht.DHT22(board.D17)`
-- [ ] Completar implementación real en `bh1750.py` — leer registros I2C con `smbus2`
-- [ ] Completar implementación real en `soil_moisture.py` — leer canal ADC vía `adafruit_ads1x15`
-- [ ] Completar implementación real en `mhz19c.py` — enviar comando de lectura por UART y parsear respuesta
-- [ ] Verificar cada sensor individualmente: ejecutar `python -c "from sensor_drivers.ds18b20 import DS18B20Driver; d=DS18B20Driver(); print(d.read())"`
+- [ ] Verificar cada sensor individualmente desde la CLI del gateway
+- [ ] Verificar que las lecturas aparecen en el dashboard web
+- [ ] Verificar que las alertas se generan correctamente
 - [ ] Comparar lecturas contra instrumentos de referencia (termómetro, higrómetro)
 
-### 8.5 Calibración y Ajustes
-- [ ] Calibrar DS18B20: verificar offset de temperatura vs termómetro de referencia
+### 11.5 Calibración y Ajustes
+- [ ] Calibrar DS18B20: verificar offset vs termómetro de referencia
 - [ ] Calibrar DHT22: verificar humedad vs higrómetro de referencia
-- [ ] Calibrar BH1750: verificar lux vs luxómetro (o referencia solar conocida)
-- [ ] Calibrar sensor de suelo: definir curva seco (0%) vs saturado (100%) con muestras reales
-- [ ] Calibrar MH-Z19C: ejecutar autocalibración ABC o calibración manual a 400ppm (aire exterior)
+- [ ] Calibrar BH1750: verificar lux vs luxómetro
+- [ ] Calibrar sensor de suelo: definir curva seco (0%) vs saturado (100%)
+- [ ] Calibrar MH-Z19C: autocalibración ABC o manual a 400ppm (aire exterior)
 - [ ] Ajustar intervalos de polling según estabilidad de lecturas
-- [ ] Documentar offsets y factores de corrección en configuración
+- [ ] Documentar offsets y factores de corrección
 
-### 8.6 Testing de Integración con Hardware
-- [ ] Ejecutar `sensor_manager.py` con los 5 sensores reales conectados
-- [ ] Verificar que el polling lee todos los sensores sin errores durante 1 hora continua
-- [ ] Verificar almacenamiento local en SQLite (lecturas persistidas correctamente)
-- [ ] Verificar publicación MQTT (Mosquitto recibe los mensajes)
-- [ ] Verificar sincronización con backend cloud (datos llegan al API)
-- [ ] Verificar motor de alertas (generar condición de alerta real, ej: calentar sensor con mano)
+### 11.6 Testing de Integración End-to-End
+- [ ] Ejecutar gateway con los 5 sensores reales conectados
+- [ ] Verificar datos en tiempo real en dashboard web
+- [ ] Verificar datos en app mobile
+- [ ] Verificar datos en app desktop
+- [ ] Verificar alertas por email (SMTP)
+- [ ] Verificar reconexión después de corte de red
+- [ ] Verificar reconexión después de reinicio del RPi
+- [ ] Verificar sincronización de datos offline
 - [ ] Medir consumo de CPU/RAM del Raspberry Pi bajo carga
-- [ ] Configurar e iniciar servicio systemd (`echosmart-gateway.service`)
-- [ ] Verificar que el gateway sobrevive reinicios y desconexiones de red
-- [ ] Prueba de estrés: 24 horas continuas de operación con todos los sensores
+- [ ] Prueba de estrés: **24 horas continuas** de operación con todos los sensores
+- [ ] Prueba de estrés: **72 horas** con cortes de red simulados cada 4 horas
 
 ---
 
@@ -1997,9 +2586,30 @@ desktop/src/
 | **Escritorio (Windows)** | Electron · React | `desktop/` | 🟠 Estructura inicial |
 | **Escritorio (macOS)** | Electron · React | `desktop/` | 🟠 Estructura inicial |
 | **Escritorio (Linux)** | Electron · React | `desktop/` | 🟠 Estructura inicial |
-| **Infraestructura** | Docker · Kubernetes · GitHub Actions | `infra/` | 🟡 Docker + K8s parcial |
+| **Infra Local (Dev)** | Docker Compose · Makefile · Scripts | `infra/` | 🟠 Pendiente |
+| **Infra Producción** | Docker · K8s · Nginx · Prometheus · Grafana | `infra/` | 🟡 Docker + K8s parcial |
+| **ISO Servidor** | Ubuntu 22.04 · Docker · echosmart-ctl | `infra/iso/server/` | 🟠 Pendiente |
+| **ISO Gateway RPi** | RPi OS Lite · Python · pi-gen | `infra/iso/gateway/` | 🟠 Pendiente |
 | **Assets / Diseño** | SVG · PNG · JPG · ICO | `assets/` | 🟢 312 archivos generados |
-| **Documentación** | Markdown · SVG | `docs/` | 🟢 Diagramas + wireframes |
+| **Documentación** | Markdown · SVG | `docs/` | 🟢 26+ documentos |
+
+## Resumen de Fases
+
+| Fase | Nombre | Semanas | Tareas | Estado |
+|------|--------|---------|--------|--------|
+| 0 | Estructura y Assets | — | ~130 | ✅ Completado |
+| 1 | Gateway Local (Simulación) | 1–3 | ~180 | 🟡 Scaffolding |
+| 2 | Backend Cloud | 4–7 | ~300 | 🟡 Scaffolding |
+| 3 | Frontend Web | 8–10 | ~250 | 🟡 Scaffolding |
+| 4 | Mobile (Android + iOS) | 11–16 | ~120 | 🟠 Estructura |
+| 5 | Desktop (Win/Mac/Linux) | 17–20 | ~70 | 🟠 Estructura |
+| 6 | **Infra Local + Emulador** | 17–18 | ~100 | 🟠 Pendiente |
+| 7 | **Infra Producción + DevOps** | 19–22 | ~150 | 🟠 Pendiente |
+| 8 | **ISO Servidor** | 23–25 | ~120 | 🟠 Pendiente |
+| 9 | **ISO Raspberry Pi Gateway** | 26–28 | ~100 | 🟠 Pendiente |
+| 10 | Features Avanzadas | 29+ | ~80 | 🟠 Pendiente |
+| 11 | Testing con Hardware Real | Final | ~40 | 🟠 Pendiente |
+| | **TOTAL** | | **~1640+** | |
 
 ## Resumen de Assets Generados
 
