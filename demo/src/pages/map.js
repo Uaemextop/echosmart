@@ -239,14 +239,25 @@ function drawHeatmap(paramKey, sensors) {
     var midVal = (scale[0][0] + scale[scale.length - 1][0]) / 2;
     var rgb = interpolateColor(midVal, scale);
     ctx.fillStyle = "rgba(" + rgb[0] + "," + rgb[1] + "," + rgb[2] + ",0.35)";
-    ctx.fillRect(0, 0, cw, ch);
+    var wL = Math.floor((WALL_M / GH_W) * cw);
+    var wT = Math.floor((WALL_M / GH_H) * ch);
+    var wW = Math.ceil(((GH_W - 2 * WALL_M) / GH_W) * cw);
+    var wH = Math.ceil(((GH_H - 2 * WALL_M) / GH_H) * ch);
+    ctx.fillRect(wL, wT, wW, wH);
     return;
   }
+
+  /* Clip heatmap to greenhouse walls — outside stays transparent (dark bg) */
+  var wallL = Math.floor((WALL_M / GH_W) * cw);
+  var wallT = Math.floor((WALL_M / GH_H) * ch);
+  var wallR = Math.ceil(((GH_W - WALL_M) / GH_W) * cw);
+  var wallB = Math.ceil(((GH_H - WALL_M) / GH_H) * ch);
 
   var imgData = ctx.createImageData(cw, ch);
   var data = imgData.data;
   for (var py = 0; py < ch; py += HEATMAP_RES) {
     for (var px = 0; px < cw; px += HEATMAP_RES) {
+      if (px < wallL || px >= wallR || py < wallT || py >= wallB) continue;
       var val = idwInterpolate(px, py, nodes);
       var c = interpolateColor(val, scale);
       for (var dy = 0; dy < HEATMAP_RES && (py + dy) < ch; dy++) {
