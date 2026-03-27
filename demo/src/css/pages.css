@@ -191,8 +191,17 @@
 }
 
 /* ===================================================
-   Reports page styles
+   Reports page — enhanced styles
    =================================================== */
+
+.reports-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
 
 .reports-grid {
   display: grid;
@@ -204,6 +213,388 @@
 .report-chart-container {
   height: 200px;
   padding: 12px;
+}
+
+/* Gauge row */
+.reports-gauge-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.report-gauge-container {
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 130px;
+}
+
+/* Summary cards */
+.report-summary-row {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.report-summary-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px;
+  transition: border-color 0.2s;
+}
+
+.report-summary-card:hover {
+  border-color: var(--border-hover);
+}
+
+.report-summary-card__header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.report-summary-card__icon {
+  font-size: 1.1rem;
+}
+
+.report-summary-card__label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  flex: 1;
+}
+
+.report-summary-card__value {
+  font-size: 1.6rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  margin-bottom: 6px;
+}
+
+.report-summary-card__stats {
+  display: flex;
+  gap: 8px;
+  font-size: 0.65rem;
+  color: var(--text-muted);
+}
+
+/* ===================================================
+   AI Report styles
+   =================================================== */
+
+.ai-report {
+  padding: 0;
+}
+
+.ai-report__brand-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 16px;
+  border-bottom: 2px solid var(--green);
+  margin-bottom: 20px;
+}
+
+.ai-report__brand-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ai-report__brand-name {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--green);
+}
+
+.ai-report__brand-subtitle {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.ai-report__brand-date {
+  text-align: right;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.ai-report__model-info {
+  background: var(--surface-elevated);
+  padding: 10px 16px;
+  border-radius: var(--radius-xs);
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.ai-report__model-badge {
+  background: var(--green-bg);
+  color: var(--green);
+  padding: 3px 10px;
+  border-radius: var(--radius-xs);
+  font-weight: 600;
+  font-size: 0.7rem;
+  white-space: nowrap;
+}
+
+.ai-report__model-text {
+  font-size: 0.72rem;
+}
+
+.ai-report__section {
+  margin-bottom: 24px;
+}
+
+.ai-report__section-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 14px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.ai-report__summary-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+}
+
+.ai-report__summary-item {
+  padding: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xs);
+  text-align: center;
+}
+
+.ai-report__summary-label {
+  display: block;
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.ai-report__summary-value {
+  display: block;
+  font-size: 1.4rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  margin: 4px 0;
+}
+
+.ai-report__summary-range {
+  display: block;
+  font-size: 0.6rem;
+  color: var(--text-muted);
+}
+
+.ai-report__instruction-note {
+  background: rgba(255,145,0,0.08);
+  padding: 12px 16px;
+  border-radius: var(--radius-xs);
+  font-size: 0.72rem;
+  color: var(--high);
+  margin-bottom: 14px;
+  border-left: 3px solid var(--high);
+  line-height: 1.5;
+}
+
+.ai-report__alert-card {
+  padding: 14px;
+  margin-bottom: 10px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xs);
+}
+
+.ai-report__alert-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.ai-report__alert-name {
+  font-weight: 700;
+  font-size: 0.88rem;
+  color: var(--text-primary);
+}
+
+.ai-report__alert-risk {
+  padding: 2px 10px;
+  border-radius: var(--radius-xs);
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+
+.ai-report__alert-reason {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+  line-height: 1.5;
+}
+
+.ai-report__alert-action {
+  font-size: 0.78rem;
+  color: var(--green);
+  background: var(--green-bg);
+  padding: 8px 12px;
+  border-radius: var(--radius-xs);
+  line-height: 1.5;
+}
+
+.ai-report__diagram {
+  margin: 12px 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xs);
+  padding: 16px;
+}
+
+.ai-report__diagram-svg {
+  width: 100%;
+  max-height: 260px;
+}
+
+.ai-report__ranges-table {
+  overflow-x: auto;
+}
+
+.ai-report__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+}
+
+.ai-report__table th {
+  text-align: left;
+  padding: 10px 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  border-bottom: 1px solid var(--border);
+}
+
+.ai-report__table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-primary);
+}
+
+.ai-report__table tr:hover td {
+  background: var(--surface-hover);
+}
+
+.ai-report__scale-bar {
+  position: relative;
+  height: 8px;
+  background: var(--surface-elevated);
+  border-radius: 4px;
+  min-width: 100px;
+}
+
+.ai-report__scale-optimal {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  background: rgba(0,230,118,0.15);
+  border-radius: 4px;
+}
+
+.ai-report__scale-marker {
+  position: absolute;
+  top: -2px;
+  width: 4px;
+  height: 12px;
+  border-radius: 2px;
+  transform: translateX(-2px);
+}
+
+.ai-report__recommendations {
+  display: grid;
+  gap: 10px;
+}
+
+.ai-report__rec-item {
+  display: flex;
+  gap: 14px;
+  padding: 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xs);
+  align-items: flex-start;
+}
+
+.ai-report__rec-number {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--green-bg);
+  color: var(--green);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+
+.ai-report__rec-title {
+  font-weight: 700;
+  font-size: 0.85rem;
+  margin-bottom: 4px;
+  color: var(--text-primary);
+}
+
+.ai-report__rec-text {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.ai-report__footer {
+  margin-top: 30px;
+  padding-top: 16px;
+  border-top: 2px solid var(--green);
+  text-align: center;
+}
+
+.ai-report__footer-brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-bottom: 6px;
+  font-weight: 600;
+  font-size: 0.82rem;
+  color: var(--green);
+}
+
+.ai-report__footer-meta {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+
+.ai-report__footer-disclaimer {
+  font-size: 0.62rem;
+  color: var(--text-muted);
+  font-style: italic;
+  max-width: 500px;
+  margin: 0 auto;
+  line-height: 1.5;
 }
 
 /* ===================================================
@@ -655,6 +1046,28 @@
 
   .reports-grid {
     grid-template-columns: 1fr;
+  }
+
+  .reports-gauge-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .report-summary-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .ai-report__summary-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .ai-report__brand-header {
+    flex-direction: column;
+    gap: 10px;
+    text-align: center;
+  }
+
+  .ai-report__brand-date {
+    text-align: center;
   }
 
   .settings-grid {
