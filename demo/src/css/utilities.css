@@ -1,0 +1,35 @@
+/* ===================================================
+   Animations & utilities
+   =================================================== */
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.4; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.anim-pulse { animation: pulse 2s ease-in-out infinite; }
+.anim-fade  { animation: fadeIn 0.3s ease-out; }
+
+/* Utility classes */
+.flex         { display: flex; }
+.items-center { align-items: center; }
+.gap-4        { gap: 4px; }
+.gap-8        { gap: 8px; }
+.gap-12       { gap: 12px; }
+.gap-16       { gap: 16px; }
+.ml-auto      { margin-left: auto; }
+.mr-8         { margin-right: 8px; }
+.mb-8         { margin-bottom: 8px; }
+.mb-16        { margin-bottom: 16px; }
+.mb-20        { margin-bottom: 20px; }
+.text-sm      { font-size: 0.8rem; }
+.text-xs      { font-size: 0.7rem; }
+.text-muted   { color: var(--text-muted); }
+.text-green   { color: var(--green); }
+.font-mono    { font-family: var(--font-mono); }
+.truncate     { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

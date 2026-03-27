@@ -1,0 +1,115 @@
+/* ===================================================
+   Dashboard page specific styles
+   =================================================== */
+
+/* ---- Chart area ---- */
+.dashboard__chart-row {
+  display: grid;
+  grid-template-columns: 1fr 260px;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.chart-container {
+  position: relative;
+  height: 220px;
+  padding: 12px 14px;
+}
+
+/* ---- Alerts panel (right sidebar in dashboard) ---- */
+.alerts-panel {
+  display: flex;
+  flex-direction: column;
+}
+
+.alerts-panel .card__body {
+  padding: 8px 12px;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.alert-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 6px;
+  border-radius: var(--radius-xs);
+  transition: background 0.15s;
+}
+
+.alert-item:hover {
+  background: var(--surface-elevated);
+}
+
+.alert-item__dot {
+  width: 4px;
+  min-height: 100%;
+  border-radius: 2px;
+  flex-shrink: 0;
+  align-self: stretch;
+}
+
+.alert-item--critical .alert-item__dot { background: var(--critical); }
+.alert-item--high     .alert-item__dot { background: var(--high); }
+.alert-item--medium   .alert-item__dot { background: var(--medium); }
+.alert-item--low      .alert-item__dot { background: var(--low); }
+
+.alert-item__content {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.alert-item__title {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.alert-item__meta {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+}
+
+/* ---- Gateway status row ---- */
+.gateway-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+
+.gateway-card {
+  padding: 16px 18px;
+}
+
+.gateway-card__header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.gateway-card__name {
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.gateway-card__detail {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 1024px) {
+  .dashboard__chart-row {
+    grid-template-columns: 1fr;
+  }
+
+  .gateway-row {
+    grid-template-columns: 1fr;
+  }
+}
