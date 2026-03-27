@@ -58,6 +58,7 @@ frontend/build/
 
 # Coverage reports
 htmlcov/
+coverage/
 .coverage
 .coverage.*
 coverage.xml
