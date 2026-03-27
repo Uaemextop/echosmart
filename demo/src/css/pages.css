@@ -1077,6 +1077,31 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* Aisle average labels */
+.greenhouse-aisle-avg {
+  position: absolute;
+  z-index: 16;
+  transform: translateX(-50%);
+  pointer-events: none;
+  text-align: center;
+}
+
+.greenhouse-aisle-avg__label {
+  font-size: 0.55rem;
+  font-weight: 500;
+  color: rgba(255,255,255,0.35);
+  text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+  white-space: nowrap;
+}
+
+.greenhouse-aisle-avg__value {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.9), 0 0 6px rgba(0,0,0,0.7);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
 /* Parameter selector */
 .greenhouse-param-selector {
   position: absolute;
