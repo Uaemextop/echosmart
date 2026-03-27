@@ -8,33 +8,39 @@
 import { ICONS } from "../js/modules/icons.js";
 import { formatValue, getColors } from "../js/modules/sensors.js";
 
+/** Temperature thresholds for color mapping (°C) */
+const TEMP_COLD = 14;
+const TEMP_COOL = 18;
+const TEMP_OPT_HIGH = 26;
+const TEMP_WARM = 28;
+const TEMP_HOT = 35;
+
 /**
  * Map a temperature value to a CSS color.
  * Blue (cold) → Green (optimal) → Red (hot)
  */
 function tempToColor(temp) {
-  const cold = 14, cool = 18, optLow = 20, optHigh = 26, warm = 28, hot = 35;
   let r, g, b;
 
-  if (temp <= cold) {
+  if (temp <= TEMP_COLD) {
     r = 66; g = 133; b = 244;           // blue
-  } else if (temp <= cool) {
-    const t = (temp - cold) / (cool - cold);
+  } else if (temp <= TEMP_COOL) {
+    const t = (temp - TEMP_COLD) / (TEMP_COOL - TEMP_COLD);
     r = Math.round(66 + t * (0 - 66));
     g = Math.round(133 + t * (188 - 133));
     b = Math.round(244 + t * (212 - 244));
-  } else if (temp <= optHigh) {
-    const t = (temp - cool) / (optHigh - cool);
+  } else if (temp <= TEMP_OPT_HIGH) {
+    const t = (temp - TEMP_COOL) / (TEMP_OPT_HIGH - TEMP_COOL);
     r = Math.round(0 + t * (0));
     g = Math.round(188 + t * (230 - 188));
     b = Math.round(212 + t * (118 - 212));
-  } else if (temp <= warm) {
-    const t = (temp - optHigh) / (warm - optHigh);
+  } else if (temp <= TEMP_WARM) {
+    const t = (temp - TEMP_OPT_HIGH) / (TEMP_WARM - TEMP_OPT_HIGH);
     r = Math.round(0 + t * 255);
     g = Math.round(230 - t * 85);
     b = Math.round(118 - t * 118);
-  } else if (temp <= hot) {
-    const t = Math.min((temp - warm) / (hot - warm), 1);
+  } else if (temp <= TEMP_HOT) {
+    const t = Math.min((temp - TEMP_WARM) / (TEMP_HOT - TEMP_WARM), 1);
     r = 255;
     g = Math.round(145 - t * 123);
     b = Math.round(0 + t * 68);
@@ -159,22 +165,20 @@ export function renderMap(sensors) {
   `;
 }
 
+/** Plant row layout configuration per zone */
+const PLANT_ROWS = {
+  zoneA: { count: 3, startY: 110, spacing: 35, x1: 40, x2: 280 },
+  zoneC: { count: 2, startY: 260, spacing: 40, x1: 40, x2: 280 },
+  zoneB: { count: 5, startY: 110, spacing: 50, x1: 320, x2: 560 },
+};
+
 function generatePlantRows() {
   let rows = "";
-  // Zona A plant rows
-  for (let i = 0; i < 3; i++) {
-    const y = 110 + i * 35;
-    rows += `<line x1="40" y1="${y}" x2="280" y2="${y}" stroke="rgba(0,230,118,0.08)" stroke-width="8" stroke-linecap="round"/>`;
-  }
-  // Zona C plant rows
-  for (let i = 0; i < 2; i++) {
-    const y = 260 + i * 40;
-    rows += `<line x1="40" y1="${y}" x2="280" y2="${y}" stroke="rgba(0,230,118,0.08)" stroke-width="8" stroke-linecap="round"/>`;
-  }
-  // Zona B plant rows
-  for (let i = 0; i < 5; i++) {
-    const y = 110 + i * 50;
-    rows += `<line x1="320" y1="${y}" x2="560" y2="${y}" stroke="rgba(0,230,118,0.08)" stroke-width="8" stroke-linecap="round"/>`;
+  for (const zone of Object.values(PLANT_ROWS)) {
+    for (let i = 0; i < zone.count; i++) {
+      const y = zone.startY + i * zone.spacing;
+      rows += `<line x1="${zone.x1}" y1="${y}" x2="${zone.x2}" y2="${y}" stroke="rgba(0,230,118,0.08)" stroke-width="8" stroke-linecap="round"/>`;
+    }
   }
   return rows;
 }
