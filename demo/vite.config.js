@@ -2,6 +2,7 @@ import { resolve } from "path";
 import { defineConfig } from "vite";
 
 export default defineConfig({
+  base: "/echosmart/",
   root: "src",
   publicDir: resolve(__dirname, "public"),
   build: {
