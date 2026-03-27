@@ -6,6 +6,9 @@ import { formatValue, checkStatus, getColors, getSpecs, computeStats, generatePe
 import { createSparkline, createLineChart, updateChartData } from "../js/modules/charts.js";
 import { ICONS } from "../js/modules/icons.js";
 
+/** Milliseconds in one hour */
+const MS_PER_HOUR = 3_600_000;
+
 const sensorMeta = [
   { key: "temperature", name: "DS18B20 #1",   type: "Temperatura",     zone: "Zona A", icon: "temperature" },
   { key: "humidity",    name: "DHT22 #1",      type: "Humedad Ambiente", zone: "Zona A", icon: "humidity" },
@@ -88,6 +91,7 @@ export function renderSensors(sensors) {
     btn.addEventListener("click", (e) => {
       e.stopPropagation();
       const idx = parseInt(btn.dataset.expand, 10);
+      if (Number.isNaN(idx) || idx < 0 || idx >= sensorMeta.length) return;
       openSensorDetail(idx, sensors);
     });
   });
@@ -199,7 +203,7 @@ function renderDetailChart(idx, sensors) {
     chartData = sensors[m.key].history;
     const now = new Date();
     chartLabels = chartData.map((_, i) => {
-      const d = new Date(now.getTime() - (chartData.length - 1 - i) * 3600000);
+      const d = new Date(now.getTime() - (chartData.length - 1 - i) * MS_PER_HOUR);
       return d.getHours().toString().padStart(2, "0") + ":00";
     });
     stats = computeStats(chartData);

@@ -597,6 +597,131 @@
   line-height: 1.5;
 }
 
+.ai-report__ai-summary {
+  font-size: 0.85rem;
+  line-height: 1.7;
+  color: var(--text-secondary);
+  padding: 14px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xs);
+  border-left: 3px solid var(--green);
+}
+
+.ai-report__error {
+  background: rgba(255,23,68,0.1);
+  border: 1px solid var(--critical);
+  border-radius: var(--radius-xs);
+  padding: 10px 16px;
+  margin-bottom: 12px;
+  font-size: 0.78rem;
+  color: var(--critical);
+}
+
+/* ===================================================
+   AI Token Form & Status
+   =================================================== */
+
+.ai-token-form {
+  padding: 4px 0;
+}
+
+.ai-token-form__label {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+}
+
+.ai-token-form__row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.ai-token-form__input {
+  flex: 1;
+  padding: 8px 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xs);
+  color: var(--text-primary);
+  font-size: 0.8rem;
+  font-family: var(--font-mono);
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.ai-token-form__input:focus {
+  border-color: var(--green);
+}
+
+.ai-token-form__input::placeholder {
+  color: var(--text-muted);
+}
+
+.ai-token-form__hint {
+  margin-top: 8px;
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.ai-token-form__hint a {
+  color: var(--cyan);
+  text-decoration: none;
+}
+
+.ai-token-form__hint a:hover {
+  text-decoration: underline;
+}
+
+.ai-token-status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 0;
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}
+
+.ai-token-status--connected .ai-token-status__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 6px var(--green);
+}
+
+.btn--sm {
+  padding: 6px 12px;
+  font-size: 0.72rem;
+}
+
+.btn--ghost {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xs);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.btn--ghost:hover {
+  background: var(--surface-hover);
+  border-color: var(--border-hover);
+}
+
+.btn--danger {
+  color: var(--critical);
+  border-color: rgba(255,23,68,0.3);
+}
+
+.btn--danger:hover {
+  background: rgba(255,23,68,0.1);
+}
+
 /* ===================================================
    Map page styles
    =================================================== */

@@ -15,6 +15,9 @@ const TEMP_OPT_HIGH = 26;
 const TEMP_WARM = 28;
 const TEMP_HOT = 35;
 
+/** Default temperature when sensor data is not available */
+const DEFAULT_TEMPERATURE = 24;
+
 /**
  * Map a temperature value to a CSS color.
  * Blue (cold) → Green (optimal) → Red (hot)
@@ -98,7 +101,7 @@ export function renderMap(sensors) {
   const placeholder = container.parentElement?.querySelector(".map-placeholder");
   if (placeholder) placeholder.style.display = "none";
 
-  const baseTemp = sensors ? sensors.temperature.value : 24;
+  const baseTemp = sensors ? sensors.temperature.value : DEFAULT_TEMPERATURE;
 
   container.innerHTML = `
     <div class="greenhouse-layout">
