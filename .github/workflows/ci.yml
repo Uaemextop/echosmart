@@ -90,7 +90,7 @@ jobs:
       - name: Run tests
         run: |
           cd frontend
-          npm test -- --coverage --watchAll=false
+          npm run test:coverage
 
   gateway-tests:
     name: Gateway Tests
