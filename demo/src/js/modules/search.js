@@ -75,6 +75,16 @@ function _createResultsElement(wrapper) {
   _resultsEl.id = "searchResults";
   wrapper.style.position = "relative";
   wrapper.appendChild(_resultsEl);
+
+  /* Event delegation — single listener handles all result clicks */
+  _resultsEl.addEventListener("click", (e) => {
+    const item = e.target.closest(".search-results__item");
+    if (!item) return;
+    location.hash = item.dataset.page;
+    _hideResults();
+    const searchInput = document.querySelector(".topbar__search input");
+    if (searchInput) searchInput.value = "";
+  });
 }
 
 function _search(query) {
@@ -95,15 +105,6 @@ function _search(query) {
   }
 
   _resultsEl.classList.add("search-results--open");
-
-  _resultsEl.querySelectorAll(".search-results__item").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      location.hash = btn.dataset.page;
-      _hideResults();
-      const searchInput = document.querySelector(".topbar__search input");
-      if (searchInput) searchInput.value = "";
-    });
-  });
 }
 
 function _hideResults() {

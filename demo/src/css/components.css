@@ -250,7 +250,7 @@
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 900px) {
   .sensor-cards {
     grid-template-columns: repeat(2, 1fr);
   }
