@@ -281,6 +281,338 @@
 }
 
 /* ===================================================
+   Sensor detail — stats row
+   =================================================== */
+
+.sensor-detail-card__stats {
+  display: flex;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.sensor-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  padding: 6px 4px;
+  background: var(--surface-elevated);
+  border-radius: var(--radius-xs);
+}
+
+.sensor-stat__label {
+  font-size: 0.6rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.sensor-stat__value {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.sensor-detail-card__expand-btn {
+  display: block;
+  width: 100%;
+  margin-top: 10px;
+  padding: 6px 0;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xs);
+  color: var(--cyan);
+  font-size: 0.72rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.sensor-detail-card__expand-btn:hover {
+  background: var(--surface-hover);
+  border-color: var(--border-hover);
+}
+
+/* ===================================================
+   Sensor detail slide-out panel
+   =================================================== */
+
+.sensor-detail-panel {
+  position: fixed;
+  top: 0;
+  right: -480px;
+  width: 440px;
+  max-width: 90vw;
+  height: 100vh;
+  background: var(--bg);
+  border-left: 1px solid var(--border);
+  z-index: 200;
+  overflow-y: auto;
+  transition: right 0.3s ease;
+  box-shadow: -4px 0 24px rgba(0,0,0,0.5);
+}
+
+.sensor-detail-panel.open {
+  right: 0;
+}
+
+.sensor-detail-panel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.sensor-detail-panel__title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.sensor-detail-panel__subtitle {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.sensor-detail-panel__close {
+  padding: 4px 8px !important;
+  font-size: 1rem;
+}
+
+.sensor-detail-panel__body {
+  padding: 20px 24px;
+}
+
+.sensor-detail-panel__current {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.sensor-detail-panel__big-value {
+  font-size: 2.4rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.sensor-detail-panel__info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.sensor-detail-panel__info-item {
+  padding: 10px 12px;
+  background: var(--surface);
+  border-radius: var(--radius-xs);
+  border: 1px solid var(--border);
+}
+
+.sensor-detail-panel__info-label {
+  display: block;
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  margin-bottom: 4px;
+}
+
+.sensor-detail-panel__info-value {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.sensor-detail-panel__period-selector {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.btn--period {
+  flex: 1;
+  padding: 8px 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xs);
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  text-align: center;
+}
+
+.btn--period:hover {
+  background: var(--surface-hover);
+}
+
+.btn--period.active {
+  background: var(--green-bg);
+  border-color: var(--green);
+  color: var(--green);
+}
+
+.sensor-detail-panel__chart-wrap {
+  height: 200px;
+  margin-bottom: 16px;
+}
+
+.sensor-detail-panel__period-stats {
+  display: flex;
+  gap: 10px;
+}
+
+.sensor-stat--panel {
+  flex: 1;
+  padding: 10px 8px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xs);
+}
+
+/* ===================================================
+   Greenhouse map styles
+   =================================================== */
+
+.greenhouse-layout {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.greenhouse-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.greenhouse-zone {
+  position: absolute;
+  border-radius: var(--radius-sm);
+  transition: background 1s ease;
+  pointer-events: none;
+}
+
+.greenhouse-zone-label {
+  position: absolute;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.greenhouse-zone-label__name {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+}
+
+.greenhouse-zone-label__temp {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+}
+
+.greenhouse-sensor-pin {
+  position: absolute;
+  z-index: 20;
+  cursor: pointer;
+}
+
+.greenhouse-sensor-pin__dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.5);
+  box-shadow: 0 0 8px rgba(0,0,0,0.5);
+  transition: transform 0.2s;
+}
+
+.greenhouse-sensor-pin:hover .greenhouse-sensor-pin__dot {
+  transform: scale(1.5);
+}
+
+.greenhouse-sensor-pin__tooltip {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xs);
+  padding: 6px 10px;
+  font-size: 0.7rem;
+  color: var(--text-primary);
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+  z-index: 30;
+}
+
+.greenhouse-sensor-pin:hover .greenhouse-sensor-pin__tooltip {
+  opacity: 1;
+}
+
+/* Temperature legend */
+.greenhouse-legend {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 8px 16px;
+  z-index: 40;
+}
+
+.greenhouse-legend__title {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.greenhouse-legend__bar {
+  width: 180px;
+  height: 10px;
+  border-radius: 5px;
+  background: linear-gradient(to right, rgb(66,133,244), rgb(0,188,212), rgb(0,230,118), rgb(255,145,0), rgb(255,23,68));
+}
+
+.greenhouse-legend__labels {
+  display: flex;
+  gap: 0;
+  font-size: 0.6rem;
+  color: var(--text-muted);
+  width: 180px;
+  margin-left: -190px;
+  margin-top: 20px;
+  position: absolute;
+  left: auto;
+  right: 16px;
+  bottom: -16px;
+  justify-content: space-between;
+}
+
+/* ===================================================
    Users page styles
    =================================================== */
 
