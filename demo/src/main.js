@@ -11,7 +11,12 @@ import "./css/sidebar.css";
 import "./css/layout.css";
 import "./css/components.css";
 import "./css/dashboard.css";
-import "./css/pages.css";
+import "./css/sensors-page.css";
+import "./css/alerts-page.css";
+import "./css/map-page.css";
+import "./css/reports-page.css";
+import "./css/settings-page.css";
+import "./css/users-page.css";
 import "./css/utilities.css";
 
 /* ---- Module imports ---- */

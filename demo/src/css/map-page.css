@@ -1,0 +1,267 @@
+/* === Map Page Styles === */
+
+.map-container {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  height: calc(100vh - var(--topbar-h) - 80px);
+  min-height: 400px;
+  position: relative;
+  overflow: hidden;
+}
+
+.map-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  gap: 12px;
+}
+
+.map-placeholder svg {
+  width: 64px;
+  height: 64px;
+  opacity: 0.4;
+}
+
+.map-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+.map-pin {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  filter: drop-shadow(0 0 4px rgba(0,230,118,0.5));
+  transition: transform 0.2s;
+}
+
+.map-pin:hover {
+  transform: scale(1.3);
+}
+
+.map-pin__label {
+  position: absolute;
+  top: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 2px 8px;
+  border-radius: var(--radius-xs);
+  font-size: 0.65rem;
+  white-space: nowrap;
+  color: var(--text-primary);
+  opacity: 0;
+  transition: opacity 0.2s;
+  pointer-events: none;
+}
+
+.map-pin:hover .map-pin__label {
+  opacity: 1;
+}
+
+/* Greenhouse map styles */
+
+.greenhouse-layout {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.greenhouse-heatmap-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+.greenhouse-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.greenhouse-sensor-pin {
+  position: absolute;
+  z-index: 20;
+  cursor: pointer;
+  transform: translate(-6px, -6px);
+}
+
+.greenhouse-sensor-pin__dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.5);
+  box-shadow: 0 0 8px rgba(0,0,0,0.5), 0 0 16px currentColor;
+  transition: transform 0.2s;
+}
+
+.greenhouse-sensor-pin:hover .greenhouse-sensor-pin__dot {
+  transform: scale(1.6);
+}
+
+.greenhouse-sensor-pin__tooltip {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0,0,0,0.85);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xs);
+  padding: 6px 10px;
+  font-size: 0.7rem;
+  color: var(--text-primary);
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+  z-index: 30;
+}
+
+.greenhouse-sensor-pin:hover .greenhouse-sensor-pin__tooltip {
+  opacity: 1;
+}
+
+/* Isotherm value labels */
+.greenhouse-isotherm {
+  position: absolute;
+  z-index: 15;
+  transform: translate(-50%, -100%);
+  pointer-events: none;
+}
+
+.greenhouse-isotherm span {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.9), 0 0 8px rgba(0,0,0,0.7);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Aisle average labels */
+.greenhouse-aisle-avg {
+  position: absolute;
+  z-index: 16;
+  transform: translateX(-50%);
+  pointer-events: none;
+  text-align: center;
+}
+
+.greenhouse-aisle-avg__label {
+  font-size: 0.55rem;
+  font-weight: 500;
+  color: rgba(255,255,255,0.35);
+  text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+  white-space: nowrap;
+}
+
+.greenhouse-aisle-avg__value {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.9), 0 0 6px rgba(0,0,0,0.7);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* Parameter selector */
+.greenhouse-param-selector {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 4px;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 4px;
+  z-index: 40;
+}
+
+.greenhouse-param-btn {
+  background: none;
+  border: 1px solid transparent;
+  border-radius: var(--radius-xs);
+  color: var(--text-muted);
+  font-size: 0.68rem;
+  font-weight: 500;
+  padding: 4px 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.greenhouse-param-btn:hover {
+  color: var(--text-primary);
+  background: rgba(255,255,255,0.06);
+}
+
+.greenhouse-param-btn--active {
+  color: var(--green);
+  background: rgba(0,230,118,0.1);
+  border-color: rgba(0,230,118,0.3);
+  font-weight: 600;
+}
+
+/* Legend */
+.greenhouse-legend {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 8px 16px;
+  z-index: 40;
+  min-width: 220px;
+}
+
+.greenhouse-legend__title {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.greenhouse-legend__bar {
+  width: 100%;
+  height: 10px;
+  border-radius: 5px;
+}
+
+.greenhouse-legend__labels {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  font-size: 0.58rem;
+  color: var(--text-muted);
+}
+
+.greenhouse-legend__optimal {
+  font-size: 0.6rem;
+  color: var(--green);
+  font-weight: 500;
+  margin-top: 2px;
+}
