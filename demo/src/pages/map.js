@@ -1,205 +1,387 @@
 /**
- * EchoSmart Demo — Map Page Renderer
+ * EchoSmart Demo — Greenhouse Map Renderer
  *
- * Renders an interactive greenhouse floor-plan with temperature-based
- * heatmap coloring per zone and overlaid sensor readings.
+ * Renders a Mexican rose greenhouse (invernadero) floor plan with:
+ *  - Structural elements: columns, arched roof trusses, walls
+ *  - Growing beds (camas) arranged in rows with aisles
+ *  - Canvas-based heatmap with IDW interpolation
+ *  - Sensor pins with tooltips for all 5 sensor types
+ *  - Switchable parameter overlays (temperature, humidity, CO2, light, soil)
+ *  - Color scale legend
+ *
+ * @module pages/map
  */
 
-import { ICONS } from "../js/modules/icons.js";
-import { formatValue, getColors } from "../js/modules/sensors.js";
+import { formatValue, getColors, getSpecs } from "../js/modules/sensors.js";
 
-/** Temperature thresholds for color mapping (°C) */
-const TEMP_COLD = 14;
-const TEMP_COOL = 18;
-const TEMP_OPT_HIGH = 26;
-const TEMP_WARM = 28;
-const TEMP_HOT = 35;
+/* ===== Color Scale Configuration per Parameter ===== */
 
-/** Default temperature when sensor data is not available */
-const DEFAULT_TEMPERATURE = 24;
-
-/**
- * Map a temperature value to a CSS color.
- * Blue (cold) → Green (optimal) → Red (hot)
- */
-function tempToColor(temp) {
-  let r, g, b;
-
-  if (temp <= TEMP_COLD) {
-    r = 66; g = 133; b = 244;           // blue
-  } else if (temp <= TEMP_COOL) {
-    const t = (temp - TEMP_COLD) / (TEMP_COOL - TEMP_COLD);
-    r = Math.round(66 + t * (0 - 66));
-    g = Math.round(133 + t * (188 - 133));
-    b = Math.round(244 + t * (212 - 244));
-  } else if (temp <= TEMP_OPT_HIGH) {
-    const t = (temp - TEMP_COOL) / (TEMP_OPT_HIGH - TEMP_COOL);
-    r = Math.round(0 + t * (0));
-    g = Math.round(188 + t * (230 - 188));
-    b = Math.round(212 + t * (118 - 212));
-  } else if (temp <= TEMP_WARM) {
-    const t = (temp - TEMP_OPT_HIGH) / (TEMP_WARM - TEMP_OPT_HIGH);
-    r = Math.round(0 + t * 255);
-    g = Math.round(230 - t * 85);
-    b = Math.round(118 - t * 118);
-  } else if (temp <= TEMP_HOT) {
-    const t = Math.min((temp - TEMP_WARM) / (TEMP_HOT - TEMP_WARM), 1);
-    r = 255;
-    g = Math.round(145 - t * 123);
-    b = Math.round(0 + t * 68);
-  } else {
-    r = 255; g = 23; b = 68;            // critical red
-  }
-  return `rgb(${r},${g},${b})`;
-}
-
-/**
- * Zone definitions for the greenhouse floor plan.
- * Each zone has percentage-based position/size within the map container.
- */
-const ZONES = [
-  {
-    id: "zona-a", label: "Zona A", sensorKey: "temperature",
-    x: "2%", y: "8%", w: "46%", h: "42%",
-    sensors: [
-      { key: "temperature", name: "DS18B20 #1", x: "25%", y: "30%" },
-      { key: "humidity",    name: "DHT22 #1",   x: "70%", y: "60%" },
-      { key: "co2",         name: "MH-Z19C",    x: "25%", y: "70%" },
-    ],
-  },
-  {
-    id: "zona-b", label: "Zona B", sensorKey: "temperature",
-    x: "52%", y: "8%", w: "46%", h: "84%",
-    sensors: [
-      { key: "light", name: "BH1750",       x: "50%", y: "20%" },
-      { key: "soil",  name: "Soil+ADS1115", x: "50%", y: "50%" },
-      { key: "co2",   name: "MH-Z19C #2",   x: "50%", y: "80%" },
-    ],
-  },
-  {
-    id: "zona-c", label: "Zona C", sensorKey: "temperature",
-    x: "2%", y: "54%", w: "46%", h: "38%",
-    sensors: [
-      { key: "temperature", name: "DS18B20 #2", x: "30%", y: "40%" },
-      { key: "humidity",    name: "DHT22 #2",   x: "70%", y: "40%" },
-    ],
-  },
-];
-
-/* Temperature offsets per zone so each shows a different temp */
-const ZONE_TEMP_OFFSETS = { "zona-a": 0, "zona-b": 1.5, "zona-c": -1.2 };
-
-let rendered = false;
-
-export function renderMap(sensors) {
-  rendered = true;
-
-  const container = document.getElementById("mapPins");
-  if (!container) return;
-
-  /* Hide the placeholder */
-  const placeholder = container.parentElement?.querySelector(".map-placeholder");
-  if (placeholder) placeholder.style.display = "none";
-
-  const baseTemp = sensors ? sensors.temperature.value : DEFAULT_TEMPERATURE;
-
-  container.innerHTML = `
-    <div class="greenhouse-layout">
-      <!-- Greenhouse outer walls -->
-      <svg class="greenhouse-svg" viewBox="0 0 600 400" preserveAspectRatio="xMidYMid meet">
-        <!-- Roof -->
-        <path d="M20 80 L300 15 L580 80" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="2"/>
-        <path d="M20 80 L20 380 L580 380 L580 80 Z" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="1.5" stroke-dasharray="6 3"/>
-        <!-- Internal dividers -->
-        <line x1="300" y1="80" x2="300" y2="380" stroke="rgba(255,255,255,0.08)" stroke-width="1" stroke-dasharray="4 4"/>
-        <line x1="20" y1="230" x2="300" y2="230" stroke="rgba(255,255,255,0.08)" stroke-width="1" stroke-dasharray="4 4"/>
-        <!-- Door -->
-        <rect x="135" y="370" width="50" height="10" rx="2" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
-        <text x="160" y="395" text-anchor="middle" fill="rgba(255,255,255,0.3)" font-size="10">Entrada</text>
-        <!-- Plant row hints -->
-        ${generatePlantRows()}
-      </svg>
-
-      ${ZONES.map((zone) => {
-        const temp = baseTemp + (ZONE_TEMP_OFFSETS[zone.id] || 0);
-        const color = tempToColor(temp);
-        return `
-        <div class="greenhouse-zone" id="${zone.id}"
-             style="left:${zone.x};top:${zone.y};width:${zone.w};height:${zone.h};
-                    background:${color};opacity:0.18;">
-        </div>
-        <div class="greenhouse-zone-label" style="left:calc(${zone.x} + 8px);top:calc(${zone.y} + 6px);">
-          <span class="greenhouse-zone-label__name">${zone.label}</span>
-          <span class="greenhouse-zone-label__temp" id="${zone.id}-temp">${temp.toFixed(1)}°C</span>
-        </div>
-        ${zone.sensors.map((s) => {
-          const sVal = sensors ? sensors[s.key].value : 0;
-          const zoneLeft = parseFloat(zone.x);
-          const zoneTop = parseFloat(zone.y);
-          const zoneW = parseFloat(zone.w);
-          const zoneH = parseFloat(zone.h);
-          const pinLeft = zoneLeft + (parseFloat(s.x) / 100) * zoneW;
-          const pinTop = zoneTop + (parseFloat(s.y) / 100) * zoneH;
-          return `
-          <div class="greenhouse-sensor-pin" style="left:${pinLeft}%;top:${pinTop}%;">
-            <div class="greenhouse-sensor-pin__dot" style="background:${getColors()[s.key]}"></div>
-            <div class="greenhouse-sensor-pin__tooltip">
-              <strong>${s.name}</strong><br/>
-              ${formatValue(s.key, sVal)}
-            </div>
-          </div>`;
-        }).join("")}
-      `;
-      }).join("")}
-    </div>
-
-    <!-- Temperature Legend -->
-    <div class="greenhouse-legend">
-      <span class="greenhouse-legend__title">Temperatura</span>
-      <div class="greenhouse-legend__bar"></div>
-      <div class="greenhouse-legend__labels">
-        <span>14°C</span>
-        <span>18°C</span>
-        <span>23°C</span>
-        <span>28°C</span>
-        <span>35°C</span>
-      </div>
-    </div>
-  `;
-}
-
-/** Plant row layout configuration per zone */
-const PLANT_ROWS = {
-  zoneA: { count: 3, startY: 110, spacing: 35, x1: 40, x2: 280 },
-  zoneC: { count: 2, startY: 260, spacing: 40, x1: 40, x2: 280 },
-  zoneB: { count: 5, startY: 110, spacing: 50, x1: 320, x2: 560 },
+const COLOR_SCALES = {
+  temperature: [
+    [10, 66, 133, 244],
+    [18, 0, 188, 212],
+    [23, 0, 230, 118],
+    [28, 255, 145, 0],
+    [35, 255, 23, 68],
+  ],
+  humidity: [
+    [20, 255, 145, 0],
+    [50, 255, 235, 59],
+    [60, 0, 230, 118],
+    [80, 0, 188, 212],
+    [99, 66, 133, 244],
+  ],
+  co2: [
+    [350, 66, 133, 244],
+    [400, 0, 230, 118],
+    [700, 0, 188, 212],
+    [1000, 255, 145, 0],
+    [1500, 255, 23, 68],
+  ],
+  light: [
+    [0, 33, 33, 66],
+    [5000, 66, 133, 244],
+    [10000, 0, 230, 118],
+    [30000, 255, 235, 59],
+    [50000, 255, 145, 0],
+  ],
+  soil: [
+    [15, 255, 23, 68],
+    [40, 255, 145, 0],
+    [50, 0, 230, 118],
+    [80, 0, 188, 212],
+    [95, 66, 133, 244],
+  ],
 };
 
-function generatePlantRows() {
-  let rows = "";
-  for (const zone of Object.values(PLANT_ROWS)) {
-    for (let i = 0; i < zone.count; i++) {
-      const y = zone.startY + i * zone.spacing;
-      rows += `<line x1="${zone.x1}" y1="${y}" x2="${zone.x2}" y2="${y}" stroke="rgba(0,230,118,0.08)" stroke-width="8" stroke-linecap="round"/>`;
+const PARAM_LABELS = {
+  temperature: "Temperatura",
+  humidity: "Humedad",
+  co2: "CO\u2082",
+  light: "Luminosidad",
+  soil: "Humedad Suelo",
+};
+
+/* ===== Greenhouse Structure ===== */
+
+const GH_W = 800;
+const GH_H = 500;
+const WALL_M = 30;
+
+const NUM_BEDS = 6;
+const BED_PAD_X = 50;
+const BED_PAD_Y = 55;
+const AISLE_W = 18;
+const NUM_COLS_STRUCT = 7;
+
+function computeBeds() {
+  const innerW = GH_W - 2 * WALL_M - 2 * BED_PAD_X;
+  const totalAisle = (NUM_BEDS - 1) * AISLE_W;
+  const bedW = (innerW - totalAisle) / NUM_BEDS;
+  const bedY = WALL_M + BED_PAD_Y;
+  const bedH = GH_H - 2 * WALL_M - 2 * BED_PAD_Y;
+  const beds = [];
+  for (let i = 0; i < NUM_BEDS; i++) {
+    beds.push({
+      x: WALL_M + BED_PAD_X + i * (bedW + AISLE_W),
+      y: bedY, w: bedW, h: bedH,
+      label: "Cama " + (i + 1),
+    });
+  }
+  return beds;
+}
+
+function computeColumnYs() {
+  const ys = [];
+  const inner = GH_H - 2 * WALL_M;
+  for (let i = 0; i <= NUM_COLS_STRUCT; i++) {
+    ys.push(WALL_M + (i / NUM_COLS_STRUCT) * inner);
+  }
+  return ys;
+}
+
+/* ===== Sensor Nodes ===== */
+
+const SENSOR_NODES = [
+  { id: "s1", x: 130, y: 400, key: "temperature", name: "DS18B20 #1", offset: 0 },
+  { id: "s2", x: 400, y: 400, key: "humidity",    name: "DHT22 #1",   offset: 0 },
+  { id: "s3", x: 670, y: 400, key: "co2",         name: "MH-Z19C",    offset: 0 },
+  { id: "s4", x: 130, y: 250, key: "temperature", name: "DS18B20 #2", offset: 1.8 },
+  { id: "s5", x: 400, y: 250, key: "light",       name: "BH1750",     offset: 0 },
+  { id: "s6", x: 670, y: 250, key: "soil",        name: "Soil+ADS1115", offset: 0 },
+  { id: "s7", x: 130, y: 100, key: "temperature", name: "DS18B20 #3", offset: -1.2 },
+  { id: "s8", x: 400, y: 100, key: "humidity",    name: "DHT22 #2",   offset: 3 },
+  { id: "s9", x: 670, y: 100, key: "co2",         name: "MH-Z19C #2", offset: -30 },
+];
+
+/* ===== Heatmap ===== */
+
+const HEATMAP_RES = 8;
+
+function interpolateColor(value, scale) {
+  if (value <= scale[0][0]) return [scale[0][1], scale[0][2], scale[0][3]];
+  const last = scale[scale.length - 1];
+  if (value >= last[0]) return [last[1], last[2], last[3]];
+  for (let i = 0; i < scale.length - 1; i++) {
+    const [v0, r0, g0, b0] = scale[i];
+    const [v1, r1, g1, b1] = scale[i + 1];
+    if (value >= v0 && value <= v1) {
+      const t = (value - v0) / (v1 - v0);
+      return [
+        Math.round(r0 + t * (r1 - r0)),
+        Math.round(g0 + t * (g1 - g0)),
+        Math.round(b0 + t * (b1 - b0)),
+      ];
     }
   }
-  return rows;
+  return [0, 0, 0];
+}
+
+function idwInterpolate(px, py, nodes) {
+  const POWER = 2.5;
+  let num = 0, den = 0;
+  for (const n of nodes) {
+    const d = Math.sqrt((px - n.x) ** 2 + (py - n.y) ** 2);
+    if (d < 1) return n.value;
+    const w = 1 / Math.pow(d, POWER);
+    num += w * n.value;
+    den += w;
+  }
+  return den > 0 ? num / den : 0;
+}
+
+/* ===== State ===== */
+
+let activeParam = "temperature";
+let canvasEl = null;
+let sensorValues = {};
+
+/* ===== Build SVG Structure ===== */
+
+function buildStructureSVG() {
+  const beds = computeBeds();
+  const colYs = computeColumnYs();
+  let svg = "";
+
+  /* Roof arches */
+  for (let i = 0; i <= 2; i++) {
+    const cx = WALL_M + (i / 2) * (GH_W - 2 * WALL_M);
+    svg += '<path d="M' + WALL_M + " " + WALL_M + " Q" + cx + " 10 " + (GH_W - WALL_M) + " " + WALL_M + '" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/>';
+  }
+
+  /* Walls */
+  svg += '<rect x="' + WALL_M + '" y="' + WALL_M + '" width="' + (GH_W - 2 * WALL_M) + '" height="' + (GH_H - 2 * WALL_M) + '" rx="4" fill="none" stroke="rgba(255,255,255,0.18)" stroke-width="2"/>';
+
+  /* Columns */
+  const colXs = [WALL_M + 5, GH_W / 2, GH_W - WALL_M - 5];
+  for (const cx of colXs) {
+    for (const cy of colYs) {
+      svg += '<rect x="' + (cx - 4) + '" y="' + (cy - 4) + '" width="8" height="8" rx="1" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.15)" stroke-width="0.8"/>';
+    }
+  }
+
+  /* Beds with rose plants */
+  for (const b of beds) {
+    svg += '<rect x="' + b.x + '" y="' + b.y + '" width="' + b.w + '" height="' + b.h + '" rx="3" fill="rgba(0,230,118,0.04)" stroke="rgba(0,230,118,0.12)" stroke-width="0.8" stroke-dasharray="4 3"/>';
+    const np = Math.floor(b.h / 28);
+    for (let p = 0; p < np; p++) {
+      const py = b.y + 14 + p * (b.h - 28) / (np - 1);
+      svg += '<circle cx="' + (b.x + b.w * 0.3) + '" cy="' + py + '" r="3" fill="rgba(0,230,118,0.08)" stroke="rgba(0,230,118,0.15)" stroke-width="0.5"/>';
+      svg += '<circle cx="' + (b.x + b.w * 0.7) + '" cy="' + py + '" r="3" fill="rgba(0,230,118,0.08)" stroke="rgba(0,230,118,0.15)" stroke-width="0.5"/>';
+    }
+    svg += '<text x="' + (b.x + b.w / 2) + '" y="' + (b.y - 6) + '" text-anchor="middle" fill="rgba(255,255,255,0.25)" font-size="9" font-weight="600">' + b.label + '</text>';
+  }
+
+  /* Aisle labels */
+  for (let i = 0; i < NUM_BEDS - 1; i++) {
+    const ax = beds[i].x + beds[i].w + AISLE_W / 2;
+    svg += '<text x="' + ax + '" y="' + (GH_H - WALL_M - 8) + '" text-anchor="middle" fill="rgba(255,255,255,0.15)" font-size="7" transform="rotate(-90,' + ax + ',' + (GH_H - WALL_M - 8) + ')">Pasillo ' + (i + 1) + '</text>';
+  }
+
+  /* Door */
+  const dx = GH_W / 2 - 30;
+  svg += '<rect x="' + dx + '" y="' + (GH_H - WALL_M - 2) + '" width="60" height="6" rx="2" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>';
+  svg += '<text x="' + (GH_W / 2) + '" y="' + (GH_H - WALL_M + 14) + '" text-anchor="middle" fill="rgba(255,255,255,0.3)" font-size="9">Entrada</text>';
+
+  /* Ventilation */
+  svg += '<text x="' + (WALL_M + 10) + '" y="' + (WALL_M - 5) + '" fill="rgba(255,255,255,0.2)" font-size="8">\u25BD Ventilaci\u00f3n cenital</text>';
+
+  return '<svg class="greenhouse-svg" viewBox="0 0 ' + GH_W + " " + GH_H + '" preserveAspectRatio="xMidYMid meet">' + svg + "</svg>";
+}
+
+/* ===== Heatmap Drawing ===== */
+
+function drawHeatmap(paramKey, sensors) {
+  if (!canvasEl) return;
+  const ctx = canvasEl.getContext("2d");
+  const cw = canvasEl.width;
+  const ch = canvasEl.height;
+  const scale = COLOR_SCALES[paramKey];
+  if (!scale) return;
+
+  const nodes = SENSOR_NODES
+    .filter(function (n) { return n.key === paramKey; })
+    .map(function (n) {
+      return {
+        x: (n.x / GH_W) * cw,
+        y: (n.y / GH_H) * ch,
+        value: (sensors && sensors[n.key]) ? sensors[n.key].value + (n.offset || 0) : scale[Math.floor(scale.length / 2)][0],
+      };
+    });
+
+  if (nodes.length === 1) {
+    var v = nodes[0].value;
+    nodes.push({ x: 0, y: 0, value: v - 1.5 });
+    nodes.push({ x: cw, y: 0, value: v + 0.8 });
+    nodes.push({ x: 0, y: ch, value: v + 1.2 });
+    nodes.push({ x: cw, y: ch, value: v - 0.5 });
+  } else if (nodes.length === 0) {
+    var midVal = (scale[0][0] + scale[scale.length - 1][0]) / 2;
+    var rgb = interpolateColor(midVal, scale);
+    ctx.fillStyle = "rgba(" + rgb[0] + "," + rgb[1] + "," + rgb[2] + ",0.35)";
+    ctx.fillRect(0, 0, cw, ch);
+    return;
+  }
+
+  var imgData = ctx.createImageData(cw, ch);
+  var data = imgData.data;
+  for (var py = 0; py < ch; py += HEATMAP_RES) {
+    for (var px = 0; px < cw; px += HEATMAP_RES) {
+      var val = idwInterpolate(px, py, nodes);
+      var c = interpolateColor(val, scale);
+      for (var dy = 0; dy < HEATMAP_RES && (py + dy) < ch; dy++) {
+        for (var dx = 0; dx < HEATMAP_RES && (px + dx) < cw; dx++) {
+          var idx = ((py + dy) * cw + (px + dx)) * 4;
+          data[idx] = c[0];
+          data[idx + 1] = c[1];
+          data[idx + 2] = c[2];
+          data[idx + 3] = 85;
+        }
+      }
+    }
+  }
+  ctx.putImageData(imgData, 0, 0);
+}
+
+/* ===== Sensor Pins ===== */
+
+function buildSensorPins(sensors) {
+  var COLORS = getColors();
+  return SENSOR_NODES.map(function (node) {
+    var leftPct = (node.x / GH_W) * 100;
+    var topPct = (node.y / GH_H) * 100;
+    var val = sensors ? sensors[node.key].value + (node.offset || 0) : 0;
+    return '<div class="greenhouse-sensor-pin" style="left:' + leftPct + '%;top:' + topPct + '%;" data-sensor-id="' + node.id + '">' +
+      '<div class="greenhouse-sensor-pin__dot" style="background:' + COLORS[node.key] + '"></div>' +
+      '<div class="greenhouse-sensor-pin__tooltip"><strong>' + node.name + '</strong><br/>' + formatValue(node.key, val) + '</div></div>';
+  }).join("");
+}
+
+/* ===== Legend ===== */
+
+function buildLegend(paramKey) {
+  var scale = COLOR_SCALES[paramKey];
+  var spec = getSpecs()[paramKey];
+  var label = PARAM_LABELS[paramKey] || paramKey;
+  var stops = scale.map(function (s, i) {
+    return "rgb(" + s[1] + "," + s[2] + "," + s[3] + ") " + ((i / (scale.length - 1)) * 100) + "%";
+  }).join(", ");
+  var labels = scale.map(function (s) { return "<span>" + s[0] + spec.unit + "</span>"; }).join("");
+  return '<div class="greenhouse-legend">' +
+    '<span class="greenhouse-legend__title">' + label + '</span>' +
+    '<div class="greenhouse-legend__bar" style="background:linear-gradient(to right, ' + stops + ')"></div>' +
+    '<div class="greenhouse-legend__labels">' + labels + '</div>' +
+    '<div class="greenhouse-legend__optimal">\u00d3ptimo: ' + spec.optMin + '\u2013' + spec.optMax + spec.unit + '</div></div>';
+}
+
+/* ===== Parameter Selector ===== */
+
+function buildParamSelector() {
+  var params = Object.keys(COLOR_SCALES);
+  var html = '<div class="greenhouse-param-selector">';
+  for (var i = 0; i < params.length; i++) {
+    var p = params[i];
+    var cls = p === activeParam ? "greenhouse-param-btn greenhouse-param-btn--active" : "greenhouse-param-btn";
+    html += '<button class="' + cls + '" data-param="' + p + '">' + PARAM_LABELS[p] + '</button>';
+  }
+  html += '</div>';
+  return html;
+}
+
+/* ===== Isotherm Labels ===== */
+
+function buildIsotherms(sensors) {
+  if (!sensors) return "";
+  var scale = COLOR_SCALES[activeParam];
+  return SENSOR_NODES.filter(function (n) { return n.key === activeParam; }).map(function (node) {
+    var val = sensors[node.key].value + (node.offset || 0);
+    var left = (node.x / GH_W) * 100;
+    var top = (node.y / GH_H) * 100;
+    var c = interpolateColor(val, scale);
+    return '<div class="greenhouse-isotherm" style="left:' + left + '%;top:' + (top + 3) + '%;">' +
+      '<span style="color:rgb(' + c[0] + ',' + c[1] + ',' + c[2] + ')">' + formatValue(activeParam, val) + '</span></div>';
+  }).join("");
+}
+
+/* ===== Public API ===== */
+
+export function renderMap(sensors) {
+  var container = document.getElementById("mapPins");
+  if (!container) return;
+
+  var placeholder = container.parentElement ? container.parentElement.querySelector(".map-placeholder") : null;
+  if (placeholder) placeholder.style.display = "none";
+
+  sensorValues = sensors;
+
+  container.innerHTML =
+    '<div class="greenhouse-layout">' +
+    '<canvas id="heatmapCanvas" class="greenhouse-heatmap-canvas"></canvas>' +
+    buildStructureSVG() +
+    buildSensorPins(sensors) +
+    buildIsotherms(sensors) +
+    buildParamSelector() +
+    buildLegend(activeParam) +
+    '</div>';
+
+  canvasEl = document.getElementById("heatmapCanvas");
+  if (canvasEl) {
+    var rect = canvasEl.parentElement.getBoundingClientRect();
+    canvasEl.width = Math.floor(rect.width);
+    canvasEl.height = Math.floor(rect.height);
+    drawHeatmap(activeParam, sensors);
+  }
+
+  container.querySelectorAll(".greenhouse-param-btn").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      activeParam = btn.dataset.param;
+      renderMap(sensorValues);
+    });
+  });
 }
 
 export function updateMap(sensors) {
   if (!sensors) return;
-  const baseTemp = sensors.temperature.value;
+  sensorValues = sensors;
 
-  ZONES.forEach((zone) => {
-    const temp = baseTemp + (ZONE_TEMP_OFFSETS[zone.id] || 0);
-    const color = tempToColor(temp);
-    const zoneEl = document.getElementById(zone.id);
-    if (zoneEl) {
-      zoneEl.style.background = color;
-    }
-    const tempLabel = document.getElementById(zone.id + "-temp");
-    if (tempLabel) {
-      tempLabel.textContent = temp.toFixed(1) + "°C";
+  if (canvasEl) {
+    drawHeatmap(activeParam, sensors);
+  }
+
+  SENSOR_NODES.forEach(function (node) {
+    var pinEl = document.querySelector('[data-sensor-id="' + node.id + '"] .greenhouse-sensor-pin__tooltip');
+    if (pinEl) {
+      var val = sensors[node.key].value + (node.offset || 0);
+      pinEl.innerHTML = "<strong>" + node.name + "</strong><br/>" + formatValue(node.key, val);
     }
   });
+
+  var container = document.getElementById("mapPins");
+  if (container) {
+    container.querySelectorAll(".greenhouse-isotherm").forEach(function (el) { el.remove(); });
+    var layout = container.querySelector(".greenhouse-layout");
+    if (layout) {
+      layout.insertAdjacentHTML("beforeend", buildIsotherms(sensors));
+    }
+  }
 }

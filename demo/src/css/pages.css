@@ -1002,48 +1002,28 @@
   overflow: hidden;
 }
 
+.greenhouse-heatmap-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
 .greenhouse-svg {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
   pointer-events: none;
-}
-
-.greenhouse-zone {
-  position: absolute;
-  border-radius: var(--radius-sm);
-  transition: background 1s ease;
-  pointer-events: none;
-}
-
-.greenhouse-zone-label {
-  position: absolute;
-  z-index: 10;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.greenhouse-zone-label__name {
-  font-size: 0.85rem;
-  font-weight: 700;
-  color: var(--text-primary);
-  text-shadow: 0 1px 4px rgba(0,0,0,0.8);
-}
-
-.greenhouse-zone-label__temp {
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: var(--text-primary);
-  font-variant-numeric: tabular-nums;
-  text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+  z-index: 5;
 }
 
 .greenhouse-sensor-pin {
   position: absolute;
   z-index: 20;
   cursor: pointer;
+  transform: translate(-6px, -6px);
 }
 
 .greenhouse-sensor-pin__dot {
@@ -1051,12 +1031,12 @@
   height: 12px;
   border-radius: 50%;
   border: 2px solid rgba(255,255,255,0.5);
-  box-shadow: 0 0 8px rgba(0,0,0,0.5);
+  box-shadow: 0 0 8px rgba(0,0,0,0.5), 0 0 16px currentColor;
   transition: transform 0.2s;
 }
 
 .greenhouse-sensor-pin:hover .greenhouse-sensor-pin__dot {
-  transform: scale(1.5);
+  transform: scale(1.6);
 }
 
 .greenhouse-sensor-pin__tooltip {
@@ -1064,7 +1044,7 @@
   bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
-  background: var(--surface);
+  background: rgba(0,0,0,0.85);
   border: 1px solid var(--border);
   border-radius: var(--radius-xs);
   padding: 6px 10px;
@@ -1082,21 +1062,79 @@
   opacity: 1;
 }
 
-/* Temperature legend */
+/* Isotherm value labels */
+.greenhouse-isotherm {
+  position: absolute;
+  z-index: 15;
+  transform: translate(-50%, -100%);
+  pointer-events: none;
+}
+
+.greenhouse-isotherm span {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.9), 0 0 8px rgba(0,0,0,0.7);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Parameter selector */
+.greenhouse-param-selector {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 4px;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 4px;
+  z-index: 40;
+}
+
+.greenhouse-param-btn {
+  background: none;
+  border: 1px solid transparent;
+  border-radius: var(--radius-xs);
+  color: var(--text-muted);
+  font-size: 0.68rem;
+  font-weight: 500;
+  padding: 4px 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.greenhouse-param-btn:hover {
+  color: var(--text-primary);
+  background: rgba(255,255,255,0.06);
+}
+
+.greenhouse-param-btn--active {
+  color: var(--green);
+  background: rgba(0,230,118,0.1);
+  border-color: rgba(0,230,118,0.3);
+  font-weight: 600;
+}
+
+/* Legend */
 .greenhouse-legend {
   position: absolute;
   bottom: 16px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 10px;
+  gap: 4px;
   background: rgba(0,0,0,0.7);
   backdrop-filter: blur(8px);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   padding: 8px 16px;
   z-index: 40;
+  min-width: 220px;
 }
 
 .greenhouse-legend__title {
@@ -1107,25 +1145,24 @@
 }
 
 .greenhouse-legend__bar {
-  width: 180px;
+  width: 100%;
   height: 10px;
   border-radius: 5px;
-  background: linear-gradient(to right, rgb(66,133,244), rgb(0,188,212), rgb(0,230,118), rgb(255,145,0), rgb(255,23,68));
 }
 
 .greenhouse-legend__labels {
   display: flex;
-  gap: 0;
-  font-size: 0.6rem;
-  color: var(--text-muted);
-  width: 180px;
-  margin-left: -190px;
-  margin-top: 20px;
-  position: absolute;
-  left: auto;
-  right: 16px;
-  bottom: -16px;
+  width: 100%;
   justify-content: space-between;
+  font-size: 0.58rem;
+  color: var(--text-muted);
+}
+
+.greenhouse-legend__optimal {
+  font-size: 0.6rem;
+  color: var(--green);
+  font-weight: 500;
+  margin-top: 2px;
 }
 
 /* ===================================================
