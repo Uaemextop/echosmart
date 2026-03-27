@@ -135,6 +135,17 @@
   display: none;
 }
 
+.sidebar__user-name {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.sidebar__user-role {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+}
+
 /* ---- Mobile overlay ---- */
 .sidebar-overlay {
   display: none;

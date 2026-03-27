@@ -65,6 +65,7 @@ function updateSensorCards(sensors) {
     { key: "humidity",    el: "dashHum" },
     { key: "co2",         el: "dashCo2" },
     { key: "light",       el: "dashLight" },
+    { key: "soil",        el: "dashSoil" },
   ];
 
   for (const c of cards) {

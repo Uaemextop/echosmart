@@ -37,6 +37,7 @@ export function initRouter(pageRenderers, defaultPage) {
       reports: "Reportes",
       settings: "Configuración",
       users: "Usuarios",
+      activity: "Actividad",
     };
     const topTitle = document.getElementById("topbarTitle");
     if (topTitle) topTitle.textContent = titles[pageName] || pageName;
