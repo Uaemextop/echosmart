@@ -1,0 +1,120 @@
+/* ===================================================
+   Notifications Dropdown Styles
+   =================================================== */
+
+.notifications {
+  display: none;
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: 340px;
+  max-height: 440px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  z-index: 200;
+  overflow: hidden;
+  flex-direction: column;
+}
+
+.notifications--open {
+  display: flex;
+}
+
+.notifications__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.notifications__title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.notifications__list {
+  flex: 1;
+  overflow-y: auto;
+  max-height: 320px;
+}
+
+.notifications__item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.15s;
+  cursor: default;
+}
+
+.notifications__item:last-child {
+  border-bottom: none;
+}
+
+.notifications__item:hover {
+  background: var(--surface-elevated);
+}
+
+.notifications__item--read {
+  opacity: 0.55;
+}
+
+.notifications__icon {
+  font-size: 0.85rem;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.notifications__content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.notifications__text {
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  line-height: 1.35;
+}
+
+.notifications__meta {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+}
+
+.notifications__empty {
+  padding: 24px 16px;
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.notifications__footer {
+  padding: 10px 16px;
+  border-top: 1px solid var(--border);
+}
+
+.notifications__view-all {
+  width: 100%;
+  padding: 8px;
+  background: var(--green-bg);
+  border: none;
+  border-radius: var(--radius-sm);
+  color: var(--green);
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, opacity 0.15s;
+}
+
+.notifications__view-all:hover {
+  opacity: 0.85;
+  background: rgba(0, 230, 118, 0.18);
+}

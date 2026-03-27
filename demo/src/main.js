@@ -1,7 +1,8 @@
 /**
  * EchoSmart Demo — Application Entry Point
  *
- * Wires together all modules: router, sensors, alerts, gateway, pages.
+ * Wires together all modules: router, sensors, alerts, gateway,
+ * notifications, search, and page renderers.
  */
 
 /* ---- CSS imports (Vite handles bundling) ---- */
@@ -11,7 +12,15 @@ import "./css/sidebar.css";
 import "./css/layout.css";
 import "./css/components.css";
 import "./css/dashboard.css";
-import "./css/pages.css";
+import "./css/sensors-page.css";
+import "./css/alerts-page.css";
+import "./css/map-page.css";
+import "./css/reports-page.css";
+import "./css/settings-page.css";
+import "./css/users-page.css";
+import "./css/activity-page.css";
+import "./css/notifications.css";
+import "./css/search.css";
 import "./css/utilities.css";
 
 /* ---- Module imports ---- */
@@ -19,6 +28,8 @@ import { createSensors, tickSensors } from "./js/modules/sensors.js";
 import { createInitialAlerts, evaluateAlerts, activeCount } from "./js/modules/alerts.js";
 import { tickGateways } from "./js/modules/gateway.js";
 import { initRouter } from "./js/modules/router.js";
+import { initNotifications, updateNotifications } from "./js/modules/notifications.js";
+import { initSearch } from "./js/modules/search.js";
 
 /* ---- Page renderers ---- */
 import { renderDashboard, updateDashboard } from "./pages/dashboard.js";
@@ -28,6 +39,7 @@ import { renderSettings } from "./pages/settings.js";
 import { renderReports } from "./pages/reports.js";
 import { renderMap, updateMap } from "./pages/map.js";
 import { renderUsers } from "./pages/users.js";
+import { renderActivity } from "./pages/activity.js";
 
 /* ---- State ---- */
 const sensors = createSensors();
@@ -82,6 +94,8 @@ function initMobileSidebar() {
 /* ---- Init ---- */
 document.addEventListener("DOMContentLoaded", () => {
   initMobileSidebar();
+  initNotifications(alerts);
+  initSearch();
   updateClock();
   setInterval(updateClock, 1000);
 
@@ -94,6 +108,7 @@ document.addEventListener("DOMContentLoaded", () => {
     reports:   () => renderReports(sensors),
     map:       () => renderMap(sensors),
     users:     () => renderUsers(),
+    activity:  () => renderActivity(),
   }, "dashboard");
 
   updateBadge();
@@ -104,6 +119,7 @@ document.addEventListener("DOMContentLoaded", () => {
     tickGateways(3000);
     evaluateAlerts(sensors, alerts);
     updateBadge();
+    updateNotifications(alerts);
 
     /* Update the currently visible page */
     const hash = location.hash.replace("#", "") || "dashboard";

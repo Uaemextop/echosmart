@@ -1,0 +1,28 @@
+/* === Alerts Page Styles === */
+
+.alerts-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.alerts-table__severity {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.alerts-table__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.alerts-table__dot--critical { background: var(--critical); }
+.alerts-table__dot--high     { background: var(--high); }
+.alerts-table__dot--medium   { background: var(--medium); }
+.alerts-table__dot--low      { background: var(--low); }

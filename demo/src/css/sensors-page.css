@@ -1,0 +1,287 @@
+/* === Sensors Page Styles === */
+
+.sensors-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.sensors-header__filters {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.sensors-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 14px;
+}
+
+.sensor-detail-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+  cursor: pointer;
+  transition: border-color 0.2s, transform 0.15s;
+}
+
+.sensor-detail-card:hover {
+  border-color: var(--border-hover);
+  transform: translateY(-2px);
+}
+
+.sensor-detail-card__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.sensor-detail-card__icon {
+  width: 36px;
+  height: 36px;
+}
+
+.sensor-detail-card__name {
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.sensor-detail-card__type {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+.sensor-detail-card__value {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin: 10px 0 4px;
+  font-variant-numeric: tabular-nums;
+}
+
+.sensor-detail-card__range {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+.sensor-detail-card__chart {
+  height: 60px;
+  margin-top: 12px;
+}
+
+.sensor-detail-card__footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+/* Sensor detail — stats row */
+
+.sensor-detail-card__stats {
+  display: flex;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.sensor-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  padding: 6px 4px;
+  background: var(--surface-elevated);
+  border-radius: var(--radius-xs);
+}
+
+.sensor-stat__label {
+  font-size: 0.6rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.sensor-stat__value {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.sensor-detail-card__expand-btn {
+  display: block;
+  width: 100%;
+  margin-top: 10px;
+  padding: 6px 0;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xs);
+  color: var(--cyan);
+  font-size: 0.72rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.sensor-detail-card__expand-btn:hover {
+  background: var(--surface-hover);
+  border-color: var(--border-hover);
+}
+
+/* Sensor detail slide-out panel */
+
+.sensor-detail-panel {
+  position: fixed;
+  top: 0;
+  right: -480px;
+  width: 440px;
+  max-width: 90vw;
+  height: 100vh;
+  background: var(--bg);
+  border-left: 1px solid var(--border);
+  z-index: 200;
+  overflow-y: auto;
+  transition: right 0.3s ease;
+  box-shadow: -4px 0 24px rgba(0,0,0,0.5);
+}
+
+.sensor-detail-panel.open {
+  right: 0;
+}
+
+.sensor-detail-panel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.sensor-detail-panel__title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.sensor-detail-panel__subtitle {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.sensor-detail-panel__close {
+  padding: 4px 8px !important;
+  font-size: 1rem;
+}
+
+.sensor-detail-panel__body {
+  padding: 20px 24px;
+}
+
+.sensor-detail-panel__current {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.sensor-detail-panel__big-value {
+  font-size: 2.4rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.sensor-detail-panel__info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.sensor-detail-panel__info-item {
+  padding: 10px 12px;
+  background: var(--surface);
+  border-radius: var(--radius-xs);
+  border: 1px solid var(--border);
+}
+
+.sensor-detail-panel__info-label {
+  display: block;
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  margin-bottom: 4px;
+}
+
+.sensor-detail-panel__info-value {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.sensor-detail-panel__period-selector {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.btn--period {
+  flex: 1;
+  padding: 8px 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xs);
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  text-align: center;
+}
+
+.btn--period:hover {
+  background: var(--surface-hover);
+}
+
+.btn--period.active {
+  background: var(--green-bg);
+  border-color: var(--green);
+  color: var(--green);
+}
+
+.sensor-detail-panel__chart-wrap {
+  height: 200px;
+  margin-bottom: 16px;
+}
+
+.sensor-detail-panel__period-stats {
+  display: flex;
+  gap: 10px;
+}
+
+.sensor-stat--panel {
+  flex: 1;
+  padding: 10px 8px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xs);
+}
+
+/* Responsive */
+
+@media (max-width: 768px) {
+  .sensors-grid {
+    grid-template-columns: 1fr;
+  }
+}
