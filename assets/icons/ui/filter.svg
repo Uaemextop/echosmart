@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none">
+  <!-- Funnel shape -->
+  <path d="M6 8h36L28 24v12l-8 4V24L6 8z" stroke="#78909C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M6 8h36L28 24v12l-8 4V24L6 8z" fill="#78909C" fill-opacity="0.08"/>
+</svg>

@@ -58,6 +58,9 @@ Bienvenido a la documentación técnica de **EchoSmart**, la plataforma IoT de a
 
 | Documento | Descripción |
 |-----------|-------------|
+| [Infraestructura Local de Desarrollo](local-dev-infrastructure.md) | Setup del entorno de desarrollo con un solo comando, emuladores de sensores, Makefile |
+| [ISO del Servidor](server-iso-setup.md) | ISO personalizado con todo el software del servidor, wizard de configuración, echosmart-ctl |
+| [ISO del Gateway Raspberry Pi](gateway-iso-setup.md) | Imagen personalizada del RPi, auto-conexión al servidor, gestión remota |
 | [Despliegue en la Nube](cloud-deployment.md) | Despliegue real en AWS y DigitalOcean, configuración de Raspberry Pi en producción |
 | [Despliegue General](deployment.md) | Docker, Kubernetes y configuración local |
 | [Variables de Entorno](environment-variables.md) | Referencia completa de variables de entorno por componente |
@@ -103,11 +106,14 @@ Bienvenido a la documentación técnica de **EchoSmart**, la plataforma IoT de a
 5. [Resolución de Problemas](troubleshooting.md)
 
 ### DevOps / Operaciones
-1. [Despliegue en la Nube](cloud-deployment.md)
-2. [Despliegue General](deployment.md)
-3. [Variables de Entorno](environment-variables.md)
-4. [Seguridad](security.md)
-5. [Resolución de Problemas](troubleshooting.md)
+1. [Infraestructura Local de Desarrollo](local-dev-infrastructure.md)
+2. [ISO del Servidor](server-iso-setup.md)
+3. [ISO del Gateway Raspberry Pi](gateway-iso-setup.md)
+4. [Despliegue en la Nube](cloud-deployment.md)
+5. [Despliegue General](deployment.md)
+6. [Variables de Entorno](environment-variables.md)
+7. [Seguridad](security.md)
+8. [Resolución de Problemas](troubleshooting.md)
 
 ---
 
@@ -115,13 +121,15 @@ Bienvenido a la documentación técnica de **EchoSmart**, la plataforma IoT de a
 
 | Métrica | Valor |
 |---------|-------|
-| Total de documentos | 21 |
+| Total de documentos | 24 |
 | Endpoints API documentados | 30+ |
 | Sensores documentados | 5 tipos (+8 futuros) |
 | Protocolos documentados | 7 (MQTT, 1-Wire, I2C, UART, GPIO, HTTP, WebSocket) |
 | Variables de entorno documentadas | 40+ |
 | Ejemplos de código | 100+ |
 | Test cases | 50+ |
+| Scripts de automatización | 15+ |
+| ISOs documentados | 2 (servidor + RPi gateway) |
 
 ---
 

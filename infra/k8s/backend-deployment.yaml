@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: echosmart-backend
+  labels:
+    app: echosmart-backend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: echosmart-backend
+  template:
+    metadata:
+      labels:
+        app: echosmart-backend
+    spec:
+      containers:
+        - name: backend
+          image: echosmart/backend:latest
+          ports:
+            - containerPort: 8000
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: echosmart-secrets
+                  key: database-url
+            - name: JWT_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: echosmart-secrets
+                  key: jwt-secret
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: echosmart-backend
+spec:
+  selector:
+    app: echosmart-backend
+  ports:
+    - port: 8000
+      targetPort: 8000
+  type: ClusterIP

@@ -1,0 +1,15 @@
+[Unit]
+Description=EchoSmart Gateway Service
+After=network.target mosquitto.service
+
+[Service]
+Type=simple
+User=pi
+WorkingDirectory=/home/pi/echosmart/gateway
+ExecStart=/home/pi/echosmart/gateway/venv/bin/python main.py
+Restart=always
+RestartSec=10
+Environment=PYTHONUNBUFFERED=1
+
+[Install]
+WantedBy=multi-user.target

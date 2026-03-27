@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" fill="none">
+  <!-- Dashed circle -->
+  <circle cx="200" cy="130" r="60" stroke="#333333" stroke-width="2" stroke-dasharray="8 6" opacity="0.6"/>
+  <!-- Ghosted sensor chip -->
+  <g opacity="0.3">
+    <rect x="175" y="105" width="50" height="50" rx="6" stroke="#333333" stroke-width="2"/>
+    <rect x="188" y="118" width="24" height="24" rx="3" stroke="#333333" stroke-width="1.5"/>
+    <circle cx="200" cy="130" r="4" fill="#333333"/>
+    <!-- Pins -->
+    <line x1="185" y1="105" x2="185" y2="95" stroke="#333333" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="200" y1="105" x2="200" y2="95" stroke="#333333" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="215" y1="105" x2="215" y2="95" stroke="#333333" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="185" y1="155" x2="185" y2="165" stroke="#333333" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="200" y1="155" x2="200" y2="165" stroke="#333333" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="215" y1="155" x2="215" y2="165" stroke="#333333" stroke-width="1.5" stroke-linecap="round"/>
+  </g>
+  <!-- Small accent dots -->
+  <circle cx="148" cy="100" r="3" fill="#00E676" opacity="0.2"/>
+  <circle cx="252" cy="160" r="2" fill="#00E676" opacity="0.15"/>
+  <circle cx="140" cy="165" r="2" fill="#00E676" opacity="0.1"/>
+  <!-- Horizontal lines suggesting empty list rows -->
+  <line x1="100" y1="220" x2="300" y2="220" stroke="#222222" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="100" y1="240" x2="280" y2="240" stroke="#1A1A1A" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="100" y1="260" x2="260" y2="260" stroke="#1A1A1A" stroke-width="1" stroke-linecap="round" opacity="0.5"/>
+  <!-- Subtle plus icon -->
+  <g opacity="0.25">
+    <circle cx="200" cy="130" r="16" stroke="#00E676" stroke-width="1.5" stroke-dasharray="4 3"/>
+    <line x1="194" y1="130" x2="206" y2="130" stroke="#00E676" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="200" y1="124" x2="200" y2="136" stroke="#00E676" stroke-width="1.5" stroke-linecap="round"/>
+  </g>
+</svg>

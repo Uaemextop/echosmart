@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none">
+  <!-- Cloud shape -->
+  <path d="M12 30a7 7 0 0 1 .5-13.9 10 10 0 0 1 19.3-1A6 6 0 0 1 36 28H12z" stroke="#78909C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M12 30a7 7 0 0 1 .5-13.9 10 10 0 0 1 19.3-1A6 6 0 0 1 36 28H12z" fill="#78909C" opacity="0.12"/>
+  <!-- CO₂ text -->
+  <text x="21" y="25" font-family="'Segoe UI', 'SF Pro Display', system-ui, sans-serif" font-size="9" font-weight="700" fill="#78909C" text-anchor="middle" letter-spacing="0.5">CO</text>
+  <text x="31.5" y="28" font-family="'Segoe UI', 'SF Pro Display', system-ui, sans-serif" font-size="7" font-weight="700" fill="#78909C" text-anchor="middle">₂</text>
+  <!-- Subtle gas wisps below -->
+  <path d="M16 33q3-2 6 0" stroke="#78909C" stroke-width="1" stroke-linecap="round" fill="none" opacity="0.3"/>
+  <path d="M26 35q3-2 6 0" stroke="#78909C" stroke-width="1" stroke-linecap="round" fill="none" opacity="0.25"/>
+  <path d="M20 37q2.5-1.5 5 0" stroke="#78909C" stroke-width="1" stroke-linecap="round" fill="none" opacity="0.2"/>
+</svg>

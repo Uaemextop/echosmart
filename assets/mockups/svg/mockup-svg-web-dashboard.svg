@@ -1,0 +1,203 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" fill="none">
+  <style>
+    text { font-family: -apple-system, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif; }
+    .title { font-size: 24px; fill: #E0E0E0; font-weight: 700; }
+    .subtitle { font-size: 14px; fill: #78909C; font-weight: 400; }
+    .value { font-size: 36px; fill: #E0E0E0; font-weight: 700; }
+    .label { font-size: 12px; fill: #78909C; font-weight: 500; }
+    .small { font-size: 11px; fill: #546E7A; }
+    .accent { fill: #00E676; }
+    .nav-item { font-size: 13px; fill: #78909C; }
+    .nav-active { font-size: 13px; fill: #00E676; }
+  </style>
+  <rect width="1920" height="1080" fill="#000000"/>
+
+  <!-- Sidebar -->
+  <rect x="0" y="0" width="240" height="1080" fill="#0A0A0A"/>
+  <text x="30" y="45" font-size="20" fill="#00E676" font-weight="700" font-family="-apple-system, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif">🌿 EchoSmart</text>
+  <rect x="0" y="80" width="240" height="44" fill="#111111" rx="0"/>
+  <rect x="0" y="80" width="3" height="44" fill="#00E676" rx="0"/>
+  <circle cx="30" cy="102" r="8" stroke="#00E676" stroke-width="1.5" fill="none"/>
+  <text x="50" y="107" class="nav-active">Dashboard</text>
+  <g transform="translate(0,134)">
+    <circle cx="30" cy="22" r="8" stroke="#78909C" stroke-width="1.5" fill="none"/>
+    <text x="50" y="27" class="nav-item">Sensors</text>
+  </g>
+  <g transform="translate(0,178)">
+    <circle cx="30" cy="22" r="8" stroke="#78909C" stroke-width="1.5" fill="none"/>
+    <text x="50" y="27" class="nav-item">Alerts</text>
+  </g>
+  <g transform="translate(0,222)">
+    <circle cx="30" cy="22" r="8" stroke="#78909C" stroke-width="1.5" fill="none"/>
+    <text x="50" y="27" class="nav-item">Map</text>
+  </g>
+  <g transform="translate(0,266)">
+    <circle cx="30" cy="22" r="8" stroke="#78909C" stroke-width="1.5" fill="none"/>
+    <text x="50" y="27" class="nav-item">Reports</text>
+  </g>
+  <g transform="translate(0,310)">
+    <circle cx="30" cy="22" r="8" stroke="#78909C" stroke-width="1.5" fill="none"/>
+    <text x="50" y="27" class="nav-item">Settings</text>
+  </g>
+  <g transform="translate(0,354)">
+    <circle cx="30" cy="22" r="8" stroke="#78909C" stroke-width="1.5" fill="none"/>
+    <text x="50" y="27" class="nav-item">Users</text>
+  </g>
+
+  <!-- Header -->
+  <rect x="240" y="0" width="1680" height="64" fill="#0A0A0A"/>
+  <text x="280" y="40" class="title">Dashboard</text>
+  <rect x="500" y="18" width="300" height="32" rx="8" fill="#111111" stroke="#1E1E1E" stroke-width="1"/>
+  <text x="520" y="39" class="small">Search sensors, alerts...</text>
+  <circle cx="1810" cy="32" r="16" fill="#111111" stroke="#1E1E1E" stroke-width="1"/>
+  <circle cx="1810" cy="28" r="6" stroke="#78909C" stroke-width="1.5" fill="none"/>
+  <line x1="1810" y1="34" x2="1810" y2="40" stroke="#78909C" stroke-width="1.5"/>
+  <circle cx="1860" cy="32" r="16" fill="#111111" stroke="#1E1E1E" stroke-width="1"/>
+  <circle cx="1860" cy="32" r="8" fill="#546E7A"/>
+
+  <!-- Stat Cards -->
+  <g transform="translate(280, 90)">
+    <!-- Temperature -->
+    <rect x="0" y="0" width="380" height="120" rx="12" fill="#111111" stroke="#1E1E1E" stroke-width="1"/>
+    <rect x="0" y="0" width="380" height="3" rx="1" fill="#FF5252"/>
+    <text x="24" y="38" class="label">Temperature</text>
+    <text x="24" y="85" class="value">24.5°C</text>
+    <circle cx="340" cy="60" r="20" fill="#1A1A1A"/>
+    <circle cx="340" cy="60" r="8" stroke="#FF5252" stroke-width="2" fill="none"/>
+    <text x="24" y="108" class="small">+1.2° from yesterday</text>
+
+    <!-- Humidity -->
+    <rect x="400" y="0" width="380" height="120" rx="12" fill="#111111" stroke="#1E1E1E" stroke-width="1"/>
+    <rect x="400" y="0" width="380" height="3" rx="1" fill="#42A5F5"/>
+    <text x="424" y="38" class="label">Humidity</text>
+    <text x="424" y="85" class="value">62%</text>
+    <circle cx="740" cy="60" r="20" fill="#1A1A1A"/>
+    <circle cx="740" cy="60" r="8" stroke="#42A5F5" stroke-width="2" fill="none"/>
+    <text x="424" y="108" class="small">Optimal range</text>
+
+    <!-- CO₂ -->
+    <rect x="800" y="0" width="380" height="120" rx="12" fill="#111111" stroke="#1E1E1E" stroke-width="1"/>
+    <rect x="800" y="0" width="380" height="3" rx="1" fill="#78909C"/>
+    <text x="824" y="38" class="label">CO₂</text>
+    <text x="824" y="85" class="value">412 ppm</text>
+    <circle cx="1140" cy="60" r="20" fill="#1A1A1A"/>
+    <circle cx="1140" cy="60" r="8" stroke="#78909C" stroke-width="2" fill="none"/>
+    <text x="824" y="108" class="small">Normal levels</text>
+
+    <!-- Light -->
+    <rect x="1200" y="0" width="380" height="120" rx="12" fill="#111111" stroke="#1E1E1E" stroke-width="1"/>
+    <rect x="1200" y="0" width="380" height="3" rx="1" fill="#FFD54F"/>
+    <text x="1224" y="38" class="label">Light</text>
+    <text x="1224" y="85" class="value">850 lux</text>
+    <circle cx="1540" cy="60" r="20" fill="#1A1A1A"/>
+    <circle cx="1540" cy="60" r="8" stroke="#FFD54F" stroke-width="2" fill="none"/>
+    <text x="1224" y="108" class="small">High intensity</text>
+  </g>
+
+  <!-- Chart Area -->
+  <g transform="translate(280, 240)">
+    <rect x="0" y="0" width="1180" height="440" rx="12" fill="#111111" stroke="#1E1E1E" stroke-width="1"/>
+    <text x="24" y="38" class="title" font-size="18">Sensor Readings — Last 24h</text>
+    <text x="24" y="58" class="small">Temperature, Humidity, CO₂</text>
+    <defs>
+      <linearGradient id="tempGrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#FF5252" stop-opacity="0.3"/>
+        <stop offset="100%" stop-color="#FF5252" stop-opacity="0"/>
+      </linearGradient>
+      <linearGradient id="humGrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#42A5F5" stop-opacity="0.2"/>
+        <stop offset="100%" stop-color="#42A5F5" stop-opacity="0"/>
+      </linearGradient>
+    </defs>
+    <!-- Grid lines -->
+    <line x1="60" y1="80" x2="1140" y2="80" stroke="#1E1E1E" stroke-width="1"/>
+    <line x1="60" y1="150" x2="1140" y2="150" stroke="#1E1E1E" stroke-width="1"/>
+    <line x1="60" y1="220" x2="1140" y2="220" stroke="#1E1E1E" stroke-width="1"/>
+    <line x1="60" y1="290" x2="1140" y2="290" stroke="#1E1E1E" stroke-width="1"/>
+    <line x1="60" y1="360" x2="1140" y2="360" stroke="#1E1E1E" stroke-width="1"/>
+    <!-- Y-axis labels -->
+    <text x="20" y="85" class="small">30°</text>
+    <text x="20" y="155" class="small">25°</text>
+    <text x="20" y="225" class="small">20°</text>
+    <text x="20" y="295" class="small">15°</text>
+    <text x="20" y="365" class="small">10°</text>
+    <!-- Temperature line -->
+    <polygon points="60,280 150,250 240,220 330,190 420,200 510,170 600,160 690,180 780,150 870,170 960,190 1050,200 1140,180 1140,400 60,400" fill="url(#tempGrad)"/>
+    <polyline points="60,280 150,250 240,220 330,190 420,200 510,170 600,160 690,180 780,150 870,170 960,190 1050,200 1140,180" stroke="#FF5252" stroke-width="2" fill="none"/>
+    <!-- Humidity line -->
+    <polygon points="60,200 150,210 240,180 330,190 420,170 510,160 600,180 690,200 780,190 870,180 960,170 1050,160 1140,170 1140,400 60,400" fill="url(#humGrad)"/>
+    <polyline points="60,200 150,210 240,180 330,190 420,170 510,160 600,180 690,200 780,190 870,180 960,170 1050,160 1140,170" stroke="#42A5F5" stroke-width="2" fill="none"/>
+    <!-- CO₂ line -->
+    <polyline points="60,300 150,290 240,310 330,280 420,270 510,290 600,300 690,280 780,270 870,290 960,300 1050,310 1140,290" stroke="#78909C" stroke-width="1.5" fill="none" stroke-dasharray="4,4"/>
+    <!-- X-axis labels -->
+    <text x="60" y="410" class="small">00:00</text>
+    <text x="240" y="410" class="small">04:00</text>
+    <text x="420" y="410" class="small">08:00</text>
+    <text x="600" y="410" class="small">12:00</text>
+    <text x="780" y="410" class="small">16:00</text>
+    <text x="960" y="410" class="small">20:00</text>
+    <text x="1100" y="410" class="small">24:00</text>
+    <!-- Legend -->
+    <circle cx="800" cy="35" r="4" fill="#FF5252"/>
+    <text x="810" y="39" class="small">Temperature</text>
+    <circle cx="900" cy="35" r="4" fill="#42A5F5"/>
+    <text x="910" y="39" class="small">Humidity</text>
+    <circle cx="980" cy="35" r="4" fill="#78909C"/>
+    <text x="990" y="39" class="small">CO₂</text>
+  </g>
+
+  <!-- Right Alerts Panel -->
+  <g transform="translate(1480, 240)">
+    <rect x="0" y="0" width="380" height="440" rx="12" fill="#111111" stroke="#1E1E1E" stroke-width="1"/>
+    <text x="24" y="38" font-size="16" fill="#E0E0E0" font-weight="600" font-family="-apple-system, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif">Recent Alerts</text>
+    <!-- Alert 1 -->
+    <g transform="translate(24, 60)">
+      <circle cx="8" cy="12" r="5" fill="#FF5252"/>
+      <text x="24" y="10" font-size="13" fill="#E0E0E0" font-family="-apple-system, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif">High Temperature — Zone A</text>
+      <text x="24" y="28" class="small">Exceeded 30°C threshold</text>
+      <text x="280" y="10" class="small">2m ago</text>
+    </g>
+    <!-- Alert 2 -->
+    <g transform="translate(24, 120)">
+      <circle cx="8" cy="12" r="5" fill="#FFA726"/>
+      <text x="24" y="10" font-size="13" fill="#E0E0E0" font-family="-apple-system, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif">Low Humidity — Zone B</text>
+      <text x="24" y="28" class="small">Below 40% threshold</text>
+      <text x="280" y="10" class="small">15m ago</text>
+    </g>
+    <!-- Alert 3 -->
+    <g transform="translate(24, 180)">
+      <circle cx="8" cy="12" r="5" fill="#42A5F5"/>
+      <text x="24" y="10" font-size="13" fill="#E0E0E0" font-family="-apple-system, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif">Sensor Offline — TH-04</text>
+      <text x="24" y="28" class="small">Connection lost</text>
+      <text x="280" y="10" class="small">1h ago</text>
+    </g>
+    <!-- Alert 4 -->
+    <g transform="translate(24, 240)">
+      <circle cx="8" cy="12" r="5" fill="#FFA726"/>
+      <text x="24" y="10" font-size="13" fill="#E0E0E0" font-family="-apple-system, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif">CO₂ Rising — Zone C</text>
+      <text x="24" y="28" class="small">Approaching 500 ppm limit</text>
+      <text x="280" y="10" class="small">2h ago</text>
+    </g>
+  </g>
+
+  <!-- Bottom Gateway Cards -->
+  <g transform="translate(280, 710)">
+    <rect x="0" y="0" width="380" height="100" rx="12" fill="#111111" stroke="#1E1E1E" stroke-width="1"/>
+    <text x="24" y="32" font-size="15" fill="#E0E0E0" font-weight="600" font-family="-apple-system, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif">Gateway Alpha</text>
+    <circle cx="24" cy="56" r="4" fill="#00E676"/>
+    <text x="36" y="60" class="small" fill="#00E676">Online</text>
+    <text x="24" y="82" class="small">8 sensors connected</text>
+
+    <rect x="400" y="0" width="380" height="100" rx="12" fill="#111111" stroke="#1E1E1E" stroke-width="1"/>
+    <text x="424" y="32" font-size="15" fill="#E0E0E0" font-weight="600" font-family="-apple-system, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif">Gateway Beta</text>
+    <circle cx="424" cy="56" r="4" fill="#00E676"/>
+    <text x="436" y="60" class="small" fill="#00E676">Online</text>
+    <text x="424" y="82" class="small">6 sensors connected</text>
+
+    <rect x="800" y="0" width="380" height="100" rx="12" fill="#111111" stroke="#1E1E1E" stroke-width="1"/>
+    <text x="824" y="32" font-size="15" fill="#E0E0E0" font-weight="600" font-family="-apple-system, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif">Gateway Gamma</text>
+    <circle cx="824" cy="56" r="4" fill="#FFA726"/>
+    <text x="836" y="60" class="small" fill="#FFA726">Degraded</text>
+    <text x="824" y="82" class="small">4 sensors connected</text>
+  </g>
+</svg>

@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450">
+  <style>
+    text { font-family: 'Segoe UI', system-ui, sans-serif; }
+    .title { font-size: 16px; font-weight: 700; fill: #E0E0E0; }
+    .label { font-size: 11px; fill: #E0E0E0; font-weight: 600; }
+    .detail { font-size: 9px; fill: #78909C; }
+    .step { font-size: 10px; fill: #B0BEC5; }
+  </style>
+  <defs>
+    <marker id="a" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#00E676"/></marker>
+    <marker id="ar" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#FF5252"/></marker>
+  </defs>
+  <rect width="800" height="450" fill="#000000"/>
+  <text x="400" y="28" text-anchor="middle" class="title">FLUJO DE AUTENTICACIÓN — JWT + RBAC</text>
+
+  <!-- Client -->
+  <rect x="30" y="60" width="130" height="360" rx="10" fill="#111111" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+  <text x="95" y="85" text-anchor="middle" class="label" fill="#00E676">CLIENTE</text>
+  <text x="95" y="100" text-anchor="middle" class="detail">Web / Mobile / Desktop</text>
+
+  <!-- Backend -->
+  <rect x="320" y="60" width="160" height="360" rx="10" fill="#0D1A2E" stroke="rgba(0,188,212,0.2)" stroke-width="1"/>
+  <text x="400" y="85" text-anchor="middle" class="label" fill="#00BCD4">BACKEND API</text>
+  <text x="400" y="100" text-anchor="middle" class="detail">FastAPI + JWT</text>
+
+  <!-- Database -->
+  <rect x="640" y="60" width="130" height="360" rx="10" fill="#111111" stroke="rgba(66,165,245,0.3)" stroke-width="1"/>
+  <text x="705" y="85" text-anchor="middle" class="label" fill="#42A5F5">BASE DE DATOS</text>
+  <text x="705" y="100" text-anchor="middle" class="detail">PostgreSQL + Redis</text>
+
+  <!-- Step 1: Login request -->
+  <line x1="160" y1="135" x2="318" y2="135" stroke="#00E676" stroke-width="1.5" marker-end="url(#a)"/>
+  <text x="240" y="128" text-anchor="middle" class="step" fill="#00E676">① POST /auth/login</text>
+  <text x="240" y="145" text-anchor="middle" class="detail">{email, password}</text>
+
+  <!-- Step 2: Verify credentials -->
+  <line x1="480" y1="155" x2="638" y2="155" stroke="#00BCD4" stroke-width="1.5" marker-end="url(#a)"/>
+  <text x="559" y="148" text-anchor="middle" class="step" fill="#00BCD4">② Verificar credenciales</text>
+  <text x="559" y="165" text-anchor="middle" class="detail">bcrypt.verify(password, hash)</text>
+
+  <!-- Step 3: Return tokens -->
+  <line x1="318" y1="195" x2="160" y2="195" stroke="#00E676" stroke-width="1.5" marker-end="url(#a)"/>
+  <text x="240" y="188" text-anchor="middle" class="step" fill="#00E676">③ Tokens JWT</text>
+  <text x="240" y="205" text-anchor="middle" class="detail">{access_token (24h), refresh_token (30d)}</text>
+
+  <!-- Step 4: API request with token -->
+  <line x1="160" y1="240" x2="318" y2="240" stroke="#FFD54F" stroke-width="1.5" marker-end="url(#a)"/>
+  <text x="240" y="233" text-anchor="middle" class="step" fill="#FFD54F">④ GET /sensors</text>
+  <text x="240" y="250" text-anchor="middle" class="detail">Authorization: Bearer &lt;token&gt;</text>
+
+  <!-- Step 5: Validate JWT + RBAC -->
+  <rect x="340" y="260" width="120" height="35" rx="6" fill="#0D1E30" stroke="rgba(255,213,79,0.2)" stroke-width="1"/>
+  <text x="400" y="278" text-anchor="middle" class="step" fill="#FFD54F">⑤ Middleware</text>
+  <text x="400" y="290" text-anchor="middle" class="detail">JWT decode + RBAC check</text>
+
+  <!-- Step 6: Query with tenant isolation -->
+  <line x1="480" y1="285" x2="638" y2="285" stroke="#42A5F5" stroke-width="1.5" marker-end="url(#a)"/>
+  <text x="559" y="278" text-anchor="middle" class="step" fill="#42A5F5">⑥ Query con tenant_id</text>
+  <text x="559" y="295" text-anchor="middle" class="detail">Row-Level Security</text>
+
+  <!-- Step 7: Response -->
+  <line x1="318" y1="330" x2="160" y2="330" stroke="#00E676" stroke-width="1.5" marker-end="url(#a)"/>
+  <text x="240" y="323" text-anchor="middle" class="step" fill="#00E676">⑦ Response 200</text>
+  <text x="240" y="340" text-anchor="middle" class="detail">Datos filtrados por tenant</text>
+
+  <!-- Step 8: Token expired -->
+  <line x1="160" y1="375" x2="318" y2="375" stroke="#FF5252" stroke-width="1.5" marker-end="url(#ar)"/>
+  <text x="240" y="368" text-anchor="middle" class="step" fill="#FF5252">⑧ POST /auth/refresh</text>
+  <text x="240" y="385" text-anchor="middle" class="detail">{refresh_token} → Nuevo access_token</text>
+
+  <!-- RBAC Legend -->
+  <rect x="170" y="410" width="460" height="30" rx="6" fill="#1A1A1A" stroke="rgba(0,230,118,0.1)" stroke-width="1"/>
+  <text x="230" y="429" text-anchor="middle" class="detail" fill="#FF1744">🔴 admin: todo</text>
+  <text x="350" y="429" text-anchor="middle" class="detail" fill="#FF9100">🟠 operator: read/write sensores</text>
+  <text x="500" y="429" text-anchor="middle" class="detail" fill="#448AFF">🔵 viewer: solo lectura</text>
+</svg>

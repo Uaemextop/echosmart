@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 100" fill="none">
+  <!-- Card background -->
+  <rect x="0" y="0" width="320" height="100" rx="10" fill="#111111" stroke="#222222" stroke-width="1"/>
+  <!-- Left accent bar -->
+  <rect x="0" y="0" width="4" height="100" rx="2" fill="#333333" opacity="0.6"/>
+  <!-- Icon slot -->
+  <circle cx="32" cy="50" r="16" fill="#1A1A1A"/>
+  <!-- Title placeholder -->
+  <rect x="60" y="28" width="160" height="6" rx="3" fill="#222222"/>
+  <!-- Description placeholder -->
+  <rect x="60" y="44" width="220" height="4" rx="2" fill="#1A1A1A"/>
+  <!-- Timestamp placeholder -->
+  <rect x="60" y="64" width="80" height="3" rx="1.5" fill="#1A1A1A" opacity="0.5"/>
+  <!-- Action slot -->
+  <rect x="270" y="38" width="32" height="24" rx="4" fill="#1A1A1A" opacity="0.4"/>
+</svg>

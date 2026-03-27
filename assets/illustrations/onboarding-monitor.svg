@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" fill="none">
+  <!-- Dashboard frame -->
+  <rect x="60" y="40" width="280" height="200" rx="8" stroke="#333333" stroke-width="1.5"/>
+  <!-- Title bar -->
+  <line x1="60" y1="65" x2="340" y2="65" stroke="#333333" stroke-width="1"/>
+  <circle cx="78" cy="52" r="3" fill="#FF5252" opacity="0.4"/>
+  <circle cx="88" cy="52" r="3" fill="#FFD54F" opacity="0.4"/>
+  <circle cx="98" cy="52" r="3" fill="#00E676" opacity="0.4"/>
+  <!-- Sensor card 1 - Temperature -->
+  <rect x="75" y="78" width="80" height="50" rx="4" stroke="#FF5252" stroke-width="1" opacity="0.5"/>
+  <text x="115" y="100" font-family="'Segoe UI', sans-serif" font-size="14" fill="#FF5252" text-anchor="middle" opacity="0.7">24°C</text>
+  <rect x="90" y="112" width="50" height="3" rx="1.5" fill="#FF5252" opacity="0.2"/>
+  <!-- Sensor card 2 - Humidity -->
+  <rect x="165" y="78" width="80" height="50" rx="4" stroke="#42A5F5" stroke-width="1" opacity="0.5"/>
+  <text x="205" y="100" font-family="'Segoe UI', sans-serif" font-size="14" fill="#42A5F5" text-anchor="middle" opacity="0.7">68%</text>
+  <rect x="180" y="112" width="50" height="3" rx="1.5" fill="#42A5F5" opacity="0.2"/>
+  <!-- Sensor card 3 - Light -->
+  <rect x="255" y="78" width="80" height="50" rx="4" stroke="#FFD54F" stroke-width="1" opacity="0.5"/>
+  <text x="295" y="100" font-family="'Segoe UI', sans-serif" font-size="14" fill="#FFD54F" text-anchor="middle" opacity="0.7">850lx</text>
+  <rect x="270" y="112" width="50" height="3" rx="1.5" fill="#FFD54F" opacity="0.2"/>
+  <!-- Chart area -->
+  <rect x="75" y="140" width="255" height="85" rx="4" stroke="#333333" stroke-width="1" opacity="0.5"/>
+  <!-- Chart line -->
+  <polyline points="85,200 110,190 135,195 160,175 185,180 210,160 235,168 260,150 285,155 310,145 325,148" stroke="#00E676" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.7"/>
+  <!-- Data flow arrows coming in from left -->
+  <g opacity="0.4">
+    <path d="M30 90h20" stroke="#00BCD4" stroke-width="1.5" stroke-linecap="round"/>
+    <polyline points="46,86 50,90 46,94" stroke="#00BCD4" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M25 150h25" stroke="#00BCD4" stroke-width="1.5" stroke-linecap="round"/>
+    <polyline points="46,146 50,150 46,154" stroke="#00BCD4" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M30 200h20" stroke="#00BCD4" stroke-width="1.5" stroke-linecap="round"/>
+    <polyline points="46,196 50,200 46,204" stroke="#00BCD4" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <!-- Pulsing data dots -->
+  <circle cx="50" cy="90" r="3" fill="#00BCD4" opacity="0.3"/>
+  <circle cx="50" cy="150" r="3" fill="#00BCD4" opacity="0.2"/>
+  <circle cx="50" cy="200" r="3" fill="#00BCD4" opacity="0.3"/>
+</svg>

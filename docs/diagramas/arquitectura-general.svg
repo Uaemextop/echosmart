@@ -1,0 +1,191 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 750">
+  <style>
+    text { font-family: 'Segoe UI', system-ui, sans-serif; }
+    .title { font-size: 18px; font-weight: 700; fill: #E0E0E0; }
+    .subtitle { font-size: 11px; fill: #78909C; letter-spacing: 2px; }
+    .label { font-size: 13px; fill: #E0E0E0; font-weight: 600; }
+    .sublabel { font-size: 10px; fill: #78909C; }
+    .arrow { stroke: #00E676; stroke-width: 2; fill: none; marker-end: url(#arrowG); }
+    .arrow-cyan { stroke: #00BCD4; stroke-width: 1.5; fill: none; marker-end: url(#arrowC); }
+    .box { rx: 12; fill: #111111; stroke: rgba(255,255,255,0.08); stroke-width: 1; }
+    .box-cloud { rx: 12; fill: #0D1A2E; stroke: rgba(0,188,212,0.25); stroke-width: 1; }
+    .box-edge { rx: 12; fill: #1A1A0A; stroke: rgba(255,143,0,0.25); stroke-width: 1; }
+  </style>
+  <defs>
+    <marker id="arrowG" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#00E676"/>
+    </marker>
+    <marker id="arrowC" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#00BCD4"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1100" height="750" fill="#000000"/>
+
+  <!-- Title -->
+  <text x="550" y="35" text-anchor="middle" class="title">ARQUITECTURA GENERAL — EchoSmart v1.0</text>
+  <text x="550" y="52" text-anchor="middle" class="subtitle">PLATAFORMA IoT MULTIPLATAFORMA PARA INVERNADEROS</text>
+
+  <!-- ═══ LAYER 1: EDGE (GATEWAY) ═══ -->
+  <rect x="30" y="80" width="300" height="280" class="box-edge"/>
+  <text x="180" y="105" text-anchor="middle" class="label">🔧 CAPA EDGE (Gateway)</text>
+  <text x="180" y="120" text-anchor="middle" class="sublabel">Raspberry Pi 4B · Python 3.9+</text>
+
+  <!-- Sensors -->
+  <rect x="50" y="135" width="120" height="90" rx="8" fill="#1A1A1A" stroke="rgba(255,82,82,0.3)" stroke-width="1"/>
+  <text x="110" y="155" text-anchor="middle" class="sublabel" fill="#FF5252">SENSORES</text>
+  <text x="110" y="172" text-anchor="middle" class="sublabel">🌡️ DS18B20</text>
+  <text x="110" y="185" text-anchor="middle" class="sublabel">💧 DHT22</text>
+  <text x="110" y="198" text-anchor="middle" class="sublabel">☀️ BH1750</text>
+  <text x="110" y="211" text-anchor="middle" class="sublabel">🌱 Soil · 💨 CO₂</text>
+
+  <!-- Gateway modules -->
+  <rect x="190" y="135" width="120" height="90" rx="8" fill="#1A1A1A" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+  <text x="250" y="155" text-anchor="middle" class="sublabel" fill="#00E676">SOFTWARE</text>
+  <text x="250" y="172" text-anchor="middle" class="sublabel">HAL Layer</text>
+  <text x="250" y="185" text-anchor="middle" class="sublabel">Sensor Manager</text>
+  <text x="250" y="198" text-anchor="middle" class="sublabel">Alert Engine</text>
+  <text x="250" y="211" text-anchor="middle" class="sublabel">Cloud Sync</text>
+
+  <!-- Local storage -->
+  <rect x="50" y="240" width="120" height="50" rx="8" fill="#1A1A1A" stroke="rgba(255,213,79,0.2)" stroke-width="1"/>
+  <text x="110" y="260" text-anchor="middle" class="sublabel" fill="#FFD54F">SQLite</text>
+  <text x="110" y="275" text-anchor="middle" class="sublabel">Caché local</text>
+
+  <!-- MQTT -->
+  <rect x="190" y="240" width="120" height="50" rx="8" fill="#1A1A1A" stroke="rgba(0,188,212,0.2)" stroke-width="1"/>
+  <text x="250" y="260" text-anchor="middle" class="sublabel" fill="#00BCD4">Mosquitto</text>
+  <text x="250" y="275" text-anchor="middle" class="sublabel">MQTT Broker</text>
+
+  <!-- Arrows sensor → sw -->
+  <line x1="170" y1="180" x2="188" y2="180" class="arrow"/>
+
+  <!-- ═══ LAYER 2: CLOUD BACKEND ═══ -->
+  <rect x="400" y="80" width="300" height="430" class="box-cloud"/>
+  <text x="550" y="105" text-anchor="middle" class="label">☁️ CAPA CLOUD (Backend)</text>
+  <text x="550" y="120" text-anchor="middle" class="sublabel">FastAPI · Docker · Kubernetes</text>
+
+  <!-- API Gateway -->
+  <rect x="420" y="135" width="260" height="45" rx="8" fill="#0D1E30" stroke="rgba(0,188,212,0.3)" stroke-width="1"/>
+  <text x="550" y="158" text-anchor="middle" class="sublabel" fill="#00BCD4">API Gateway (REST + WebSocket) — JWT + Rate Limit</text>
+
+  <!-- Services -->
+  <rect x="420" y="195" width="82" height="55" rx="6" fill="#0D1E30" stroke="rgba(0,230,118,0.15)" stroke-width="1"/>
+  <text x="461" y="215" text-anchor="middle" class="sublabel" fill="#00E676">Auth</text>
+  <text x="461" y="230" text-anchor="middle" class="sublabel">Service</text>
+
+  <rect x="509" y="195" width="82" height="55" rx="6" fill="#0D1E30" stroke="rgba(0,230,118,0.15)" stroke-width="1"/>
+  <text x="550" y="215" text-anchor="middle" class="sublabel" fill="#00E676">Sensor</text>
+  <text x="550" y="230" text-anchor="middle" class="sublabel">Service</text>
+
+  <rect x="598" y="195" width="82" height="55" rx="6" fill="#0D1E30" stroke="rgba(0,230,118,0.15)" stroke-width="1"/>
+  <text x="639" y="215" text-anchor="middle" class="sublabel" fill="#00E676">Alert</text>
+  <text x="639" y="230" text-anchor="middle" class="sublabel">Service</text>
+
+  <rect x="420" y="260" width="82" height="55" rx="6" fill="#0D1E30" stroke="rgba(0,230,118,0.15)" stroke-width="1"/>
+  <text x="461" y="280" text-anchor="middle" class="sublabel" fill="#00E676">Report</text>
+  <text x="461" y="295" text-anchor="middle" class="sublabel">Service</text>
+
+  <rect x="509" y="260" width="82" height="55" rx="6" fill="#0D1E30" stroke="rgba(0,230,118,0.15)" stroke-width="1"/>
+  <text x="550" y="280" text-anchor="middle" class="sublabel" fill="#00E676">Sync</text>
+  <text x="550" y="295" text-anchor="middle" class="sublabel">Service</text>
+
+  <rect x="598" y="260" width="82" height="55" rx="6" fill="#0D1E30" stroke="rgba(0,230,118,0.15)" stroke-width="1"/>
+  <text x="639" y="280" text-anchor="middle" class="sublabel" fill="#00E676">Tenant</text>
+  <text x="639" y="295" text-anchor="middle" class="sublabel">Service</text>
+
+  <!-- Databases -->
+  <rect x="420" y="340" width="82" height="55" rx="6" fill="#0D1E30" stroke="rgba(66,165,245,0.3)" stroke-width="1"/>
+  <text x="461" y="360" text-anchor="middle" class="sublabel" fill="#42A5F5">PostgreSQL</text>
+  <text x="461" y="375" text-anchor="middle" class="sublabel">Relacional</text>
+
+  <rect x="509" y="340" width="82" height="55" rx="6" fill="#0D1E30" stroke="rgba(171,71,188,0.3)" stroke-width="1"/>
+  <text x="550" y="360" text-anchor="middle" class="sublabel" fill="#AB47BC">InfluxDB</text>
+  <text x="550" y="375" text-anchor="middle" class="sublabel">Time-series</text>
+
+  <rect x="598" y="340" width="82" height="55" rx="6" fill="#0D1E30" stroke="rgba(255,82,82,0.3)" stroke-width="1"/>
+  <text x="639" y="360" text-anchor="middle" class="sublabel" fill="#FF5252">Redis</text>
+  <text x="639" y="375" text-anchor="middle" class="sublabel">Cache/Sessions</text>
+
+  <!-- Workers -->
+  <rect x="420" y="410" width="260" height="45" rx="8" fill="#0D1E30" stroke="rgba(255,143,0,0.25)" stroke-width="1"/>
+  <text x="550" y="435" text-anchor="middle" class="sublabel" fill="#FF8F00">Workers Async — Celery (Alertas, Reportes, Notificaciones)</text>
+
+  <!-- ═══ LAYER 3: CLIENTS ═══ -->
+  <rect x="770" y="80" width="300" height="430" class="box"/>
+  <text x="920" y="105" text-anchor="middle" class="label">📱 CAPA CLIENTES</text>
+  <text x="920" y="120" text-anchor="middle" class="sublabel">Multiplataforma · API Compartida</text>
+
+  <!-- Web -->
+  <rect x="790" y="140" width="260" height="55" rx="8" fill="#1A1A1A" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+  <text x="920" y="162" text-anchor="middle" class="sublabel" fill="#00E676">💻 Frontend Web</text>
+  <text x="920" y="178" text-anchor="middle" class="sublabel">React 18 + Vite + Redux Toolkit</text>
+
+  <!-- Mobile -->
+  <rect x="790" y="205" width="260" height="55" rx="8" fill="#1A1A1A" stroke="rgba(0,188,212,0.2)" stroke-width="1"/>
+  <text x="920" y="227" text-anchor="middle" class="sublabel" fill="#00BCD4">📱 App Móvil (Android + iOS)</text>
+  <text x="920" y="243" text-anchor="middle" class="sublabel">React Native · Expo · APK / IPA</text>
+
+  <!-- Desktop -->
+  <rect x="790" y="270" width="260" height="55" rx="8" fill="#1A1A1A" stroke="rgba(171,71,188,0.2)" stroke-width="1"/>
+  <text x="920" y="292" text-anchor="middle" class="sublabel" fill="#AB47BC">🖥️ Desktop (Win + Mac + Linux)</text>
+  <text x="920" y="308" text-anchor="middle" class="sublabel">Electron · EXE / DMG / AppImage</text>
+
+  <!-- Admin Panel -->
+  <rect x="790" y="335" width="260" height="55" rx="8" fill="#1A1A1A" stroke="rgba(255,143,0,0.2)" stroke-width="1"/>
+  <text x="920" y="357" text-anchor="middle" class="sublabel" fill="#FF8F00">⚙️ Panel Admin</text>
+  <text x="920" y="373" text-anchor="middle" class="sublabel">Clientes · Invernaderos · Soporte · OTA</text>
+
+  <!-- Shared Module -->
+  <rect x="790" y="410" width="260" height="45" rx="8" fill="#1A1A1A" stroke="rgba(0,230,118,0.15)" stroke-width="1"/>
+  <text x="920" y="435" text-anchor="middle" class="sublabel" fill="#00E676">📦 shared/ — API Client · Constants · Types</text>
+
+  <!-- ═══ CONNECTION ARROWS ═══ -->
+  <!-- Edge → Cloud -->
+  <line x1="330" y1="220" x2="398" y2="220" class="arrow"/>
+  <text x="365" y="210" text-anchor="middle" class="sublabel" fill="#00E676">HTTPS</text>
+  <text x="365" y="235" text-anchor="middle" class="sublabel" fill="#00BCD4">MQTT</text>
+
+  <!-- Cloud → Clients -->
+  <line x1="700" y1="220" x2="788" y2="170" class="arrow-cyan"/>
+  <line x1="700" y1="220" x2="788" y2="235" class="arrow-cyan"/>
+  <line x1="700" y1="280" x2="788" y2="300" class="arrow-cyan"/>
+  <line x1="700" y1="280" x2="788" y2="365" class="arrow-cyan"/>
+
+  <!-- ═══ BOTTOM LEGEND ═══ -->
+  <rect x="30" y="540" width="1040" height="190" rx="12" fill="#111111" stroke="rgba(0,230,118,0.1)" stroke-width="1"/>
+  <text x="550" y="570" text-anchor="middle" class="label">PROTOCOLOS Y TECNOLOGÍAS</text>
+
+  <!-- Protocol boxes -->
+  <rect x="50" y="590" width="140" height="50" rx="6" fill="#1A1A1A"/>
+  <text x="120" y="612" text-anchor="middle" class="sublabel" fill="#FF5252">🌡️ 1-Wire</text>
+  <text x="120" y="628" text-anchor="middle" class="sublabel">DS18B20</text>
+
+  <rect x="200" y="590" width="140" height="50" rx="6" fill="#1A1A1A"/>
+  <text x="270" y="612" text-anchor="middle" class="sublabel" fill="#42A5F5">💧 GPIO</text>
+  <text x="270" y="628" text-anchor="middle" class="sublabel">DHT22</text>
+
+  <rect x="350" y="590" width="140" height="50" rx="6" fill="#1A1A1A"/>
+  <text x="420" y="612" text-anchor="middle" class="sublabel" fill="#FFD54F">☀️ I2C</text>
+  <text x="420" y="628" text-anchor="middle" class="sublabel">BH1750</text>
+
+  <rect x="500" y="590" width="140" height="50" rx="6" fill="#1A1A1A"/>
+  <text x="570" y="612" text-anchor="middle" class="sublabel" fill="#8D6E63">🌱 ADC</text>
+  <text x="570" y="628" text-anchor="middle" class="sublabel">Soil Moisture</text>
+
+  <rect x="650" y="590" width="140" height="50" rx="6" fill="#1A1A1A"/>
+  <text x="720" y="612" text-anchor="middle" class="sublabel" fill="#78909C">💨 UART</text>
+  <text x="720" y="628" text-anchor="middle" class="sublabel">MHZ-19C CO₂</text>
+
+  <rect x="800" y="590" width="140" height="50" rx="6" fill="#1A1A1A"/>
+  <text x="870" y="612" text-anchor="middle" class="sublabel" fill="#00BCD4">📡 MQTT</text>
+  <text x="870" y="628" text-anchor="middle" class="sublabel">Mosquitto</text>
+
+  <rect x="950" y="590" width="110" height="50" rx="6" fill="#1A1A1A"/>
+  <text x="1005" y="612" text-anchor="middle" class="sublabel" fill="#00E676">🔒 JWT</text>
+  <text x="1005" y="628" text-anchor="middle" class="sublabel">Auth + RBAC</text>
+
+  <!-- Footer -->
+  <text x="550" y="715" text-anchor="middle" class="sublabel">EchoSmart v1.0 — Plataforma IoT para Agricultura de Precisión</text>
+</svg>

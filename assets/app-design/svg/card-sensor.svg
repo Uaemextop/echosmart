@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180" fill="none">
+  <!-- Card background shape -->
+  <rect x="0" y="0" width="320" height="180" rx="12" fill="#111111" stroke="#222222" stroke-width="1"/>
+  <!-- Subtle top accent line -->
+  <rect x="16" y="12" width="40" height="3" rx="1.5" fill="#333333" opacity="0.5"/>
+  <!-- Value placeholder area -->
+  <rect x="16" y="40" width="120" height="8" rx="4" fill="#222222"/>
+  <!-- Unit placeholder -->
+  <rect x="16" y="58" width="40" height="4" rx="2" fill="#1A1A1A"/>
+  <!-- Mini sparkline area -->
+  <rect x="16" y="90" width="288" height="60" rx="4" fill="#0A0A0A" opacity="0.5"/>
+  <!-- Sparkline placeholder curve -->
+  <polyline points="28,140 60,130 92,135 124,118 156,122 188,110 220,115 252,105 284,108 292,110" stroke="#333333" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.3"/>
+  <!-- Status indicator slot -->
+  <circle cx="296" cy="20" r="4" fill="#222222"/>
+  <!-- Icon slot -->
+  <rect x="260" y="40" width="44" height="44" rx="8" fill="#0A0A0A" opacity="0.4"/>
+</svg>

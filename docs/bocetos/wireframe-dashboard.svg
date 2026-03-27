@@ -1,0 +1,160 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 650">
+  <style>
+    text { font-family: 'Segoe UI', system-ui, sans-serif; }
+    .title { font-size: 14px; font-weight: 700; fill: #E0E0E0; }
+    .label { font-size: 10px; fill: #E0E0E0; font-weight: 600; }
+    .detail { font-size: 8px; fill: #78909C; }
+    .value { font-size: 18px; font-weight: 700; }
+    .wire { stroke: #2E7D32; stroke-width: 0.5; fill: none; stroke-dasharray: 2,2; opacity: 0.3; }
+  </style>
+  <rect width="1000" height="650" fill="#000000"/>
+  <text x="500" y="20" text-anchor="middle" class="detail" fill="#546E7A">WIREFRAME — DASHBOARD WEB</text>
+
+  <!-- Sidebar -->
+  <rect x="0" y="0" width="60" height="650" fill="#0A0A0A" stroke="rgba(0,230,118,0.06)" stroke-width="1"/>
+  <circle cx="30" cy="30" r="12" fill="#111111" stroke="#00E676" stroke-width="1"/>
+  <text x="30" y="34" text-anchor="middle" class="detail" fill="#00E676">🌿</text>
+  <!-- Nav items -->
+  <rect x="12" y="70" width="36" height="36" rx="8" fill="#1A1A1A"/>
+  <text x="30" y="93" text-anchor="middle" class="detail" fill="#00E676">📊</text>
+  <rect x="12" y="115" width="36" height="36" rx="8" fill="transparent"/>
+  <text x="30" y="138" text-anchor="middle" class="detail">🌡️</text>
+  <rect x="12" y="160" width="36" height="36" rx="8" fill="transparent"/>
+  <text x="30" y="183" text-anchor="middle" class="detail">⚠️</text>
+  <rect x="12" y="205" width="36" height="36" rx="8" fill="transparent"/>
+  <text x="30" y="228" text-anchor="middle" class="detail">📄</text>
+  <rect x="12" y="250" width="36" height="36" rx="8" fill="transparent"/>
+  <text x="30" y="273" text-anchor="middle" class="detail">🗺️</text>
+  <rect x="12" y="590" width="36" height="36" rx="8" fill="transparent"/>
+  <text x="30" y="613" text-anchor="middle" class="detail">⚙️</text>
+
+  <!-- Header -->
+  <rect x="60" y="0" width="940" height="50" fill="#111111" stroke="rgba(0,230,118,0.06)" stroke-width="1"/>
+  <text x="85" y="30" class="title">Dashboard</text>
+  <text x="85" y="42" class="detail">Invernadero Principal · Última actualización: hace 5s</text>
+  <!-- Search -->
+  <rect x="650" y="12" width="180" height="26" rx="13" fill="#1A1A1A"/>
+  <text x="670" y="29" class="detail">🔍 Buscar...</text>
+  <!-- User -->
+  <circle cx="870" cy="25" r="14" fill="#1A1A1A" stroke="#00E676" stroke-width="1"/>
+  <text x="870" y="29" text-anchor="middle" class="detail" fill="#00E676">JD</text>
+  <!-- Notifications -->
+  <circle cx="920" cy="25" r="14" fill="#1A1A1A"/>
+  <text x="920" y="29" text-anchor="middle" class="detail">🔔</text>
+  <circle cx="930" cy="17" r="5" fill="#FF1744"/>
+  <text x="930" y="20" text-anchor="middle" style="font-size:7px;fill:white;">3</text>
+
+  <!-- ═══ STATS BAR ═══ -->
+  <rect x="75" y="62" width="215" height="70" rx="12" fill="#111111" stroke="rgba(0,230,118,0.1)" stroke-width="1"/>
+  <text x="95" y="82" class="detail" fill="#78909C">Total Sensores</text>
+  <text x="95" y="108" class="value" fill="#00E676">24</text>
+  <text x="140" y="108" class="detail" fill="#00E676">activos</text>
+  <rect x="95" y="118" width="170" height="4" rx="2" fill="#1A1A1A"/>
+  <rect x="95" y="118" width="140" height="4" rx="2" fill="#00E676" opacity="0.6"/>
+
+  <rect x="305" y="62" width="215" height="70" rx="12" fill="#111111" stroke="rgba(0,188,212,0.1)" stroke-width="1"/>
+  <text x="325" y="82" class="detail" fill="#78909C">Gateways Online</text>
+  <text x="325" y="108" class="value" fill="#00BCD4">3</text>
+  <text x="345" y="108" class="detail" fill="#00BCD4">de 3</text>
+
+  <rect x="535" y="62" width="215" height="70" rx="12" fill="#111111" stroke="rgba(255,23,68,0.1)" stroke-width="1"/>
+  <text x="555" y="82" class="detail" fill="#78909C">Alertas Activas</text>
+  <text x="555" y="108" class="value" fill="#FF1744">2</text>
+  <text x="575" y="108" class="detail" fill="#FF5252">críticas</text>
+
+  <rect x="765" y="62" width="215" height="70" rx="12" fill="#111111" stroke="rgba(255,213,79,0.1)" stroke-width="1"/>
+  <text x="785" y="82" class="detail" fill="#78909C">Última Lectura</text>
+  <text x="785" y="108" class="value" fill="#FFD54F">5s</text>
+  <text x="815" y="108" class="detail" fill="#78909C">atrás</text>
+
+  <!-- ═══ SENSOR CARDS ═══ -->
+  <text x="85" y="155" class="label" fill="#78909C">Sensores en Tiempo Real</text>
+
+  <!-- Temp card -->
+  <rect x="75" y="165" width="180" height="110" rx="12" fill="#111111" stroke="rgba(255,82,82,0.15)" stroke-width="1"/>
+  <text x="95" y="185" class="detail" fill="#78909C">🌡️ Temperatura Zona A</text>
+  <text x="95" y="215" class="value" fill="#FF5252">24.5°C</text>
+  <text x="95" y="235" class="detail" fill="#00E676">● Normal (18-28°C)</text>
+  <!-- Mini chart -->
+  <polyline points="95,260 110,255 125,258 140,250 155,252 170,248 185,253 200,245 215,250 230,248 245,243" stroke="#FF5252" stroke-width="1.5" fill="none" opacity="0.6"/>
+
+  <!-- Humidity card -->
+  <rect x="270" y="165" width="180" height="110" rx="12" fill="#111111" stroke="rgba(66,165,245,0.15)" stroke-width="1"/>
+  <text x="290" y="185" class="detail" fill="#78909C">💧 Humedad Zona A</text>
+  <text x="290" y="215" class="value" fill="#42A5F5">68.2%</text>
+  <text x="290" y="235" class="detail" fill="#00E676">● Normal (60-80%)</text>
+  <polyline points="290,260 305,258 320,255 335,260 350,257 365,262 380,258 395,255 410,260 425,256 440,258" stroke="#42A5F5" stroke-width="1.5" fill="none" opacity="0.6"/>
+
+  <!-- Light card -->
+  <rect x="465" y="165" width="180" height="110" rx="12" fill="#111111" stroke="rgba(255,213,79,0.15)" stroke-width="1"/>
+  <text x="485" y="185" class="detail" fill="#78909C">☀️ Luminosidad Zona A</text>
+  <text x="485" y="215" class="value" fill="#FFD54F">18.5K</text>
+  <text x="535" y="215" class="detail" fill="#FFD54F">lux</text>
+  <text x="485" y="235" class="detail" fill="#00E676">● Normal (10K-30K)</text>
+  <polyline points="485,260 500,255 515,250 530,248 545,253 560,245 575,248 590,252 605,250 620,248 635,245" stroke="#FFD54F" stroke-width="1.5" fill="none" opacity="0.6"/>
+
+  <!-- CO2 card -->
+  <rect x="660" y="165" width="180" height="110" rx="12" fill="#111111" stroke="rgba(120,144,156,0.15)" stroke-width="1"/>
+  <text x="680" y="185" class="detail" fill="#78909C">💨 CO₂ Zona A</text>
+  <text x="680" y="215" class="value" fill="#78909C">620</text>
+  <text x="720" y="215" class="detail" fill="#78909C">ppm</text>
+  <text x="680" y="235" class="detail" fill="#00E676">● Normal (400-1000)</text>
+  <polyline points="680,260 695,258 710,255 725,258 740,260 755,256 770,260 785,258 800,255 815,258 830,260" stroke="#78909C" stroke-width="1.5" fill="none" opacity="0.6"/>
+
+  <!-- ═══ CHART AREA ═══ -->
+  <rect x="75" y="295" width="560" height="220" rx="12" fill="#111111" stroke="rgba(0,230,118,0.08)" stroke-width="1"/>
+  <text x="95" y="320" class="label">Histórico de Temperatura — Últimas 24h</text>
+  <!-- Grid -->
+  <line x1="95" y1="340" x2="95" y2="490" stroke="#1A1A1A" stroke-width="1"/>
+  <line x1="95" y1="490" x2="615" y2="490" stroke="#1A1A1A" stroke-width="1"/>
+  <line x1="95" y1="380" x2="615" y2="380" stroke="#1A1A1A" stroke-width="0.5" stroke-dasharray="3,3" opacity="0.3"/>
+  <line x1="95" y1="430" x2="615" y2="430" stroke="#1A1A1A" stroke-width="0.5" stroke-dasharray="3,3" opacity="0.3"/>
+  <!-- Y-axis labels -->
+  <text x="85" y="348" text-anchor="end" class="detail">30°</text>
+  <text x="85" y="384" text-anchor="end" class="detail">25°</text>
+  <text x="85" y="434" text-anchor="end" class="detail">20°</text>
+  <text x="85" y="494" text-anchor="end" class="detail">15°</text>
+  <!-- Chart line -->
+  <polyline points="110,420 140,415 170,410 200,418 230,405 260,395 290,390 320,385 350,388 380,382 410,378 440,375 470,380 500,372 530,370 560,375 590,368" stroke="#FF5252" stroke-width="2" fill="none"/>
+  <!-- Optimal range band -->
+  <rect x="95" y="365" width="520" height="60" rx="0" fill="#00E676" opacity="0.03"/>
+  <text x="595" y="398" text-anchor="end" class="detail" fill="#00E676">Rango óptimo</text>
+
+  <!-- ═══ ALERTS PANEL ═══ -->
+  <rect x="650" y="295" width="330" height="220" rx="12" fill="#111111" stroke="rgba(255,23,68,0.1)" stroke-width="1"/>
+  <text x="670" y="320" class="label" fill="#FF1744">⚠️ Alertas Recientes</text>
+
+  <rect x="665" y="335" width="300" height="40" rx="6" fill="#1A0A0A" stroke="rgba(255,23,68,0.2)" stroke-width="1"/>
+  <circle cx="680" cy="355" r="5" fill="#FF1744"/>
+  <text x="695" y="350" class="detail" fill="#E0E0E0">Temp Zona B: 32.5°C</text>
+  <text x="695" y="363" class="detail" fill="#FF5252">CRÍTICA · hace 2 min</text>
+  <rect x="910" y="343" width="45" height="18" rx="4" fill="#1A1A1A"/>
+  <text x="932" y="355" text-anchor="middle" class="detail" fill="#00E676">ACK</text>
+
+  <rect x="665" y="385" width="300" height="40" rx="6" fill="#1A0D00" stroke="rgba(255,145,0,0.2)" stroke-width="1"/>
+  <circle cx="680" cy="405" r="5" fill="#FF9100"/>
+  <text x="695" y="400" class="detail" fill="#E0E0E0">Humedad suelo Zona A: 45%</text>
+  <text x="695" y="413" class="detail" fill="#FF9100">ALTA · hace 15 min</text>
+  <rect x="910" y="393" width="45" height="18" rx="4" fill="#1A1A1A"/>
+  <text x="932" y="405" text-anchor="middle" class="detail" fill="#00E676">ACK</text>
+
+  <rect x="665" y="435" width="300" height="40" rx="6" fill="#111111" stroke="rgba(68,138,255,0.15)" stroke-width="1"/>
+  <circle cx="680" cy="455" r="5" fill="#448AFF"/>
+  <text x="695" y="450" class="detail" fill="#E0E0E0">CO₂ Zona C: 950 ppm</text>
+  <text x="695" y="463" class="detail" fill="#448AFF">BAJA · hace 1h</text>
+
+  <!-- Bottom status bar -->
+  <rect x="60" y="530" width="940" height="25" fill="#000000"/>
+  <circle cx="80" cy="543" r="4" fill="#00E676"/>
+  <text x="92" y="547" class="detail" fill="#00E676">Sistema operativo</text>
+  <text x="250" y="547" class="detail">API: 12ms</text>
+  <text x="380" y="547" class="detail">WebSocket: conectado</text>
+  <text x="550" y="547" class="detail">3 gateways online</text>
+  <text x="900" y="547" class="detail">EchoSmart v1.0</text>
+
+  <!-- Wireframe annotation -->
+  <rect x="75" y="570" width="905" height="70" rx="8" fill="none" stroke="#2E7D32" stroke-width="0.5" stroke-dasharray="4,3" opacity="0.3"/>
+  <text x="500" y="592" text-anchor="middle" class="detail" fill="#2E7D32">BOCETO / WIREFRAME — Dashboard Principal</text>
+  <text x="500" y="607" text-anchor="middle" class="detail" fill="#546E7A">Dark theme (#000000) · Sidebar nav · Stats bar · Sensor cards con mini-charts</text>
+  <text x="500" y="622" text-anchor="middle" class="detail" fill="#546E7A">Gráfica histórica · Panel de alertas · Status bar · Actualización en tiempo real via WebSocket</text>
+</svg>

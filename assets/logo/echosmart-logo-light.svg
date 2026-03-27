@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 120" fill="none">
+  <defs>
+    <linearGradient id="leafGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00E676"/>
+      <stop offset="100%" stop-color="#2E7D32"/>
+    </linearGradient>
+    <linearGradient id="signalGrad" x1="0%" y1="50%" x2="100%" y2="50%">
+      <stop offset="0%" stop-color="#00BCD4"/>
+      <stop offset="100%" stop-color="#00838F"/>
+    </linearGradient>
+  </defs>
+  <!-- Icon -->
+  <g transform="translate(10, 10) scale(0.83)">
+    <path d="M30 95Q18 55 45 28Q58 15 78 15Q88 15 95 20Q95 35 88 52Q72 85 35 95Q32 95 30 95z" fill="url(#leafGrad)" opacity="0.9"/>
+    <path d="M88 22Q60 50 32 92" stroke="#1A1A1A" stroke-width="2" stroke-linecap="round" opacity="0.2" fill="none"/>
+    <path d="M72 28a20 20 0 0 1 14 14" stroke="url(#signalGrad)" stroke-width="3" stroke-linecap="round" fill="none" opacity="0.9"/>
+    <path d="M78 18a30 30 0 0 1 22 22" stroke="url(#signalGrad)" stroke-width="2.5" stroke-linecap="round" fill="none" opacity="0.6"/>
+    <path d="M84 8a40 40 0 0 1 30 30" stroke="url(#signalGrad)" stroke-width="2" stroke-linecap="round" fill="none" opacity="0.35"/>
+  </g>
+  <!-- EchoSmart text for light backgrounds -->
+  <text x="125" y="58" font-family="'Segoe UI', 'SF Pro Display', system-ui, sans-serif" font-size="46" font-weight="700" fill="#1A1A1A" letter-spacing="-1">
+    Echo<tspan fill="#2E7D32">Smart</tspan>
+  </text>
+  <!-- Subtitle -->
+  <text x="127" y="82" font-family="'Segoe UI', 'SF Pro Display', system-ui, sans-serif" font-size="12" fill="#546E7A" letter-spacing="3">
+    SMART AGRICULTURE MONITORING
+  </text>
+</svg>

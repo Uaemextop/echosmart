@@ -1,0 +1,138 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 650">
+  <style>
+    text { font-family: 'Segoe UI', system-ui, sans-serif; }
+    .title { font-size: 16px; font-weight: 700; fill: #E0E0E0; }
+    .label { font-size: 12px; fill: #E0E0E0; font-weight: 600; }
+    .detail { font-size: 9px; fill: #78909C; }
+    .entity { font-size: 11px; fill: #00E676; font-weight: 600; }
+    .field { font-size: 9px; fill: #B0BEC5; }
+    .pk { font-size: 9px; fill: #FFD54F; font-weight: 600; }
+    .fk { font-size: 9px; fill: #42A5F5; }
+  </style>
+  <defs>
+    <marker id="a" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#546E7A"/>
+    </marker>
+  </defs>
+
+  <rect width="900" height="650" fill="#000000"/>
+  <text x="450" y="30" text-anchor="middle" class="title">DIAGRAMA ENTIDAD-RELACIÓN — Base de Datos PostgreSQL</text>
+
+  <!-- ═══ TENANTS ═══ -->
+  <rect x="350" y="55" width="200" height="130" rx="10" fill="#111111" stroke="rgba(255,143,0,0.3)" stroke-width="1"/>
+  <text x="450" y="75" text-anchor="middle" class="entity">TENANTS</text>
+  <line x1="360" y1="82" x2="540" y2="82" stroke="#2E7D32" stroke-width="0.5"/>
+  <text x="370" y="98" class="pk">🔑 id UUID PK</text>
+  <text x="370" y="112" class="field">name VARCHAR(255)</text>
+  <text x="370" y="126" class="field">slug VARCHAR(100) UNIQUE</text>
+  <text x="370" y="140" class="field">is_active BOOLEAN</text>
+  <text x="370" y="154" class="field">branding JSON</text>
+  <text x="370" y="168" class="field">created_at TIMESTAMP</text>
+
+  <!-- ═══ USERS ═══ -->
+  <rect x="30" y="55" width="200" height="155" rx="10" fill="#111111" stroke="rgba(0,230,118,0.3)" stroke-width="1"/>
+  <text x="130" y="75" text-anchor="middle" class="entity">USERS</text>
+  <line x1="40" y1="82" x2="220" y2="82" stroke="#2E7D32" stroke-width="0.5"/>
+  <text x="50" y="98" class="pk">🔑 id UUID PK</text>
+  <text x="50" y="112" class="fk">🔗 tenant_id → tenants.id</text>
+  <text x="50" y="126" class="field">email VARCHAR(255) UNIQUE</text>
+  <text x="50" y="140" class="field">hashed_password VARCHAR</text>
+  <text x="50" y="154" class="field">full_name VARCHAR(255)</text>
+  <text x="50" y="168" class="field">role ENUM(admin,operator,viewer)</text>
+  <text x="50" y="182" class="field">is_active BOOLEAN</text>
+  <text x="50" y="196" class="field">created_at TIMESTAMP</text>
+
+  <!-- ═══ GATEWAYS ═══ -->
+  <rect x="670" y="55" width="200" height="155" rx="10" fill="#111111" stroke="rgba(0,188,212,0.3)" stroke-width="1"/>
+  <text x="770" y="75" text-anchor="middle" class="entity">GATEWAYS</text>
+  <line x1="680" y1="82" x2="860" y2="82" stroke="#2E7D32" stroke-width="0.5"/>
+  <text x="690" y="98" class="pk">🔑 id UUID PK</text>
+  <text x="690" y="112" class="fk">🔗 tenant_id → tenants.id</text>
+  <text x="690" y="126" class="field">name VARCHAR(255)</text>
+  <text x="690" y="140" class="field">location VARCHAR(255)</text>
+  <text x="690" y="154" class="field">api_key VARCHAR(255) UNIQUE</text>
+  <text x="690" y="168" class="field">is_online BOOLEAN</text>
+  <text x="690" y="182" class="field">last_seen TIMESTAMP</text>
+  <text x="690" y="196" class="field">firmware_version VARCHAR</text>
+
+  <!-- ═══ SENSORS ═══ -->
+  <rect x="350" y="260" width="200" height="175" rx="10" fill="#111111" stroke="rgba(255,82,82,0.3)" stroke-width="1"/>
+  <text x="450" y="280" text-anchor="middle" class="entity">SENSORS</text>
+  <line x1="360" y1="287" x2="540" y2="287" stroke="#2E7D32" stroke-width="0.5"/>
+  <text x="370" y="303" class="pk">🔑 id UUID PK</text>
+  <text x="370" y="317" class="fk">🔗 gateway_id → gateways.id</text>
+  <text x="370" y="331" class="fk">🔗 tenant_id → tenants.id</text>
+  <text x="370" y="345" class="field">name VARCHAR(255)</text>
+  <text x="370" y="359" class="field">type ENUM(temp,humid,light,soil,co2)</text>
+  <text x="370" y="373" class="field">unit VARCHAR(20)</text>
+  <text x="370" y="387" class="field">min_value FLOAT</text>
+  <text x="370" y="401" class="field">max_value FLOAT</text>
+  <text x="370" y="415" class="field">is_online BOOLEAN</text>
+  <text x="370" y="429" class="field">location VARCHAR(255)</text>
+
+  <!-- ═══ READINGS ═══ -->
+  <rect x="30" y="300" width="200" height="110" rx="10" fill="#111111" stroke="rgba(171,71,188,0.3)" stroke-width="1"/>
+  <text x="130" y="320" text-anchor="middle" class="entity">READINGS</text>
+  <line x1="40" y1="327" x2="220" y2="327" stroke="#2E7D32" stroke-width="0.5"/>
+  <text x="50" y="343" class="pk">🔑 id UUID PK</text>
+  <text x="50" y="357" class="fk">🔗 sensor_id → sensors.id</text>
+  <text x="50" y="371" class="fk">🔗 tenant_id → tenants.id</text>
+  <text x="50" y="385" class="field">value FLOAT NOT NULL</text>
+  <text x="50" y="399" class="field">timestamp TIMESTAMP INDEX</text>
+
+  <!-- ═══ ALERTS ═══ -->
+  <rect x="670" y="280" width="200" height="170" rx="10" fill="#111111" stroke="rgba(255,23,68,0.3)" stroke-width="1"/>
+  <text x="770" y="300" text-anchor="middle" class="entity">ALERTS</text>
+  <line x1="680" y1="307" x2="860" y2="307" stroke="#2E7D32" stroke-width="0.5"/>
+  <text x="690" y="323" class="pk">🔑 id UUID PK</text>
+  <text x="690" y="337" class="fk">🔗 sensor_id → sensors.id</text>
+  <text x="690" y="351" class="fk">🔗 tenant_id → tenants.id</text>
+  <text x="690" y="365" class="field">rule_name VARCHAR(255)</text>
+  <text x="690" y="379" class="field">condition ENUM(gt,lt,eq,range)</text>
+  <text x="690" y="393" class="field">threshold FLOAT</text>
+  <text x="690" y="407" class="field">severity ENUM(critical,high,med,low)</text>
+  <text x="690" y="421" class="field">is_active BOOLEAN</text>
+  <text x="690" y="435" class="field">acknowledged BOOLEAN</text>
+
+  <!-- ═══ REPORTS ═══ -->
+  <rect x="350" y="490" width="200" height="140" rx="10" fill="#111111" stroke="rgba(255,143,0,0.3)" stroke-width="1"/>
+  <text x="450" y="510" text-anchor="middle" class="entity">REPORTS</text>
+  <line x1="360" y1="517" x2="540" y2="517" stroke="#2E7D32" stroke-width="0.5"/>
+  <text x="370" y="533" class="pk">🔑 id UUID PK</text>
+  <text x="370" y="547" class="fk">🔗 tenant_id → tenants.id</text>
+  <text x="370" y="561" class="fk">🔗 created_by → users.id</text>
+  <text x="370" y="575" class="field">title VARCHAR(255)</text>
+  <text x="370" y="589" class="field">format ENUM(pdf, excel)</text>
+  <text x="370" y="603" class="field">status ENUM(pending,ready,error)</text>
+  <text x="370" y="617" class="field">file_url VARCHAR(500)</text>
+
+  <!-- ═══ RELATIONSHIP LINES ═══ -->
+  <!-- Tenants → Users -->
+  <line x1="350" y1="120" x2="230" y2="120" stroke="#546E7A" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#a)"/>
+  <text x="290" y="113" text-anchor="middle" class="detail">1:N</text>
+
+  <!-- Tenants → Gateways -->
+  <line x1="550" y1="120" x2="670" y2="120" stroke="#546E7A" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#a)"/>
+  <text x="610" y="113" text-anchor="middle" class="detail">1:N</text>
+
+  <!-- Tenants → Sensors -->
+  <line x1="450" y1="185" x2="450" y2="258" stroke="#546E7A" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#a)"/>
+  <text x="465" y="225" class="detail">1:N</text>
+
+  <!-- Gateways → Sensors -->
+  <line x1="670" y1="200" x2="550" y2="300" stroke="#546E7A" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#a)"/>
+  <text x="620" y="245" class="detail">1:N</text>
+
+  <!-- Sensors → Readings -->
+  <line x1="350" y1="360" x2="230" y2="360" stroke="#546E7A" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#a)"/>
+  <text x="290" y="353" text-anchor="middle" class="detail">1:N</text>
+
+  <!-- Sensors → Alerts -->
+  <line x1="550" y1="360" x2="670" y2="360" stroke="#546E7A" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#a)"/>
+  <text x="610" y="353" text-anchor="middle" class="detail">1:N</text>
+
+  <!-- Users → Reports -->
+  <line x1="130" y1="210" x2="130" y2="560" stroke="#546E7A" stroke-width="1" stroke-dasharray="4,3"/>
+  <line x1="130" y1="560" x2="350" y2="560" stroke="#546E7A" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#a)"/>
+  <text x="240" y="553" class="detail">1:N</text>
+</svg>
