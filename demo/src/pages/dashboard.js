@@ -12,8 +12,8 @@ const sparklines = {};
 
 /**
  * Render the dashboard page content.
- * @param {import("../modules/sensors.js")} sensors
- * @param {import("../modules/alerts.js").Alert[]} alerts
+ * @param {Record<string, import("../js/modules/sensors.js").SensorState>} sensors
+ * @param {import("../js/modules/alerts.js").Alert[]} alerts
  */
 export function renderDashboard(sensors, alerts) {
   updateSensorCards(sensors);
