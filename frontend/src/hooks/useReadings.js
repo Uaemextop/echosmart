@@ -18,7 +18,7 @@ export function useReadings(sensorId, { from, to, refreshInterval = 60000 } = {}
     return () => {
       // Cleanup
     };
-  }, [sensorId, from, to, dispatch]);
+  }, [sensorId, from, to, refreshInterval, dispatch]);
 
   return { readings, loading, error };
 }
