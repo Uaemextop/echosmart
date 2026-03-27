@@ -199,6 +199,8 @@
     <div class="sensors-grid" id="sensorsGrid">
       <!-- populated by JS -->
     </div>
+    <!-- Sensor detail slide-out panel -->
+    <div class="sensor-detail-panel" id="sensorDetailPanel"></div>
   </section>
 
   <!-- =========== PAGE: Alerts =========== -->
@@ -250,22 +252,77 @@
 
   <!-- =========== PAGE: Reports =========== -->
   <section class="page page--hidden" id="page-reports">
+    <!-- Export PDF Button -->
+    <div class="reports-header">
+      <span class="text-sm text-muted">Reportes y Análisis</span>
+      <button class="btn btn--primary" id="exportPdfBtn">
+        <svg viewBox="0 0 24 24" fill="none" width="16" height="16" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        Exportar como PDF
+      </button>
+    </div>
+
+    <!-- Summary cards -->
+    <div class="report-summary-row" id="reportsSummary">
+      <!-- populated by JS -->
+    </div>
+
+    <!-- Gauge charts -->
+    <div class="reports-gauge-row">
+      <div class="card">
+        <div class="card__header"><span class="card__title">🌡️ Temperatura</span></div>
+        <div class="report-gauge-container"><canvas id="gaugeTemp"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card__header"><span class="card__title">💧 Humedad</span></div>
+        <div class="report-gauge-container"><canvas id="gaugeHum"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card__header"><span class="card__title">☁️ CO₂</span></div>
+        <div class="report-gauge-container"><canvas id="gaugeCo2"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card__header"><span class="card__title">🌱 Suelo</span></div>
+        <div class="report-gauge-container"><canvas id="gaugeSoil"></canvas></div>
+      </div>
+    </div>
+
+    <!-- Line charts -->
     <div class="reports-grid">
       <div class="card">
-        <div class="card__header"><span class="card__title">Temperatura</span></div>
+        <div class="card__header"><span class="card__title">Temperatura · 24h</span></div>
         <div class="report-chart-container"><canvas id="reportTempChart"></canvas></div>
       </div>
       <div class="card">
-        <div class="card__header"><span class="card__title">Humedad</span></div>
+        <div class="card__header"><span class="card__title">Humedad · 24h</span></div>
         <div class="report-chart-container"><canvas id="reportHumChart"></canvas></div>
       </div>
       <div class="card">
-        <div class="card__header"><span class="card__title">CO₂</span></div>
+        <div class="card__header"><span class="card__title">CO₂ · 24h</span></div>
         <div class="report-chart-container"><canvas id="reportCo2Chart"></canvas></div>
       </div>
       <div class="card">
-        <div class="card__header"><span class="card__title">Luminosidad</span></div>
+        <div class="card__header"><span class="card__title">Luminosidad · 24h</span></div>
         <div class="report-chart-container"><canvas id="reportLightChart"></canvas></div>
+      </div>
+    </div>
+
+    <!-- Bar chart comparison -->
+    <div class="card" style="margin-bottom:20px">
+      <div class="card__header"><span class="card__title">📊 Comparativa de Sensores (% del rango)</span></div>
+      <div class="report-chart-container"><canvas id="reportBarChart"></canvas></div>
+    </div>
+
+    <!-- AI Analysis Report -->
+    <div class="card" style="margin-bottom:20px">
+      <div class="card__header">
+        <span class="card__title">🤖 Reporte de Análisis con IA — GitHub Models</span>
+      </div>
+      <!-- Token input / AI status area -->
+      <div class="card__body" id="aiTokenArea">
+        <!-- populated by JS -->
+      </div>
+      <div class="card__body" id="aiReportContent">
+        <!-- populated by JS -->
       </div>
     </div>
   </section>

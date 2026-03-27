@@ -26,7 +26,7 @@ import { renderSensors, updateSensors } from "./pages/sensors.js";
 import { renderAlerts } from "./pages/alerts.js";
 import { renderSettings } from "./pages/settings.js";
 import { renderReports } from "./pages/reports.js";
-import { renderMap } from "./pages/map.js";
+import { renderMap, updateMap } from "./pages/map.js";
 import { renderUsers } from "./pages/users.js";
 
 /* ---- State ---- */
@@ -92,7 +92,7 @@ document.addEventListener("DOMContentLoaded", () => {
     alerts:    () => renderAlerts(alerts),
     settings:  () => renderSettings(),
     reports:   () => renderReports(sensors),
-    map:       () => renderMap(),
+    map:       () => renderMap(sensors),
     users:     () => renderUsers(),
   }, "dashboard");
 
@@ -110,5 +110,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (hash === "dashboard") updateDashboard(sensors, alerts);
     if (hash === "sensors")   updateSensors(sensors);
     if (hash === "alerts")    renderAlerts(alerts);
+    if (hash === "map")       updateMap(sensors);
   }, 3000);
 });

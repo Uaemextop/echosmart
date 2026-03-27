@@ -135,5 +135,55 @@ export function trendInfo(trend, unit) {
   };
 }
 
+/**
+ * Generate simulated historical data for a given period.
+ * @param {string} key - sensor key
+ * @param {"day"|"week"|"month"} period
+ * @returns {{ labels: string[], data: number[], min: number, max: number, avg: number }}
+ */
+export function generatePeriodData(key, period) {
+  const spec = SPECS[key];
+  if (!spec) return { labels: [], data: [], min: 0, max: 0, avg: 0 };
+
+  const configs = {
+    day:   { points: 24, labelFn: (i) => `${String(i).padStart(2, "0")}:00` },
+    week:  { points: 7,  labelFn: (i) => ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"][i] },
+    month: { points: 30, labelFn: (i) => `Día ${i + 1}` },
+  };
+
+  const cfg = configs[period] || configs.day;
+  const center = (spec.optMin + spec.optMax) / 2;
+  const range = (spec.optMax - spec.optMin) / 2;
+  const data = [];
+  const labels = [];
+  let v = center + rand(-range * 0.3, range * 0.3);
+
+  for (let i = 0; i < cfg.points; i++) {
+    const variance = range * (period === "day" ? 0.15 : period === "week" ? 0.25 : 0.3);
+    v = clamp(v + rand(-variance, variance), spec.min, spec.max);
+    data.push(Math.round(v * 10) / 10);
+    labels.push(cfg.labelFn(i));
+  }
+
+  const min = Math.min(...data);
+  const max = Math.max(...data);
+  const avg = Math.round((data.reduce((a, b) => a + b, 0) / data.length) * 10) / 10;
+
+  return { labels, data, min, max, avg };
+}
+
+/**
+ * Compute live stats from the current 24-point history.
+ * @param {number[]} history
+ * @returns {{ min: number, max: number, avg: number }}
+ */
+export function computeStats(history) {
+  if (!history || history.length === 0) return { min: 0, max: 0, avg: 0 };
+  const min = Math.min(...history);
+  const max = Math.max(...history);
+  const avg = Math.round((history.reduce((a, b) => a + b, 0) / history.length) * 10) / 10;
+  return { min, max, avg };
+}
+
 export function getSpecs() { return SPECS; }
 export function getColors() { return COLORS; }
