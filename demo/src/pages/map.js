@@ -179,8 +179,7 @@ function getNodeValue(node, paramKey, sensors) {
 /* ===== Heatmap ===== */
 
 const HEATMAP_RES = 6;
-const BLOB_RADIUS = 170;
-const BLOB_MAX_ALPHA = 140;
+const HEATMAP_ALPHA = 130;
 
 function interpolateColor(value, scale) {
   if (value <= scale[0][0]) return [scale[0][1], scale[0][2], scale[0][3]];
@@ -326,7 +325,7 @@ function buildStructureSVG() {
   return '<svg class="greenhouse-svg" viewBox="0 0 ' + GH_W + " " + GH_H + '" preserveAspectRatio="xMidYMid meet">' + svg + "</svg>";
 }
 
-/* ===== Heatmap Drawing (clipped to greenhouse walls, blob effect) ===== */
+/* ===== Heatmap Drawing (full-coverage IDW, clipped to greenhouse walls) ===== */
 
 function drawHeatmap(paramKey, sensors) {
   if (!canvasEl) return;
@@ -355,32 +354,12 @@ function drawHeatmap(paramKey, sensors) {
   const wallR = Math.floor(((GH_W - WALL_M) / GH_W) * cw);
   const wallB = Math.floor(((GH_H - WALL_M) / GH_H) * ch);
 
-  /* Blob influence radius in canvas pixels */
-  const blobR = (BLOB_RADIUS / GH_W) * cw;
-
   const imgData = ctx.createImageData(cw, ch);
   const data = imgData.data;
 
-  /* Iterate only within wall bounds */
+  /* Fill the entire greenhouse interior using IDW interpolation */
   for (let py = wallT; py < wallB; py += HEATMAP_RES) {
     for (let px = wallL; px < wallR; px += HEATMAP_RES) {
-      /* Compute minimum distance to nearest sensor for blob alpha */
-      let minDist = Infinity;
-      for (let ni = 0; ni < nodes.length; ni++) {
-        const ndx = px - nodes[ni].x;
-        const ndy = py - nodes[ni].y;
-        const d = Math.sqrt(ndx * ndx + ndy * ndy);
-        if (d < minDist) minDist = d;
-      }
-
-      /* Skip pixels beyond influence radius */
-      if (minDist >= blobR) continue;
-
-      /* Smooth quadratic falloff for organic blob look */
-      const ratio = 1 - minDist / blobR;
-      const alpha = Math.round(BLOB_MAX_ALPHA * ratio * ratio);
-      if (alpha < 2) continue;
-
       const val = idwInterpolate(px, py, nodes);
       const c = interpolateColor(val, scale);
 
@@ -393,7 +372,7 @@ function drawHeatmap(paramKey, sensors) {
           data[idx] = c[0];
           data[idx + 1] = c[1];
           data[idx + 2] = c[2];
-          data[idx + 3] = alpha;
+          data[idx + 3] = HEATMAP_ALPHA;
         }
       }
     }
@@ -556,6 +535,7 @@ export function renderMap(sensors) {
     buildIsotherms(sensors) +
     buildAisleAverages(sensors) +
     '</div>' +
+    '<div class="greenhouse-hover-tooltip" id="ghHoverTooltip"></div>' +
     buildParamSelector() +
     buildLegend(activeParam) +
     buildZoomControls();
@@ -619,6 +599,9 @@ export function renderMap(sensors) {
 
   /* Container-level zoom/pan handlers (bind once) */
   setupContainerZoom();
+
+  /* Hover tooltip handler */
+  setupHoverTooltip();
 }
 
 export function updateMap(sensors) {
@@ -649,6 +632,64 @@ export function updateMap(sensors) {
       layout.insertAdjacentHTML("beforeend", buildAisleAverages(sensors));
     }
   }
+}
+
+/* ===== Hover Tooltip — shows interpolated value at mouse position ===== */
+
+function setupHoverTooltip() {
+  const mc = document.querySelector(".map-container");
+  if (!mc || mc.dataset.hoverInit) return;
+  mc.dataset.hoverInit = "1";
+
+  const tooltip = document.getElementById("ghHoverTooltip");
+  if (!tooltip) return;
+
+  mc.addEventListener("mousemove", function (e) {
+    if (isPanning) { tooltip.style.opacity = "0"; return; }
+
+    const layoutEl = mc.querySelector(".greenhouse-layout");
+    if (!layoutEl) return;
+
+    /* Convert mouse position to greenhouse SVG coordinates */
+    const lRect = layoutEl.getBoundingClientRect();
+    const ghX = ((e.clientX - lRect.left) / lRect.width) * GH_W;
+    const ghY = ((e.clientY - lRect.top) / lRect.height) * GH_H;
+
+    /* Only show within greenhouse walls */
+    if (ghX < WALL_M || ghX > GH_W - WALL_M || ghY < WALL_M || ghY > GH_H - WALL_M) {
+      tooltip.style.opacity = "0";
+      return;
+    }
+
+    /* IDW interpolate value at this point */
+    const nodes = SENSOR_NODES.map(function (n) {
+      return { x: n.x, y: n.y, value: getNodeValue(n, activeParam, sensorValues) };
+    });
+    const val = idwInterpolate(ghX, ghY, nodes);
+    const scale = COLOR_SCALES[activeParam];
+    const c = interpolateColor(val, scale);
+
+    /* Position tooltip near the cursor (offset to avoid covering pointer) */
+    const mcRect = mc.getBoundingClientRect();
+    let tx = e.clientX - mcRect.left + 14;
+    let ty = e.clientY - mcRect.top - 32;
+    /* Keep tooltip within container bounds */
+    if (tx + 120 > mcRect.width) tx = e.clientX - mcRect.left - 130;
+    if (ty < 4) ty = e.clientY - mcRect.top + 16;
+
+    tooltip.style.left = tx + "px";
+    tooltip.style.top = ty + "px";
+    tooltip.style.opacity = "1";
+    tooltip.style.borderColor = "rgb(" + c[0] + "," + c[1] + "," + c[2] + ")";
+    tooltip.innerHTML =
+      '<span class="greenhouse-hover-tooltip__label">' + PARAM_LABELS[activeParam] + '</span>' +
+      '<span class="greenhouse-hover-tooltip__value" style="color:rgb(' + c[0] + ',' + c[1] + ',' + c[2] + ')">' +
+      formatValue(activeParam, val) + '</span>';
+  });
+
+  mc.addEventListener("mouseleave", function () {
+    tooltip.style.opacity = "0";
+  });
 }
 
 /* ===== Container-level Zoom/Pan Handlers (bind once) ===== */
