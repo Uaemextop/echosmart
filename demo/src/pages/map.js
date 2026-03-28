@@ -178,7 +178,9 @@ function getNodeValue(node, paramKey, sensors) {
 
 /* ===== Heatmap ===== */
 
-const HEATMAP_RES = 8;
+const HEATMAP_RES = 6;
+const BLOB_RADIUS = 170;
+const BLOB_MAX_ALPHA = 140;
 
 function interpolateColor(value, scale) {
   if (value <= scale[0][0]) return [scale[0][1], scale[0][2], scale[0][3]];
@@ -319,7 +321,7 @@ function buildStructureSVG() {
   return '<svg class="greenhouse-svg" viewBox="0 0 ' + GH_W + " " + GH_H + '" preserveAspectRatio="xMidYMid meet">' + svg + "</svg>";
 }
 
-/* ===== Heatmap Drawing (clipped to greenhouse walls) ===== */
+/* ===== Heatmap Drawing (clipped to greenhouse walls, blob effect) ===== */
 
 function drawHeatmap(paramKey, sensors) {
   if (!canvasEl) return;
@@ -341,27 +343,51 @@ function drawHeatmap(paramKey, sensors) {
     };
   });
 
-  /* Greenhouse wall boundaries in canvas pixels */
+  /* Greenhouse wall boundaries in canvas pixels (use floor for strict clipping) */
   const wallL = Math.floor((WALL_M / GH_W) * cw);
   const wallT = Math.floor((WALL_M / GH_H) * ch);
-  const wallR = Math.ceil(((GH_W - WALL_M) / GH_W) * cw);
-  const wallB = Math.ceil(((GH_H - WALL_M) / GH_H) * ch);
+  const wallR = Math.floor(((GH_W - WALL_M) / GH_W) * cw);
+  const wallB = Math.floor(((GH_H - WALL_M) / GH_H) * ch);
+
+  /* Blob influence radius in canvas pixels */
+  const blobR = (BLOB_RADIUS / GH_W) * cw;
 
   const imgData = ctx.createImageData(cw, ch);
   const data = imgData.data;
-  for (let py = 0; py < ch; py += HEATMAP_RES) {
-    for (let px = 0; px < cw; px += HEATMAP_RES) {
-      /* Only draw INSIDE the greenhouse walls */
-      if (px < wallL || px >= wallR || py < wallT || py >= wallB) continue;
+
+  /* Iterate only within wall bounds */
+  for (let py = wallT; py < wallB; py += HEATMAP_RES) {
+    for (let px = wallL; px < wallR; px += HEATMAP_RES) {
+      /* Compute minimum distance to nearest sensor for blob alpha */
+      let minDist = Infinity;
+      for (let ni = 0; ni < nodes.length; ni++) {
+        const ndx = px - nodes[ni].x;
+        const ndy = py - nodes[ni].y;
+        const d = Math.sqrt(ndx * ndx + ndy * ndy);
+        if (d < minDist) minDist = d;
+      }
+
+      /* Skip pixels beyond influence radius */
+      if (minDist >= blobR) continue;
+
+      /* Smooth quadratic falloff for organic blob look */
+      const ratio = 1 - minDist / blobR;
+      const alpha = Math.round(BLOB_MAX_ALPHA * ratio * ratio);
+      if (alpha < 2) continue;
+
       const val = idwInterpolate(px, py, nodes);
       const c = interpolateColor(val, scale);
-      for (let dy = 0; dy < HEATMAP_RES && (py + dy) < ch; dy++) {
-        for (let dx = 0; dx < HEATMAP_RES && (px + dx) < cw; dx++) {
+
+      /* Fill block, strictly clipped to wall boundaries */
+      const maxDy = Math.min(HEATMAP_RES, wallB - py);
+      const maxDx = Math.min(HEATMAP_RES, wallR - px);
+      for (let dy = 0; dy < maxDy; dy++) {
+        for (let dx = 0; dx < maxDx; dx++) {
           const idx = ((py + dy) * cw + (px + dx)) * 4;
           data[idx] = c[0];
           data[idx + 1] = c[1];
           data[idx + 2] = c[2];
-          data[idx + 3] = 85;
+          data[idx + 3] = alpha;
         }
       }
     }
