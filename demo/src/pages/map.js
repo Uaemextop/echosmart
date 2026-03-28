@@ -147,24 +147,31 @@ function computeAisles() {
  * Each sensor has per-parameter offsets to create realistic spatial variation.
  * All nodes contribute to EVERY parameter's heatmap.
  */
+/*
+ * 9 sensors distributed in a staggered pattern across ALL 6 beds.
+ * Row A (bottom, y=340): Beds 1, 3, 5  (odd beds)
+ * Row B (middle, y=250): Beds 2, 4, 6  (even beds)
+ * Row C (top,    y=160): Beds 1, 3, 5  (odd beds)
+ * Bed centers: 1→126, 2→236, 3→345, 4→455, 5→565, 6→674
+ */
 const SENSOR_NODES = [
-  { id: "s1", x: 130, y: 400, name: "Sensor A1", aisle: 0,
+  { id: "s1", x: 126, y: 340, name: "Sensor A1",
     offsets: { temperature: 0, humidity: 0, co2: 0, light: 0, soil: 0 } },
-  { id: "s2", x: 400, y: 400, name: "Sensor A2", aisle: 2,
+  { id: "s2", x: 345, y: 340, name: "Sensor A2",
     offsets: { temperature: 0.8, humidity: -2, co2: 15, light: 500, soil: -3 } },
-  { id: "s3", x: 670, y: 400, name: "Sensor A3", aisle: 4,
+  { id: "s3", x: 565, y: 340, name: "Sensor A3",
     offsets: { temperature: -0.5, humidity: 3, co2: -20, light: -800, soil: 2 } },
-  { id: "s4", x: 130, y: 250, name: "Sensor B1", aisle: 0,
+  { id: "s4", x: 236, y: 250, name: "Sensor B1",
     offsets: { temperature: 1.8, humidity: -5, co2: 30, light: 2000, soil: -5 } },
-  { id: "s5", x: 400, y: 250, name: "Sensor B2", aisle: 2,
+  { id: "s5", x: 455, y: 250, name: "Sensor B2",
     offsets: { temperature: 2.5, humidity: -8, co2: 50, light: 4000, soil: -8 } },
-  { id: "s6", x: 670, y: 250, name: "Sensor B3", aisle: 4,
+  { id: "s6", x: 674, y: 250, name: "Sensor B3",
     offsets: { temperature: 1.2, humidity: -3, co2: 25, light: 1500, soil: -4 } },
-  { id: "s7", x: 130, y: 100, name: "Sensor C1", aisle: 0,
+  { id: "s7", x: 126, y: 160, name: "Sensor C1",
     offsets: { temperature: -1.2, humidity: 5, co2: -10, light: -2000, soil: 4 } },
-  { id: "s8", x: 400, y: 100, name: "Sensor C2", aisle: 2,
+  { id: "s8", x: 345, y: 160, name: "Sensor C2",
     offsets: { temperature: -0.3, humidity: 3, co2: -5, light: -500, soil: 2 } },
-  { id: "s9", x: 670, y: 100, name: "Sensor C3", aisle: 4,
+  { id: "s9", x: 565, y: 160, name: "Sensor C3",
     offsets: { temperature: -1.8, humidity: 7, co2: -25, light: -3000, soil: 6 } },
 ];
 
@@ -215,6 +222,53 @@ function idwInterpolate(px, py, nodes) {
 let activeParam = "temperature";
 let canvasEl = null;
 let sensorValues = {};
+
+/* ===== Zoom / Pan State ===== */
+
+let zoomLevel = 1;
+let panX = 0;
+let panY = 0;
+let isPanning = false;
+let panStartX = 0;
+let panStartY = 0;
+let panStartPanX = 0;
+let panStartPanY = 0;
+let _paramChange = false;
+
+const MIN_ZOOM = 0.5;
+const MAX_ZOOM = 5;
+const ZOOM_STEP = 0.2;
+
+function applyTransform() {
+  var el = document.querySelector(".greenhouse-layout");
+  if (el) {
+    el.style.transform = "translate(" + panX + "px," + panY + "px) scale(" + zoomLevel + ")";
+  }
+  var label = document.querySelector(".greenhouse-zoom-level");
+  if (label) {
+    label.textContent = Math.round(zoomLevel * 100) + "%";
+  }
+}
+
+function zoomAt(clientX, clientY, delta) {
+  var mc = document.querySelector(".map-container");
+  if (!mc) return;
+  var rect = mc.getBoundingClientRect();
+  var mx = clientX - rect.left;
+  var my = clientY - rect.top;
+  var oldZoom = zoomLevel;
+  zoomLevel = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, zoomLevel + delta));
+  panX = mx - ((mx - panX) / oldZoom) * zoomLevel;
+  panY = my - ((my - panY) / oldZoom) * zoomLevel;
+  applyTransform();
+}
+
+function resetZoom() {
+  zoomLevel = 1;
+  panX = 0;
+  panY = 0;
+  applyTransform();
+}
 
 /* ===== Build SVG Structure ===== */
 
