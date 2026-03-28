@@ -143,11 +143,6 @@ function computeAisles() {
 /* ===== Sensor Nodes — Each reads ALL parameters ===== */
 
 /*
- * 9 sensors in 3 rows × 3 columns distributed across the greenhouse.
- * Each sensor has per-parameter offsets to create realistic spatial variation.
- * All nodes contribute to EVERY parameter's heatmap.
- */
-/*
  * 9 sensors distributed in a staggered pattern across ALL 6 beds.
  * Row A (bottom, y=340): Beds 1, 3, 5  (odd beds)
  * Row B (middle, y=250): Beds 2, 4, 6  (even beds)
@@ -238,25 +233,26 @@ let _paramChange = false;
 const MIN_ZOOM = 0.5;
 const MAX_ZOOM = 5;
 const ZOOM_STEP = 0.2;
+const CONTROLS_SELECTOR = ".greenhouse-zoom-controls, .greenhouse-param-selector, .greenhouse-legend, .greenhouse-sensor-pin";
 
 function applyTransform() {
-  var el = document.querySelector(".greenhouse-layout");
+  const el = document.querySelector(".greenhouse-layout");
   if (el) {
     el.style.transform = "translate(" + panX + "px," + panY + "px) scale(" + zoomLevel + ")";
   }
-  var label = document.querySelector(".greenhouse-zoom-level");
+  const label = document.querySelector(".greenhouse-zoom-level");
   if (label) {
     label.textContent = Math.round(zoomLevel * 100) + "%";
   }
 }
 
 function zoomAt(clientX, clientY, delta) {
-  var mc = document.querySelector(".map-container");
+  const mc = document.querySelector(".map-container");
   if (!mc) return;
-  var rect = mc.getBoundingClientRect();
-  var mx = clientX - rect.left;
-  var my = clientY - rect.top;
-  var oldZoom = zoomLevel;
+  const rect = mc.getBoundingClientRect();
+  const mx = clientX - rect.left;
+  const my = clientY - rect.top;
+  const oldZoom = zoomLevel;
   zoomLevel = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, zoomLevel + delta));
   panX = mx - ((mx - panX) / oldZoom) * zoomLevel;
   panY = my - ((my - panY) / oldZoom) * zoomLevel;
@@ -476,7 +472,7 @@ function buildAisleAverages(sensors) {
   for (let i = 0; i < avgs.length; i++) {
     const a = avgs[i];
     const left = (a.cx / GH_W) * 100;
-    const top = ((WALL_M + 20) / GH_H) * 100;
+    const top = ((WALL_M + 8) / GH_H) * 100;
     const c = interpolateColor(a.avg, scale);
     const valStr = spec.decimals > 0
       ? a.avg.toFixed(spec.decimals) + spec.unit
@@ -489,6 +485,17 @@ function buildAisleAverages(sensors) {
   return html;
 }
 
+/* ===== Zoom Controls ===== */
+
+function buildZoomControls() {
+  return '<div class="greenhouse-zoom-controls">' +
+    '<button class="greenhouse-zoom-btn" data-zoom="in" title="Acercar (+)">+</button>' +
+    '<span class="greenhouse-zoom-level">' + Math.round(zoomLevel * 100) + '%</span>' +
+    '<button class="greenhouse-zoom-btn" data-zoom="reset" title="Restablecer (1:1)">\u27F2</button>' +
+    '<button class="greenhouse-zoom-btn" data-zoom="out" title="Alejar (\u2212)">\u2212</button>' +
+    '</div>';
+}
+
 /* ===== Public API ===== */
 
 export function renderMap(sensors) {
@@ -498,8 +505,17 @@ export function renderMap(sensors) {
   const placeholder = container.parentElement ? container.parentElement.querySelector(".map-placeholder") : null;
   if (placeholder) placeholder.style.display = "none";
 
+  /* Reset zoom when entering page (not on param change) */
+  if (!_paramChange) {
+    zoomLevel = 1;
+    panX = 0;
+    panY = 0;
+  }
+  _paramChange = false;
+
   sensorValues = sensors;
 
+  /* Controls are placed OUTSIDE greenhouse-layout so they don't scale on zoom */
   container.innerHTML =
     '<div class="greenhouse-layout">' +
     '<canvas id="heatmapCanvas" class="greenhouse-heatmap-canvas"></canvas>' +
@@ -507,9 +523,10 @@ export function renderMap(sensors) {
     buildSensorPins(sensors) +
     buildIsotherms(sensors) +
     buildAisleAverages(sensors) +
+    '</div>' +
     buildParamSelector() +
     buildLegend(activeParam) +
-    '</div>';
+    buildZoomControls();
 
   canvasEl = document.getElementById("heatmapCanvas");
   if (canvasEl) {
@@ -519,12 +536,39 @@ export function renderMap(sensors) {
     drawHeatmap(activeParam, sensors);
   }
 
+  applyTransform();
+
+  /* Param button listeners */
   container.querySelectorAll(".greenhouse-param-btn").forEach(function (btn) {
     btn.addEventListener("click", function () {
       activeParam = btn.dataset.param;
+      _paramChange = true;
       renderMap(sensorValues);
     });
   });
+
+  /* Zoom button listeners */
+  container.querySelectorAll(".greenhouse-zoom-btn").forEach(function (btn) {
+    btn.addEventListener("click", function (e) {
+      e.stopPropagation();
+      const action = btn.dataset.zoom;
+      if (action === "reset") {
+        resetZoom();
+      } else {
+        const mc = document.querySelector(".map-container");
+        if (!mc) return;
+        const rect = mc.getBoundingClientRect();
+        zoomAt(
+          rect.left + rect.width / 2,
+          rect.top + rect.height / 2,
+          action === "in" ? ZOOM_STEP : -ZOOM_STEP
+        );
+      }
+    });
+  });
+
+  /* Container-level zoom/pan handlers (bind once) */
+  setupContainerZoom();
 }
 
 export function updateMap(sensors) {
@@ -544,7 +588,7 @@ export function updateMap(sensors) {
     }
   });
 
-  /* Refresh isotherms */
+  /* Refresh isotherms and aisle averages */
   const container = document.getElementById("mapPins");
   if (container) {
     container.querySelectorAll(".greenhouse-isotherm").forEach(function (el) { el.remove(); });
@@ -555,4 +599,93 @@ export function updateMap(sensors) {
       layout.insertAdjacentHTML("beforeend", buildAisleAverages(sensors));
     }
   }
+}
+
+/* ===== Container-level Zoom/Pan Handlers (bind once) ===== */
+
+function setupContainerZoom() {
+  const mc = document.querySelector(".map-container");
+  if (!mc || mc.dataset.zoomInit) return;
+  mc.dataset.zoomInit = "1";
+
+  /* Wheel zoom */
+  mc.addEventListener("wheel", function (e) {
+    e.preventDefault();
+    const delta = e.deltaY > 0 ? -ZOOM_STEP : ZOOM_STEP;
+    zoomAt(e.clientX, e.clientY, delta);
+  }, { passive: false });
+
+  /* Mouse drag pan */
+  mc.addEventListener("mousedown", function (e) {
+    if (e.button !== 0) return;
+    if (e.target.closest(CONTROLS_SELECTOR)) return;
+    isPanning = true;
+    panStartX = e.clientX;
+    panStartY = e.clientY;
+    panStartPanX = panX;
+    panStartPanY = panY;
+    mc.classList.add("map-container--panning");
+    e.preventDefault();
+  });
+
+  window.addEventListener("mousemove", function (e) {
+    if (!isPanning) return;
+    panX = panStartPanX + (e.clientX - panStartX);
+    panY = panStartPanY + (e.clientY - panStartY);
+    applyTransform();
+  });
+
+  window.addEventListener("mouseup", function () {
+    if (!isPanning) return;
+    isPanning = false;
+    mc.classList.remove("map-container--panning");
+  });
+
+  /* Double-click to zoom in */
+  mc.addEventListener("dblclick", function (e) {
+    if (e.target.closest(CONTROLS_SELECTOR)) return;
+    zoomAt(e.clientX, e.clientY, ZOOM_STEP * 2);
+  });
+
+  /* Touch support */
+  let lastTouchDist = 0;
+
+  mc.addEventListener("touchstart", function (e) {
+    if (e.touches.length === 1) {
+      isPanning = true;
+      panStartX = e.touches[0].clientX;
+      panStartY = e.touches[0].clientY;
+      panStartPanX = panX;
+      panStartPanY = panY;
+    } else if (e.touches.length === 2) {
+      isPanning = false;
+      const dx = e.touches[1].clientX - e.touches[0].clientX;
+      const dy = e.touches[1].clientY - e.touches[0].clientY;
+      lastTouchDist = Math.sqrt(dx * dx + dy * dy);
+    }
+  }, { passive: true });
+
+  mc.addEventListener("touchmove", function (e) {
+    if (e.touches.length === 1 && isPanning) {
+      panX = panStartPanX + (e.touches[0].clientX - panStartX);
+      panY = panStartPanY + (e.touches[0].clientY - panStartY);
+      applyTransform();
+    } else if (e.touches.length === 2) {
+      e.preventDefault();
+      const dx = e.touches[1].clientX - e.touches[0].clientX;
+      const dy = e.touches[1].clientY - e.touches[0].clientY;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (lastTouchDist > 0 && Math.abs(dist - lastTouchDist) > 5) {
+        const cx = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+        const cy = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+        zoomAt(cx, cy, dist > lastTouchDist ? ZOOM_STEP : -ZOOM_STEP);
+        lastTouchDist = dist;
+      }
+    }
+  }, { passive: false });
+
+  mc.addEventListener("touchend", function () {
+    isPanning = false;
+    lastTouchDist = 0;
+  }, { passive: true });
 }

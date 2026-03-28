@@ -8,6 +8,11 @@
   min-height: 400px;
   position: relative;
   overflow: hidden;
+  cursor: grab;
+}
+
+.map-container--panning {
+  cursor: grabbing;
 }
 
 .map-placeholder {
@@ -75,7 +80,9 @@
 .greenhouse-layout {
   position: absolute;
   inset: 0;
-  overflow: hidden;
+  overflow: visible;
+  transform-origin: 0 0;
+  will-change: transform;
 }
 
 .greenhouse-heatmap-canvas {
@@ -264,4 +271,56 @@
   color: var(--green);
   font-weight: 500;
   margin-top: 2px;
+}
+
+/* Zoom controls */
+.greenhouse-zoom-controls {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 4px;
+  z-index: 50;
+}
+
+.greenhouse-zoom-btn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: 1px solid transparent;
+  border-radius: var(--radius-xs);
+  color: var(--text-primary);
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  user-select: none;
+}
+
+.greenhouse-zoom-btn:hover {
+  background: rgba(255,255,255,0.1);
+  border-color: rgba(255,255,255,0.2);
+}
+
+.greenhouse-zoom-btn:active {
+  background: rgba(255,255,255,0.15);
+}
+
+.greenhouse-zoom-level {
+  text-align: center;
+  font-size: 0.6rem;
+  color: var(--text-muted);
+  padding: 2px 0;
+  font-variant-numeric: tabular-nums;
+  user-select: none;
 }
