@@ -179,7 +179,7 @@ function getNodeValue(node, paramKey, sensors) {
 /* ===== Heatmap ===== */
 
 const HEATMAP_RES = 6;
-const HEATMAP_ALPHA = 130;
+const HEATMAP_ALPHA = 70;
 
 function interpolateColor(value, scale) {
   if (value <= scale[0][0]) return [scale[0][1], scale[0][2], scale[0][3]];
