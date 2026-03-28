@@ -232,6 +232,10 @@ let panStartPanX = 0;
 let panStartPanY = 0;
 let _paramChange = false;
 
+/* Centering offset — computed in renderMap to keep layout at correct aspect ratio */
+let layoutOffsetX = 0;
+let layoutOffsetY = 0;
+
 const MIN_ZOOM = 0.5;
 const MAX_ZOOM = 5;
 const ZOOM_STEP = 0.2;
@@ -252,8 +256,9 @@ function zoomAt(clientX, clientY, delta) {
   const mc = document.querySelector(".map-container");
   if (!mc) return;
   const rect = mc.getBoundingClientRect();
-  const mx = clientX - rect.left;
-  const my = clientY - rect.top;
+  /* Mouse position relative to the layout's initial top-left (not container) */
+  const mx = clientX - rect.left - layoutOffsetX;
+  const my = clientY - rect.top - layoutOffsetY;
   const oldZoom = zoomLevel;
   zoomLevel = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, zoomLevel + delta));
   panX = mx - ((mx - panX) / oldZoom) * zoomLevel;
@@ -328,6 +333,7 @@ function drawHeatmap(paramKey, sensors) {
   const ctx = canvasEl.getContext("2d");
   const cw = canvasEl.width;
   const ch = canvasEl.height;
+  if (cw < 1 || ch < 1) return;
   const scale = COLOR_SCALES[paramKey];
   if (!scale) return;
 
@@ -553,6 +559,24 @@ export function renderMap(sensors) {
     buildParamSelector() +
     buildLegend(activeParam) +
     buildZoomControls();
+
+  /* Size greenhouse-layout to preserve 800:500 aspect ratio and center it */
+  const layoutEl = container.querySelector(".greenhouse-layout");
+  const mc = container.closest(".map-container") || container.parentElement;
+  if (layoutEl && mc) {
+    const cRect = mc.getBoundingClientRect();
+    const cW = cRect.width;
+    const cH = cRect.height;
+    const fitScale = Math.min(cW / GH_W, cH / GH_H);
+    const lW = GH_W * fitScale;
+    const lH = GH_H * fitScale;
+    layoutOffsetX = (cW - lW) / 2;
+    layoutOffsetY = (cH - lH) / 2;
+    layoutEl.style.width = lW + "px";
+    layoutEl.style.height = lH + "px";
+    layoutEl.style.left = layoutOffsetX + "px";
+    layoutEl.style.top = layoutOffsetY + "px";
+  }
 
   canvasEl = document.getElementById("heatmapCanvas");
   if (canvasEl) {

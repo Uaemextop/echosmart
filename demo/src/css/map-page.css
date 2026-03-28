@@ -79,8 +79,8 @@
 
 .greenhouse-layout {
   position: absolute;
-  inset: 0;
-  overflow: visible;
+  /* Dimensions and position set by JS to maintain 800:500 aspect ratio */
+  overflow: hidden;
   transform-origin: 0 0;
   will-change: transform;
 }
