@@ -10,14 +10,11 @@ import { ICONS } from "../js/modules/icons.js";
 const MS_PER_HOUR = 3_600_000;
 
 const sensorMeta = [
-  { key: "temperature", name: "DS18B20 #1",   type: "Temperatura",     zone: "Zona A", icon: "temperature" },
-  { key: "humidity",    name: "DHT22 #1",      type: "Humedad Ambiente", zone: "Zona A", icon: "humidity" },
-  { key: "co2",         name: "MH-Z19C",       type: "CO₂",             zone: "Zona A", icon: "co2" },
-  { key: "light",       name: "BH1750",        type: "Luminosidad",     zone: "Zona B", icon: "light" },
-  { key: "soil",        name: "Soil+ADS1115",  type: "Humedad Suelo",   zone: "Zona B", icon: "soil" },
-  { key: "temperature", name: "DS18B20 #2",   type: "Temperatura",     zone: "Zona C", icon: "temperature" },
-  { key: "humidity",    name: "DHT22 #2",      type: "Humedad Ambiente", zone: "Zona C", icon: "humidity" },
-  { key: "co2",         name: "MH-Z19C #2",    type: "CO₂",             zone: "Zona B", icon: "co2" },
+  { key: "temperature", name: "DS18B20",       type: "Temperatura",      zone: "Camas 1–3", icon: "temperature" },
+  { key: "humidity",    name: "DHT22",         type: "Humedad Ambiente", zone: "Camas 1–3", icon: "humidity" },
+  { key: "co2",         name: "MH-Z19C",      type: "CO₂",             zone: "Central",    icon: "co2" },
+  { key: "light",       name: "BH1750",        type: "Luminosidad",     zone: "Camas 4–6", icon: "light" },
+  { key: "soil",        name: "Soil+ADS1115",  type: "Humedad Suelo",   zone: "Camas 4–6", icon: "soil" },
 ];
 
 const sparkRefs = {};
