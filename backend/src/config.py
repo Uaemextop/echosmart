@@ -25,7 +25,12 @@ class Settings(BaseSettings):
     jwt_refresh_token_expire_days: int = 30
 
     # CORS
-    cors_origins: list[str] = ["http://localhost:3000", "http://localhost:5173"]
+    cors_origins: list[str] = [
+        "http://localhost:3000",
+        "http://localhost:5173",
+        "https://echosmart.me",
+        "https://www.echosmart.me",
+    ]
 
     # Logging
     log_level: str = "INFO"
