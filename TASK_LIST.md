@@ -519,6 +519,14 @@ A continuación se definen los **5 sensores** seleccionados para el proyecto. Ca
 | `echosmart run` | — | `--config=<path>`, `--sensors=<path>`, `--simulate=true`, `--once=true`, `--interval=<sec>` | Ejecutar daemon de polling |
 | `echosmart setup` | — | `--config=<path>` | Wizard de primer arranque |
 | `echosmart status` | — | `--format=json\|text` | Estado del gateway y sensores |
+| `echosmart config` | `<scope>` | `--get=<key>`, `--set=<key>`, `--value=<value>`, `--file=<path>`, `--format=json\|text` | Leer, validar, exportar o actualizar configuración |
+| `echosmart discover` | `<scope>` | `--network=<cidr>`, `--timeout=<sec>`, `--format=json\|text` | Descubrir sensores, gateway, servidor o servicios locales |
+| `echosmart api` | `<resource>` | `--method=GET\|POST\|PUT\|DELETE`, `--path=<route>`, `--body=<json>`, `--token=<jwt>`, `--output=<file>` | Consumir la API backend y automatizar provisioning |
+| `echosmart web` | `<action>` | `--host=<host>`, `--port=<port>`, `--open=true`, `--profile=dev\|prod` | Servir o abrir consola web/local UI del gateway |
+| `echosmart server` | `<action>` | `--url=<server>`, `--api-key=<key>`, `--gateway-id=<id>`, `--format=json\|text` | Registrar, provisionar, diagnosticar o actualizar vínculo con servidor |
+| `echosmart iso` | `<target>` | `--build=true`, `--verify=true`, `--flash=<device>`, `--version=<semver>` | Construir, verificar o flashear ISOs del gateway/servidor |
+| `echosmart app` | `<target>` | `--platform=web\|mobile\|desktop`, `--pair=true`, `--bundle=true`, `--qr=true` | Integrar gateway con apps cliente |
+| `echosmart infra` | `<action>` | `--profile=dev\|staging\|prod`, `--compose=<file>`, `--check=true` | Orquestar infraestructura local/remota |
 | `echosmart calibrate` | `<sensor>` | `--dry=<val>`, `--wet=<val>`, `--ref=<val>` | Calibrar sensor |
 | `echosmart list` | — | — | Listar sensores configurados |
 | `echosmart test` | `<sensor>\|all` | `--simulate=true` | Probar sensores |
@@ -538,6 +546,15 @@ echosmart run --interval=30                       # Daemon con polling cada 30s
 echosmart run --config=/etc/echosmart/gateway.env # Daemon con config custom
 echosmart setup                                   # Wizard interactivo
 echosmart status                                  # Estado actual
+echosmart config gateway --get=polling_interval   # Leer una clave de configuración
+echosmart config sensors --file=/etc/echosmart/sensors.json --format=json  # Exportar sensores
+echosmart discover server --timeout=5             # Buscar servidor en la red local
+echosmart api gateways --method=GET --path=/api/v1/gateways  # Consumir API backend
+echosmart web serve --host=0.0.0.0 --port=8080    # Servir consola web local
+echosmart server register --url=https://api.echosmart.io --api-key=XXX  # Registrar gateway
+echosmart iso gateway --verify=true               # Verificar imagen ISO del gateway
+echosmart app mobile --pair=true --qr=true        # Emparejar app móvil con QR
+echosmart infra up --profile=dev                  # Levantar infraestructura local
 echosmart calibrate soil --dry=3200 --wet=1400    # Calibrar sensor de suelo
 echosmart list                                    # Listar sensores
 echosmart test all --simulate=true                # Probar todos los sensores
@@ -567,6 +584,22 @@ gateway/
 │   │   ├── cmd_setup.cpp                         # Wizard interactivo de config
 │   │   ├── cmd_status.h                          # Comando `echosmart status`
 │   │   ├── cmd_status.cpp                        # Lee sysinfo + última lectura
+│   │   ├── cmd_config.h                          # Comando `echosmart config <scope>`
+│   │   ├── cmd_config.cpp                        # Gestión y validación de configuración
+│   │   ├── cmd_discover.h                        # Comando `echosmart discover <scope>`
+│   │   ├── cmd_discover.cpp                      # Descubrimiento de sensores, server y red
+│   │   ├── cmd_api.h                             # Comando `echosmart api <resource>`
+│   │   ├── cmd_api.cpp                           # Cliente HTTP/REST del backend
+│   │   ├── cmd_web.h                             # Comando `echosmart web <action>`
+│   │   ├── cmd_web.cpp                           # Servidor/consola web local
+│   │   ├── cmd_server.h                          # Comando `echosmart server <action>`
+│   │   ├── cmd_server.cpp                        # Registro, provision y diagnóstico remoto
+│   │   ├── cmd_iso.h                             # Comando `echosmart iso <target>`
+│   │   ├── cmd_iso.cpp                           # Build/verify/flash de imágenes ISO
+│   │   ├── cmd_app.h                             # Comando `echosmart app <target>`
+│   │   ├── cmd_app.cpp                           # Integración con web/mobile/desktop
+│   │   ├── cmd_infra.h                           # Comando `echosmart infra <action>`
+│   │   ├── cmd_infra.cpp                         # Docker, compose, health, backup
 │   │   ├── cmd_calibrate.h                       # Comando `echosmart calibrate <sensor>`
 │   │   ├── cmd_calibrate.cpp                     # Calibración de sensor
 │   │   ├── cmd_list.h                            # Comando `echosmart list`
@@ -650,6 +683,14 @@ gateway/
 │       ├── test_alert_rule.cpp                   # Tests de AlertRule
 │       ├── test_config_loader.cpp                # Tests de ConfigLoader
 │       ├── test_json_formatter.cpp               # Tests de JSON
+│       ├── test_cmd_config.cpp                   # Tests comando config
+│       ├── test_cmd_discover.cpp                 # Tests comando discover
+│       ├── test_cmd_api.cpp                      # Tests comando api
+│       ├── test_cmd_web.cpp                      # Tests comando web
+│       ├── test_cmd_server.cpp                   # Tests comando server
+│       ├── test_cmd_iso.cpp                      # Tests comando iso
+│       ├── test_cmd_app.cpp                      # Tests comando app
+│       ├── test_cmd_infra.cpp                    # Tests comando infra
 │       ├── test_ds18b20.cpp                      # Tests DS18B20
 │       ├── test_dht22.cpp                        # Tests DHT22
 │       ├── test_bh1750.cpp                       # Tests BH1750
@@ -694,7 +735,7 @@ gateway/
 - [ ] Crear `gateway/cpp/main.cpp`
   - [ ] `int main(int argc, char* argv[])` — parsear args, dispatch a comando
   - [ ] Si `argc < 2` → imprimir ayuda y salir con código 1
-  - [ ] Mapa de comandos: `{"read", "sysinfo", "run", "setup", "status", "calibrate", "list", "test", "version", "help"}`
+  - [ ] Mapa de comandos: `{"read", "sysinfo", "run", "setup", "status", "config", "discover", "api", "web", "server", "iso", "app", "infra", "calibrate", "list", "test", "version", "help"}`
   - [ ] Dispatch: `cmd_map[argv[1]](argc, argv)` → código de salida
   - [ ] Comando desconocido → `"error: unknown command '<cmd>'. Run 'echosmart help'.\n"` + exit 1
 - [ ] Crear `gateway/cpp/cli.h`
@@ -911,6 +952,62 @@ gateway/
 #### 1.6.2 Comandos adicionales
 - [ ] `commands/cmd_setup.h/.cpp` — wizard interactivo, escribe `/etc/echosmart/gateway.env`
 - [ ] `commands/cmd_status.h/.cpp` — sysinfo + última lectura de cada sensor
+- [ ] `commands/cmd_config.h/.cpp` — gestión de configuración
+  - [ ] `echosmart config gateway --get=<key>` — leer clave en `gateway.env`
+  - [ ] `echosmart config gateway --set=<key> --value=<val>` — actualizar clave en `gateway.env`
+  - [ ] `echosmart config sensors --file=<path>` — validar y exportar `sensors.json`
+  - [ ] `echosmart config calibration --file=<path>` — validar `calibration.json`
+  - [ ] `echosmart config validate --file=<path>` — verificar formato de config
+  - [ ] `echosmart config export --format=json|text` — exportar configuración consolidada
+  - [ ] `echosmart config import --file=<path>` — importar configuración y hacer backup previo
+  - [ ] `echosmart config doctor --check=true` — detectar claves faltantes o inválidas
+- [ ] `commands/cmd_discover.h/.cpp` — descubrimiento local
+  - [ ] `echosmart discover sensors --timeout=<sec>` — detectar buses I2C, 1-Wire y UART
+  - [ ] `echosmart discover server --network=<cidr>` — localizar `echosmart-server.local`
+  - [ ] `echosmart discover web --port=<port>` — verificar consola web local
+  - [ ] `echosmart discover app --qr=true` — preparar pairing con apps cliente
+  - [ ] `echosmart discover infra --profile=dev` — detectar dependencias locales (docker, mosquitto, db)
+- [ ] `commands/cmd_api.h/.cpp` — cliente genérico de API backend
+  - [ ] `echosmart api auth --method=POST --path=/api/v1/auth/login --body=<json>`
+  - [ ] `echosmart api gateways --method=GET --path=/api/v1/gateways`
+  - [ ] `echosmart api sensors --method=GET --path=/api/v1/sensors`
+  - [ ] `echosmart api config --method=PUT --path=/api/v1/gateways/{id}/config`
+  - [ ] `echosmart api reports --method=POST --path=/api/v1/reports`
+  - [ ] Soportar `--token=<jwt>`, `--header=<key:value>`, `--output=<file>`
+- [ ] `commands/cmd_web.h/.cpp` — consola/bridge web local
+  - [ ] `echosmart web serve --host=<host> --port=<port>` — servir panel local
+  - [ ] `echosmart web open --url=<url>` — abrir UI web del gateway
+  - [ ] `echosmart web assets --profile=dev|prod` — validar assets web embebidos
+  - [ ] `echosmart web proxy --target=<backend>` — proxy a API backend para debug
+  - [ ] `echosmart web health --format=json|text` — estado del bridge web
+- [ ] `commands/cmd_server.h/.cpp` — relación con servidor cloud
+  - [ ] `echosmart server register --url=<server> --api-key=<key>` — registrar gateway
+  - [ ] `echosmart server heartbeat --gateway-id=<id>` — enviar heartbeat
+  - [ ] `echosmart server diagnostics --gateway-id=<id>` — enviar sysinfo + sensores
+  - [ ] `echosmart server provision --gateway-id=<id>` — descargar config, mqtt creds y políticas
+  - [ ] `echosmart server update --gateway-id=<id>` — consultar actualización disponible
+  - [ ] `echosmart server unpair --gateway-id=<id>` — desvincular gateway del tenant
+- [ ] `commands/cmd_iso.h/.cpp` — imágenes ISO
+  - [ ] `echosmart iso gateway --build=true --version=<semver>` — construir imagen RPi
+  - [ ] `echosmart iso gateway --verify=true --file=<img>` — verificar checksum y estructura
+  - [ ] `echosmart iso gateway --flash=<device>` — flashear a microSD
+  - [ ] `echosmart iso server --build=true` — construir ISO del servidor
+  - [ ] `echosmart iso server --verify=true --file=<iso>` — verificar ISO del servidor
+  - [ ] `echosmart iso catalog --format=json` — listar artefactos disponibles
+- [ ] `commands/cmd_app.h/.cpp` — integración con apps cliente
+  - [ ] `echosmart app web --open=true` — abrir dashboard web asociado
+  - [ ] `echosmart app mobile --pair=true --qr=true` — generar pairing QR móvil
+  - [ ] `echosmart app desktop --pair=true` — registrar app desktop con gateway
+  - [ ] `echosmart app notify --platform=mobile --body=<json>` — enviar evento de prueba
+  - [ ] `echosmart app bundle --platform=web|mobile|desktop` — preparar bundle de integración
+- [ ] `commands/cmd_infra.h/.cpp` — operaciones de infraestructura
+  - [ ] `echosmart infra up --profile=dev|staging|prod` — levantar stack
+  - [ ] `echosmart infra down --profile=dev|staging|prod` — detener stack
+  - [ ] `echosmart infra status --profile=dev|staging|prod` — health global
+  - [ ] `echosmart infra logs --service=<name>` — logs agregados por servicio
+  - [ ] `echosmart infra backup --target=db|config|all` — backup manual
+  - [ ] `echosmart infra restore --file=<archive>` — restaurar backup
+  - [ ] `echosmart infra doctor --check=true` — dependencias, puertos y conectividad
 - [ ] `commands/cmd_calibrate.h/.cpp` — `echosmart calibrate soil --dry=3200 --wet=1400`
 - [ ] `commands/cmd_list.h/.cpp` — listar sensores de `sensors.json`
 - [ ] `commands/cmd_test.h/.cpp` — probar sensores, imprimir PASS/FAIL
@@ -1057,6 +1154,14 @@ gateway/
 - [ ] Test de integración: `echosmart read invalid_sensor` → exit code ≠ 0
 - [ ] Test de integración: `echosmart run --simulate=true --once=true` → log "polling cycle start" y "polling cycle end"
 - [ ] Test de integración: `echosmart version` → contiene "1.0.0"
+- [ ] Test de integración: `echosmart config gateway --format=json` → retorna JSON válido
+- [ ] Test de integración: `echosmart discover sensors --timeout=1` → retorna lista o estado vacío válido
+- [ ] Test de integración: `echosmart api gateways --method=GET --path=/api/v1/gateways` con mock server → 200 OK
+- [ ] Test de integración: `echosmart web health --format=json` → estructura de health válida
+- [ ] Test de integración: `echosmart server register --url=http://localhost:8000 --api-key=test` con mock → provisioning OK
+- [ ] Test de integración: `echosmart iso gateway --verify=true --file=/tmp/test.img` → validación correcta
+- [ ] Test de integración: `echosmart app mobile --pair=true --qr=true` → payload de pairing válido
+- [ ] Test de integración: `echosmart infra doctor --check=true` → reporte de dependencias
 - [ ] Test de integración: verificar .deb se construye sin errores
 
 ### 1.8 Comunicaciones (MQTT + HTTP Sync)
@@ -1116,6 +1221,15 @@ gateway/
   - [ ] `GET /api/config` — lee `/etc/echosmart/gateway.env`
   - [ ] `POST /api/config` — actualiza configuración y reinicia servicio
   - [ ] `POST /api/restart` — `systemctl restart echosmart-gateway` (servicio systemd)
+- [ ] Exponer bridge para comandos de plataforma:
+  - [ ] `POST /api/cli/config/validate` — ejecuta `echosmart config validate`
+  - [ ] `POST /api/cli/discover/server` — ejecuta `echosmart discover server`
+  - [ ] `POST /api/cli/api/proxy` — ejecuta `echosmart api <resource>`
+  - [ ] `POST /api/cli/web/serve` — ejecuta `echosmart web serve`
+  - [ ] `POST /api/cli/server/provision` — ejecuta `echosmart server provision`
+  - [ ] `POST /api/cli/iso/verify` — ejecuta `echosmart iso <target> --verify=true`
+  - [ ] `POST /api/cli/app/pair` — ejecuta `echosmart app <target> --pair=true`
+  - [ ] `POST /api/cli/infra/doctor` — ejecuta `echosmart infra doctor --check=true`
 - [ ] Identificación del gateway: hostname, MAC, serial, versión
 - [ ] Tests: descubrimiento, API local, actualización de config
 
@@ -1132,7 +1246,7 @@ gateway/
   - [ ] Instrucciones de compilación: `cmake -S cpp -B build && cmake --build build`
   - [ ] Instrucciones de testing: `ctest --test-dir build --output-on-failure`
   - [ ] Instrucciones de empaquetado: `cd gateway && dpkg-buildpackage -b -us -uc`
-  - [ ] Tabla de binarios con todos sus flags y sub-comandos
+  - [ ] Tabla del comando unificado `echosmart` con todos sus comandos, inputs y argumentos
   - [ ] Tabla de archivos `.h`, `.cpp`, `.qml`, `.qrc`, `.ui` con descripción
 
 ---
@@ -1452,6 +1566,11 @@ gateway/
   - [ ] `GET /{id}/status` — Estado de salud del gateway
   - [ ] `POST /{id}/restart` — Reiniciar gateway remotamente
   - [ ] `PUT /{id}/config` — Actualizar configuración remota
+  - [ ] `POST /{id}/provision` — Entregar config, MQTT creds y artefactos al comando `echosmart server provision`
+  - [ ] `POST /{id}/heartbeat` — Endpoint para `echosmart server heartbeat`
+  - [ ] `POST /{id}/diagnostics` — Recibir sysinfo y health checks del comando `echosmart server diagnostics`
+  - [ ] `GET /{id}/commands` — Cola de comandos remotos pendientes para el gateway
+  - [ ] `POST /{id}/commands/{command_id}/ack` — Confirmar ejecución remota
 - [ ] **Alerts Router** (`/api/v1/alerts`):
   - [ ] `GET /` — Listar alertas (filtros: severity, status, sensor, date)
   - [ ] `GET /{id}` — Detalle de alerta
@@ -1486,6 +1605,20 @@ gateway/
   - [ ] `GET /charts/readings` — Datos para gráficas de lecturas (24h/7d/30d)
   - [ ] `GET /charts/alerts` — Timeline de alertas
   - [ ] `GET /map` — Datos geoespaciales de sensores/gateways
+- [ ] **Config Router** (`/api/v1/config`):
+  - [ ] `GET /schema` — Schema de `gateway.env`, `sensors.json`, `calibration.json`
+  - [ ] `GET /templates` — Plantillas default para `echosmart config export`
+  - [ ] `POST /validate` — Validar archivos enviados por `echosmart config validate`
+  - [ ] `POST /import` — Importar configuración desde CLI o portal
+- [ ] **Artifacts Router** (`/api/v1/artifacts`):
+  - [ ] `GET /iso/gateway/latest` — Última imagen gateway para `echosmart iso gateway`
+  - [ ] `GET /iso/server/latest` — Última imagen server para `echosmart iso server`
+  - [ ] `GET /deb/gateway/latest` — Último paquete `.deb`
+  - [ ] `GET /checksums/{artifact}` — SHA256 de artefactos
+- [ ] **Apps Router** (`/api/v1/apps`):
+  - [ ] `POST /pair` — Pairing móvil/desktop desde `echosmart app <target>`
+  - [ ] `GET /bundle/{platform}` — Bundle/config para integración de app
+  - [ ] `POST /notify/test` — Notificación de prueba para `echosmart app notify`
 - [ ] Agregar dependency injection en cada router (servicio como dependencia)
 - [ ] Agregar respuestas estándar: `200`, `201`, `204`, `400`, `401`, `403`, `404`, `409`, `422`, `500`
 - [ ] Agregar documentación OpenAPI (descriptions, examples, tags)
@@ -1927,6 +2060,11 @@ frontend/src/
   - [ ] `/reports` → ReportsPage (MainLayout)
   - [ ] `/gateways` → GatewaysPage (MainLayout)
   - [ ] `/gateways/:id` → GatewayDetailPage (MainLayout)
+  - [ ] `/gateway-console` → GatewayConsolePage (MainLayout)
+  - [ ] `/gateway-config` → GatewayConfigPage (MainLayout)
+  - [ ] `/provisioning` → ProvisioningPage (MainLayout)
+  - [ ] `/artifacts/iso` → IsoArtifactsPage (MainLayout)
+  - [ ] `/apps/integrations` → AppIntegrationsPage (MainLayout)
   - [ ] `/settings` → SettingsPage (MainLayout)
   - [ ] `/admin/users` → UsersPage (MainLayout, admin only)
   - [ ] `/admin/tenants` → TenantsPage (MainLayout, admin only)
@@ -1935,6 +2073,7 @@ frontend/src/
 - [ ] Loading fallback con Spinner componente
 - [ ] Error boundary con página de error amigable
 - [ ] Tests: navegación entre rutas, guards, redirects, 404
+- [ ] Agregar sección "CLI snippets" en la UI para copiar comandos `echosmart api`, `echosmart server`, `echosmart iso`, `echosmart app`
 
 ### 3.6 Feature: Autenticación
 
@@ -2694,6 +2833,13 @@ mobile/src/
 
 ### 4.8 Funcionalidades Nativas
 
+- [ ] **Pairing y Deep Link con `echosmart app`**:
+  - [ ] Generar QR de pairing desde el gateway (`echosmart app mobile --pair=true --qr=true`)
+  - [ ] Escanear QR desde la app y registrar gateway/token local
+  - [ ] Soportar pairing manual por código corto de 6 dígitos
+  - [ ] Deep link: `echosmart://pair?gateway_id=...`
+  - [ ] Tests: pairing QR, pairing manual, deep link correcto
+
 - [ ] **Push Notifications** (Firebase Cloud Messaging):
   - [ ] Configurar `expo-notifications`:
     - [ ] Solicitar permisos al usuario
@@ -3388,6 +3534,15 @@ desktop/
   - [ ] `make build` — Build de producción de todos los componentes
   - [ ] `make iso-server` — Generar ISO del servidor
   - [ ] `make iso-gateway` — Generar ISO del Raspberry Pi
+  - [ ] `make cli-help` — Mostrar matriz de comandos `echosmart`
+  - [ ] `make cli-config-check` — Ejecutar `echosmart config validate`
+  - [ ] `make cli-discover` — Ejecutar `echosmart discover sensors --timeout=3`
+  - [ ] `make cli-api-smoke` — Ejecutar `echosmart api health --method=GET --path=/health`
+  - [ ] `make cli-web-smoke` — Ejecutar `echosmart web health --format=json`
+  - [ ] `make cli-server-smoke` — Ejecutar `echosmart server heartbeat --gateway-id=demo`
+  - [ ] `make cli-iso-verify` — Ejecutar `echosmart iso gateway --verify=true`
+  - [ ] `make cli-app-pair` — Ejecutar `echosmart app mobile --pair=true --qr=true`
+  - [ ] `make cli-infra-doctor` — Ejecutar `echosmart infra doctor --check=true`
   - [ ] Documentar cada target con `make help`
 
 ---
@@ -3474,6 +3629,13 @@ desktop/
     - [ ] `test-backend`: pytest con PostgreSQL service container + coverage
     - [ ] `test-frontend`: vitest con coverage
     - [ ] `test-gateway`: compilar y ejecutar binarios con --simulate
+    - [ ] `test-cli-contract`: validar sintaxis `echosmart <command> <input> --<arg>=<value>` para todos los comandos
+    - [ ] `test-cli-api`: mock server para `echosmart api`
+    - [ ] `test-cli-web`: smoke tests de `echosmart web`
+    - [ ] `test-cli-server`: provisioning y heartbeat mockeados
+    - [ ] `test-cli-iso`: verificar comandos `echosmart iso gateway/server`
+    - [ ] `test-cli-app`: pairing y bundle mockeados
+    - [ ] `test-cli-infra`: doctor/up/down mockeados
     - [ ] `security-scan`: bandit (Python) + npm audit (Node.js) + trivy (Docker)
   - [ ] Reportar cobertura como comentario en PR (codecov/coveralls)
   - [ ] Bloquear merge si cobertura < 80% o lint falla
@@ -3686,6 +3848,7 @@ desktop/
     - [ ] Email "From" (ej: `noreply@echosmart.io`)
   - [ ] **Paso 5: Red** — Configurar IP estática o DHCP
   - [ ] **Paso 6: Timezone** — Seleccionar zona horaria
+  - [ ] **Paso 7: Artefactos CLI** — Mostrar comandos `echosmart server`, `echosmart iso server`, `echosmart infra doctor`
 - [ ] Generar todas las credenciales automáticamente:
   - [ ] Contraseña PostgreSQL (32 chars random)
   - [ ] Contraseña InfluxDB (32 chars random)
@@ -3703,6 +3866,8 @@ desktop/
 - [ ] Crear tenant predeterminado
 - [ ] Iniciar todos los servicios Docker
 - [ ] Verificar que todos los servicios están healthy
+- [ ] Publicar endpoint de provisioning para `echosmart server provision`
+- [ ] Publicar catálogo de artefactos para `echosmart iso server --verify=true`
 - [ ] Enviar email de prueba al admin
 - [ ] Imprimir resumen de la instalación con URLs
 
@@ -3815,6 +3980,8 @@ desktop/
   - [ ] **Paso 3: API Key** — Clave de autenticación del gateway (generada en el servidor)
   - [ ] **Paso 4: WiFi** (opcional) — SSID y contraseña de la red WiFi
   - [ ] **Paso 5: IP** — DHCP (default) o IP estática
+  - [ ] **Paso 6: Config CLI** — Ejecutar `echosmart config doctor --check=true`
+  - [ ] **Paso 7: Discover** — Ejecutar `echosmart discover sensors --timeout=3`
 - [ ] Auto-registro del gateway en el servidor:
   - [ ] POST `/api/v1/gateways/register` con API key
   - [ ] Recibir y guardar `gateway_id` y `mqtt_credentials`
@@ -3822,6 +3989,8 @@ desktop/
 - [ ] Verificar conectividad con el servidor
 - [ ] Verificar que los sensores son detectados (I2C, 1-Wire, UART)
 - [ ] Iniciar servicio del gateway
+- [ ] Ejecutar `echosmart server provision --gateway-id=<id>` al finalizar setup
+- [ ] Ejecutar `echosmart web serve --port=8080` como consola local opcional
 - [ ] LED indicator (si RPi tiene LED): parpadeo lento = conectando, fijo = conectado
 
 ### 9.4 Auto-Conexión al Servidor
@@ -4160,6 +4329,18 @@ desktop/
 - [ ] API de provisioning para gateways nuevos
 - [ ] Stripe para pagos recurrentes
 - [ ] Documentación para el usuario final
+- [ ] Generador de snippets CLI por tenant:
+  - [ ] Botón "Copiar `echosmart server register ...`"
+  - [ ] Botón "Copiar `echosmart api gateways --method=GET ...`"
+  - [ ] Botón "Copiar `echosmart config gateway --get=polling_interval`"
+  - [ ] Botón "Copiar `echosmart iso gateway --verify=true`"
+  - [ ] Botón "Copiar `echosmart app mobile --pair=true --qr=true`"
+- [ ] Portal de descargas:
+  - [ ] Último `.deb` del gateway
+  - [ ] Última ISO del gateway
+  - [ ] Última ISO del servidor
+  - [ ] Checksums SHA256
+  - [ ] Historial de versiones
 
 ### 12.9 Logística y Envío
 
