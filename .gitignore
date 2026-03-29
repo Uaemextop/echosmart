@@ -88,3 +88,5 @@ tmp/
 # EchoSmart PHP site credentials (never commit)
 hosting/site/includes/config.php
 hosting/site/logs/*.log
+hosting/site/includes/config.php
+hosting/site/logs/

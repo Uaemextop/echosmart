@@ -152,38 +152,56 @@ The email signature template uses placeholders `{{NAME}}`, `{{TITLE}}`, `{{EMAIL
 
 ---
 
-## WordPress
+## Web Application (Custom PHP + HTML/CSS/JS)
 
-| Item       | URL / Value                                |
-|------------|--------------------------------------------|
-| Site       | https://echosmart.me                       |
-| Admin      | https://echosmart.me/wp-admin/             |
-| PHP        | 8.2.30                                     |
-| Site Name  | EchoSmart                                  |
-| Tagline    | Smart IoT Monitoring Solutions             |
-| Timezone   | America/Mexico_City                        |
-| Admin Email| admin@echosmart.me                         |
+WordPress was removed and replaced with a custom-built web application.
 
-### WordPress Security
+### Pages
+
+| URL                          | Description                                |
+|------------------------------|--------------------------------------------|
+| https://echosmart.me         | Landing page (hero, features, pricing, contact) |
+| https://echosmart.me/login.html | User login                               |
+| https://echosmart.me/register.html | User registration (serial + account)  |
+| https://echosmart.me/dashboard.html | Dashboard with live sensor data      |
+| https://echosmart.me/forgot-password.html | Password recovery              |
+| https://echosmart.me/webmail/ | Branded webmail portal                    |
+
+### Backend API
+
+| Endpoint               | Method | Description                          |
+|------------------------|--------|--------------------------------------|
+| `/api/auth.php`        | POST   | Auth (login, register, logout, me, forgot-password, reset-password) |
+| `/api/contact.php`     | POST   | Contact form submission              |
+
+### Database
+
+| Item     | Value                     |
+|----------|---------------------------|
+| Name     | eduardoc3677_esmart       |
+| User     | eduardoc3677_esmart       |
+| Engine   | MariaDB / InnoDB          |
+| Tables   | users, sessions, password_resets, contact_messages |
+
+### SMTP (Email Sending)
+
+Transactional emails sent via authenticated SMTP over SSL:
+- **From:** `noreply@echosmart.me` (EchoSmart)
+- **Server:** `mail.echosmart.me:465` (SSL)
+- **Emails:** Welcome, password reset, contact notification
+
+### Security
 
 | Setting | Status |
 |---------|--------|
-| Force SSL Admin | ✅ `FORCE_SSL_ADMIN = true` |
-| Disable File Editing | ✅ `DISALLOW_FILE_EDIT = true` |
-| XML-RPC Blocked | ✅ via `.htaccess` |
+| HTTPS Forced | ✅ via `.htaccess` |
 | HSTS Header | ✅ `max-age=31536000; includeSubDomains; preload` |
 | X-Content-Type-Options | ✅ `nosniff` |
 | X-Frame-Options | ✅ `SAMEORIGIN` |
 | X-XSS-Protection | ✅ `1; mode=block` |
-| wp-admin Basic Auth | ✅ Password-protected directory |
-| LiteSpeed Cache | ✅ Active |
-
-### WordPress SMTP (Secure Email Sending)
-
-WordPress sends all emails via authenticated SMTP over SSL:
-- **From:** `noreply@echosmart.me` (EchoSmart)
-- **Server:** `mail.echosmart.me:465` (SSL)
-- **Plugins:** WP Mail SMTP + GoSMTP Pro
+| includes/ blocked | ✅ via `.htaccess` |
+| Password hashing | ✅ bcrypt via `password_hash()` |
+| Session tokens | ✅ `bin2hex(random_bytes(32))` with 7-day expiry |
 
 ---
 

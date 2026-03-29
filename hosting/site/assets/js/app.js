@@ -74,7 +74,7 @@ async function checkAuth() {
   const token = localStorage.getItem(APP.TOKEN_KEY);
   if (!token) return null;
   try {
-    const data = await apiCall('auth.php?action=me', null, 'GET');
+    const data = await apiCall('auth.php', { action: 'me' });
     if (data.user) localStorage.setItem(APP.USER_KEY, JSON.stringify(data.user));
     return data.user || data;
   } catch (_) {
