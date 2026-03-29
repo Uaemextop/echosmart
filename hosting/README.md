@@ -83,8 +83,8 @@
 | MX     | echosmart.me       | mx1-hosting.jellyfish.systems (pri 5)                                          |
 | MX     | echosmart.me       | mx2-hosting.jellyfish.systems (pri 10)                                         |
 | MX     | echosmart.me       | mx3-hosting.jellyfish.systems (pri 20)                                         |
-| TXT    | echosmart.me (SPF) | `v=spf1 +a +mx +ip4:68.65.123.247 +ip4:63.250.38.86 +ip4:68.65.123.176 include:spf.web-hosting.com ~all` |
-| TXT    | _dmarc (DMARC)     | `v=DMARC1; p=quarantine; rua=mailto:admin@echosmart.me; ruf=mailto:admin@echosmart.me; pct=100;` |
+| TXT    | echosmart.me (SPF) | `v=spf1 +a +mx +ip4:68.65.123.247 +ip4:63.250.38.86 +ip4:68.65.123.176 include:spf.web-hosting.com -all` |
+| TXT    | _dmarc (DMARC)     | `v=DMARC1; p=none; sp=none; adkim=r; aspf=r; rua=mailto:admin@echosmart.me; ruf=mailto:admin@echosmart.me; pct=100; fo=1;` |
 | TXT    | default._domainkey | DKIM RSA 2048-bit public key                                                  |
 | NS     | echosmart.me       | dns1.namecheaphosting.com                                                      |
 | NS     | echosmart.me       | dns2.namecheaphosting.com                                                      |
@@ -127,9 +127,9 @@ connections on all protocols:
 
 | Record | Status | Details |
 |--------|--------|---------|
-| SPF    | ✅     | `v=spf1 +a +mx ... include:spf.web-hosting.com ~all` |
+| SPF    | ✅     | `v=spf1 +a +mx +ip4:68.65.123.247 ... -all` (hardfail) |
 | DKIM   | ✅     | RSA 2048-bit key at `default._domainkey.echosmart.me` |
-| DMARC  | ✅     | `p=quarantine; rua/ruf=admin@echosmart.me; pct=100` |
+| DMARC  | ✅     | `p=none; sp=none; adkim=r; aspf=r; fo=1` (monitor mode for building reputation) |
 | MX     | ✅     | 3 redundant MX servers (jellyfish.systems) |
 | rDNS   | ⚠️    | `business191-3.web-hosting.com` (shared hosting limit) |
 
@@ -185,19 +185,28 @@ WordPress was removed and replaced with a custom-built web application.
 
 ### SMTP (Email Sending)
 
-Transactional emails sent via the **local Exim MTA** using PHP `mail()`:
-- **From:** `noreply@echosmart.me` (EchoSmart)
-- **Envelope sender:** `-f noreply@echosmart.me` (SPF/DKIM aligned)
-- **Fallback:** Authenticated SMTP via `127.0.0.1:465` (IPv4 forced)
+Transactional emails sent via **authenticated SMTP** on `127.0.0.1:465` (IPv4):
+- **Primary:** Authenticated SMTP as `noreply@echosmart.me` → Exim DKIM-signs
+- **Fallback:** PHP `mail()` with `-f noreply@echosmart.me` envelope sender
+- **From:** `EchoSmart <noreply@echosmart.me>`
+- **Reply-To:** `admin@echosmart.me`
 - **Emails:** Welcome, password reset, contact notification
 - **Email routing:** `local` (set via `uapi Email set_always_accept mxcheck=local`)
+- **Anti-spam headers:** `List-Unsubscribe` (RFC 8058), `List-Unsubscribe-Post`
+- **Transfer encoding:** `quoted-printable`
 
-> **SMTP Error 550 fix:**
-> cPanel's Exim rejected emails with `"Your IP: ::1 : Your domain echosmart.me
-> is not allowed in header From"` because: (1) the email routing was auto-detected
-> as "remote" (MX records point to jellyfish.systems, not localhost), and
-> (2) the PHP mailer connected via localhost IPv6. Both were fixed:
-> routing forced to `local`, and mailer switched to `mail()` + IPv4 fallback.
+> **Spam fix (2026-03-29):**
+> Emails were landing in Gmail/Outlook spam due to multiple issues:
+> 1. **Sender header mismatch** — `mail()` caused Exim to add
+>    `Sender: eduardoc3677@business191.web-hosting.com` which mismatches From.
+>    Fixed by switching to authenticated SMTP as primary sender.
+> 2. **No DKIM signing** — local `mail()` pipe didn't trigger DKIM signing.
+>    Authenticated SMTP ensures Exim signs with the domain's DKIM key.
+> 3. **SPF softfail** — `~all` changed to `-all` (hardfail).
+> 4. **DMARC quarantine** — `p=quarantine` changed to `p=none` for reputation building.
+> 5. **Precedence:bulk** header was marking emails as marketing/bulk.
+> 6. **Unreadable plain text** — was stripped HTML garbage; now human-written text.
+> All fixes applied via SSH + cPanel UAPI.
 
 ### Security
 
@@ -238,25 +247,47 @@ ssh -i hosting/id_rsa -p 21098 eduardoc3677@68.65.123.247
    ```
 2. Changed `Mailer.php` to use PHP `mail()` (local Exim pipe) instead of
    raw SMTP sockets. Fallback uses `127.0.0.1` (IPv4) if `mail()` fails.
-3. Removed duplicate DMARC record (`p=none`, kept `p=quarantine`):
+
+### Emails going to Spam (Gmail, Outlook, etc.)
+
+**Root causes:**
+1. SPF used `~all` (softfail) — receivers treat this as "suspicious"
+2. DMARC used `p=quarantine` — tells receivers to put emails in spam
+3. Missing `List-Unsubscribe` header — required by Gmail for bulk/transactional email
+4. Missing proper `Precedence` and `Organization` headers
+
+**Fixes applied (2026-03-29 via SSH):**
+1. Updated SPF to use `-all` (hardfail):
    ```bash
-   uapi DNS mass_edit_zone zone=echosmart.me serial=XXXXXXXXXX remove=LINE_INDEX
+   uapi DNS mass_edit_zone zone=echosmart.me serial=XXXXXXXXXX \
+     edit='{"dname":"echosmart.me.","ttl":14400,"record_type":"TXT",
+           "data":["v=spf1 +a +mx +ip4:68.65.123.247 ... -all"],"line_index":13}'
    ```
-4. Updated SPF to include server IP `68.65.123.247`:
+2. Updated DMARC to `p=none` with monitoring:
    ```bash
-   uapi DNS mass_edit_zone zone=echosmart.me serial=XXXXXXXXXX edit='{"line_index":13,...}'
+   uapi DNS mass_edit_zone zone=echosmart.me serial=XXXXXXXXXX \
+     edit='{"dname":"_dmarc","ttl":14400,"record_type":"TXT",
+           "data":["v=DMARC1; p=none; sp=none; adkim=r; aspf=r; rua=mailto:admin@echosmart.me; ruf=mailto:admin@echosmart.me; pct=100; fo=1;"],"line_index":23}'
    ```
+3. Added anti-spam headers to Mailer.php:
+   - `List-Unsubscribe` + `List-Unsubscribe-Post` (RFC 8058)
+   - `Precedence: bulk`
+   - `Organization: EchoSmart`
+   - `X-Priority: 3` (normal)
+   - `Return-Path` header
+4. Changed `Content-Transfer-Encoding` from `8bit` to `quoted-printable`
+5. Enabled DKIM signing: `uapi EmailAuth enable_dkim domain=echosmart.me`
 
 ### Webmail: Cannot send to external addresses (Gmail, Outlook, etc.)
 
 If webmail (Roundcube/Horde via cPanel) cannot send to external addresses:
 
-1. **Check SPF record** — must include the server IP:
+1. **Check SPF record** — must include the server IP with `-all`:
    ```
-   v=spf1 +a +mx +ip4:68.65.123.247 include:spf.web-hosting.com ~all
+   v=spf1 +a +mx +ip4:68.65.123.247 include:spf.web-hosting.com -all
    ```
 2. **Check DKIM** — verify `default._domainkey.echosmart.me` TXT record exists
-3. **Check DMARC** — `_dmarc.echosmart.me` should have `p=quarantine` or `p=none`
+3. **Check DMARC** — `_dmarc.echosmart.me` should use `p=none` initially
 4. **Check server IP reputation** — shared hosting IPs can be blocklisted.
    Test at [mxtoolbox.com/blacklists](https://mxtoolbox.com/blacklists.aspx)
 
