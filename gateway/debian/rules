@@ -1,0 +1,60 @@
+#!/usr/bin/make -f
+# Reglas de empaquetado Debian para echosmart-gateway
+# Uso: dpkg-buildpackage -us -uc -b
+
+INSTALL_DIR  = /opt/echosmart/gateway
+BIN_DIR      = /usr/bin
+SERVICE_DIR  = /lib/systemd/system
+CONFIG_DIR   = /etc/echosmart
+SYSINFO_BIN  = debian/echosmart-gateway/usr/bin/echosmart-sysinfo
+
+%:
+	dh $@
+
+override_dh_auto_build:
+	# Compilar el binario C echosmart-sysinfo
+	gcc -O2 -o echosmart-sysinfo c/echosmart-sysinfo.c
+	# Instalar dependencias Python en venv
+	python3 -m venv debian/venv
+	debian/venv/bin/pip install --quiet -r requirements.txt
+
+override_dh_auto_install:
+	# Crear estructura de directorios
+	install -d debian/echosmart-gateway$(INSTALL_DIR)
+	install -d debian/echosmart-gateway$(INSTALL_DIR)/src
+	install -d debian/echosmart-gateway$(INSTALL_DIR)/src/sensor_drivers
+	install -d debian/echosmart-gateway$(BIN_DIR)
+	install -d debian/echosmart-gateway$(SERVICE_DIR)
+	install -d debian/echosmart-gateway$(CONFIG_DIR)
+
+	# Copiar fuentes Python
+	cp -r src/                    debian/echosmart-gateway$(INSTALL_DIR)/
+	cp    main.py __init__.py     debian/echosmart-gateway$(INSTALL_DIR)/
+	cp    requirements.txt        debian/echosmart-gateway$(INSTALL_DIR)/
+	cp    sensors.json            debian/echosmart-gateway$(INSTALL_DIR)/ 2>/dev/null || true
+
+	# Copiar venv
+	cp -r debian/venv             debian/echosmart-gateway$(INSTALL_DIR)/venv
+
+	# Scripts bin
+	install -m 755 bin/echosmart-gateway       debian/echosmart-gateway$(BIN_DIR)/
+	install -m 755 bin/echosmart-gateway-setup debian/echosmart-gateway$(BIN_DIR)/
+
+	# Binario nativo
+	install -m 755 echosmart-sysinfo           debian/echosmart-gateway$(BIN_DIR)/
+
+	# Servicio systemd
+	install -m 644 debian/echosmart-gateway.service \
+	               debian/echosmart-gateway$(SERVICE_DIR)/
+
+	# Config de ejemplo
+	install -m 640 debian/gateway.env.example \
+	               debian/echosmart-gateway$(CONFIG_DIR)/gateway.env.example
+
+override_dh_auto_test:
+	# Los tests requieren pytest; se ejecutan en CI, no durante el empaquetado
+	@echo "Tests omitidos en empaquetado (ejecutar: pytest tests/ -v)"
+
+override_dh_auto_clean:
+	rm -f echosmart-sysinfo
+	rm -rf debian/venv

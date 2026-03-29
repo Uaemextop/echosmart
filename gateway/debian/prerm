@@ -1,0 +1,26 @@
+#!/bin/bash
+# prerm — Script pre-desinstalación del paquete echosmart-gateway
+set -e
+
+SERVICE_NAME="echosmart-gateway"
+
+case "$1" in
+remove|upgrade|failed-upgrade|deconfigure)
+    # Detener y deshabilitar el servicio si systemd está disponible
+    if command -v systemctl &>/dev/null && systemctl --version &>/dev/null 2>&1; then
+        if systemctl is-active --quiet "${SERVICE_NAME}" 2>/dev/null; then
+            systemctl stop "${SERVICE_NAME}" || true
+        fi
+        if systemctl is-enabled --quiet "${SERVICE_NAME}" 2>/dev/null; then
+            systemctl disable "${SERVICE_NAME}" || true
+        fi
+    fi
+    ;;
+*)
+    echo "prerm called with unknown argument \`$1'" >&2
+    exit 1
+    ;;
+esac
+
+#DEBHELPER#
+exit 0

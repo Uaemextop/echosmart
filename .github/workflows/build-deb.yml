@@ -1,0 +1,110 @@
+name: Build .deb Package
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Versión del paquete (sin 'v', ej: 1.0.0)"
+        required: true
+        default: "1.0.0"
+
+permissions:
+  contents: write
+
+jobs:
+  build-deb:
+    name: Build echosmart-gateway .deb
+    runs-on: ubuntu-22.04
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends \
+            dpkg-dev debhelper devscripts build-essential \
+            python3-venv python3-pip gcc
+
+      - name: Determine version
+        id: version
+        run: |
+          if [[ "${GITHUB_REF}" == refs/tags/v* ]]; then
+            VERSION="${GITHUB_REF#refs/tags/v}"
+          else
+            VERSION="${{ github.event.inputs.version || '1.0.0' }}"
+          fi
+          echo "VERSION=${VERSION}" | tee -a "${GITHUB_ENV}"
+          echo "version=${VERSION}" >> "${GITHUB_OUTPUT}"
+
+      - name: Update debian/changelog version
+        run: |
+          sed -i "s/echosmart-gateway (.*)/echosmart-gateway (${VERSION}-1)/" \
+            gateway/debian/changelog
+
+      - name: Install gateway Python dependencies
+        run: |
+          cd gateway
+          pip install -r requirements.txt
+
+      - name: Run gateway tests before packaging
+        run: |
+          cd gateway
+          pip install pytest pytest-cov
+          python -m pytest tests/ -v --tb=short
+
+      - name: Compile C sysinfo binary
+        run: |
+          gcc -O2 -o gateway/echosmart-sysinfo gateway/c/echosmart-sysinfo.c
+
+      - name: Build .deb package
+        run: |
+          cd gateway
+          dpkg-buildpackage -us -uc -b --build=binary
+
+      - name: List generated packages
+        run: ls -lh ../*.deb 2>/dev/null || ls -lh *.deb 2>/dev/null || find . -name "*.deb"
+
+      - name: Upload .deb artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: echosmart-gateway-${{ steps.version.outputs.version }}-arm64.deb
+          path: "**/*.deb"
+          retention-days: 90
+
+      - name: Create GitHub Release and attach .deb
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: "EchoSmart Gateway v${{ steps.version.outputs.version }}"
+          body: |
+            ## EchoSmart Gateway v${{ steps.version.outputs.version }}
+
+            ### Instalación en Raspberry Pi
+
+            ```bash
+            # Descargar e instalar el paquete
+            wget https://github.com/Uaemextop/echosmart/releases/download/${{ github.ref_name }}/echosmart-gateway_${{ steps.version.outputs.version }}-1_arm64.deb
+            sudo dpkg -i echosmart-gateway_${{ steps.version.outputs.version }}-1_arm64.deb
+
+            # Ejecutar el asistente de configuración
+            sudo echosmart-gateway-setup
+            ```
+
+            ### Contenido del paquete
+            - `echosmart-gateway` — CLI + daemon systemd
+            - `echosmart-gateway-setup` — Asistente de configuración
+            - `echosmart-sysinfo` — Diagnóstico nativo del sistema (binario C)
+            - Servicio systemd con restart automático
+          files: "**/*.deb"
+          draft: false
+          prerelease: false

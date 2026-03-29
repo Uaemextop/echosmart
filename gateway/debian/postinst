@@ -1,0 +1,52 @@
+#!/bin/bash
+# postinst — Script post-instalación del paquete echosmart-gateway
+set -e
+
+INSTALL_DIR="/opt/echosmart/gateway"
+SERVICE_NAME="echosmart-gateway"
+
+case "$1" in
+configure)
+    # Crear usuario de sistema si no existe
+    if ! id -u echosmart &>/dev/null; then
+        adduser --system --group --no-create-home \
+                --home "${INSTALL_DIR}" \
+                --shell /usr/sbin/nologin \
+                echosmart
+    fi
+
+    # Asegurar permisos correctos
+    chown -R echosmart:echosmart "${INSTALL_DIR}"
+    chmod 750 "${INSTALL_DIR}"
+
+    # Crear directorio de configuración si no existe
+    mkdir -p /etc/echosmart
+    chown root:echosmart /etc/echosmart
+    chmod 750 /etc/echosmart
+
+    # Recargar demonios de systemd
+    if command -v systemctl &>/dev/null && systemctl --version &>/dev/null 2>&1; then
+        systemctl daemon-reload
+    fi
+
+    echo ""
+    echo "  ┌─────────────────────────────────────────────────────────────┐"
+    echo "  │         EchoSmart Gateway instalado correctamente          │"
+    echo "  │                                                             │"
+    echo "  │  Ejecuta el asistente de configuración para comenzar:      │"
+    echo "  │    sudo echosmart-gateway-setup                             │"
+    echo "  │                                                             │"
+    echo "  │  O configura manualmente: /etc/echosmart/gateway.env        │"
+    echo "  └─────────────────────────────────────────────────────────────┘"
+    echo ""
+    ;;
+abort-upgrade|abort-remove|abort-deconfigure)
+    ;;
+*)
+    echo "postinst called with unknown argument \`$1'" >&2
+    exit 1
+    ;;
+esac
+
+#DEBHELPER#
+exit 0

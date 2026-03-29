@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+# echosmart-gateway — Wrapper binario para el CLI del EchoSmart Gateway
+# Instalado en /usr/bin/echosmart-gateway por el paquete .deb
+set -euo pipefail
+
+INSTALL_DIR="/opt/echosmart/gateway"
+VENV_PYTHON="${INSTALL_DIR}/venv/bin/python"
+CLI_MODULE="gateway.src.cli"
+
+# Detectar Python: preferir el venv instalado, caer a python3 del sistema
+if [[ -x "${VENV_PYTHON}" ]]; then
+    exec "${VENV_PYTHON}" -m "${CLI_MODULE}" "$@"
+elif command -v python3 &>/dev/null; then
+    # Desarrollo local — asumir que el repo está en el PYTHONPATH
+    exec python3 -m "${CLI_MODULE}" "$@"
+else
+    echo "Error: no se encontró Python 3. Instale python3 o el paquete echosmart-gateway." >&2
+    exit 1
+fi

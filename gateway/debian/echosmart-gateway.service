@@ -1,0 +1,28 @@
+[Unit]
+Description=EchoSmart Gateway — Monitoreo ambiental para Raspberry Pi
+Documentation=https://github.com/Uaemextop/echosmart/blob/main/docs/gateway-edge-computing.md
+After=network-online.target mosquitto.service
+Wants=network-online.target
+Requires=mosquitto.service
+
+[Service]
+Type=simple
+User=echosmart
+Group=echosmart
+WorkingDirectory=/opt/echosmart/gateway
+EnvironmentFile=-/etc/echosmart/gateway.env
+ExecStart=/usr/bin/echosmart-gateway run
+ExecReload=/bin/kill -HUP $MAINPID
+Restart=on-failure
+RestartSec=10
+TimeoutStopSec=20
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=echosmart-gateway
+NoNewPrivileges=yes
+ProtectSystem=strict
+ReadWritePaths=/var/lib/echosmart /etc/echosmart
+PrivateTmp=yes
+
+[Install]
+WantedBy=multi-user.target

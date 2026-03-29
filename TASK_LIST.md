@@ -3684,6 +3684,8 @@ desktop/
 | **Backend (Cloud)** | FastAPI · PostgreSQL · InfluxDB · Redis | `backend/` | 🟡 Scaffolding completo |
 | **Frontend (Web)** | React 18 · Vite · Redux Toolkit · Recharts | `frontend/` | 🟡 Scaffolding completo |
 | **Gateway (Edge)** | Python · Raspberry Pi · SQLite · MQTT | `gateway/` | 🟡 Scaffolding completo |
+| **Gateway CLI** | Python CLI + Bash wrapper + C sysinfo | `gateway/bin/`, `gateway/c/` | 🟢 Implementado |
+| **Paquete .deb** | dpkg · debhelper · systemd | `gateway/debian/` | 🟢 Listo para build |
 | **Móvil (Android)** | React Native · Expo | `mobile/` | 🟠 Estructura inicial |
 | **Móvil (iOS)** | React Native · Expo | `mobile/` | 🟠 Estructura inicial |
 | **Escritorio (Windows)** | Electron · React | `desktop/` | 🟠 Estructura inicial |
@@ -3712,7 +3714,8 @@ desktop/
 | 9 | **ISO Raspberry Pi Gateway** | 26–28 | ~100 | 🟠 Pendiente |
 | 10 | Features Avanzadas | 29+ | ~80 | 🟠 Pendiente |
 | 11 | Testing con Hardware Real | Final | ~40 | 🟠 Pendiente |
-| | **TOTAL** | | **~1640+** | |
+| 12 | **Producción y Comercialización** | Post-v1 | ~55 | 🟡 En progreso |
+| | **TOTAL** | | **~1695+** | |
 
 ## Resumen de Assets Generados
 
@@ -3742,4 +3745,110 @@ desktop/
 
 ---
 
-*Última actualización: 25 de marzo de 2026*
+## Fase 12: Producción y Comercialización del Kit (Post-v1)
+
+> 🚀 **Objetivo**: Convertir el proyecto EchoSmart en un producto comercial vendible. Incluye empaquetado .deb, binarios nativos para Raspberry Pi OS, documentación del kit, BOM, precios y pipeline de CI/CD para releases automatizados.
+
+### 12.1 Empaquetado .deb del Gateway
+
+- [x] Crear `gateway/debian/control` — metadatos del paquete Debian
+- [x] Crear `gateway/debian/rules` — reglas de compilación (debhelper)
+- [x] Crear `gateway/debian/postinst` — script post-instalación (crear usuario, systemd, mensaje de bienvenida)
+- [x] Crear `gateway/debian/prerm` — script pre-desinstalación (detener servicio)
+- [x] Crear `gateway/debian/changelog` — historial de versiones del paquete
+- [x] Crear `gateway/debian/compat` — nivel de compatibilidad debhelper
+- [x] Crear `gateway/debian/echosmart-gateway.service` — servicio systemd endurecido (NoNewPrivileges, ProtectSystem)
+- [x] Crear `gateway/debian/gateway.env.example` — plantilla de configuración
+- [ ] Probar build del .deb nativo en Raspberry Pi OS arm64
+- [ ] Probar build cross-compilado en Ubuntu x86-64 con dpkg-buildpackage
+- [ ] Firmar el paquete .deb con GPG para distribución oficial
+
+### 12.2 CLI del Gateway (`echosmart-gateway`)
+
+- [x] Implementar `gateway/src/cli.py` con sub-comandos: `run`, `status`, `test-sensors`, `version`
+- [x] Crear `gateway/bin/echosmart-gateway` — wrapper bash que detecta venv vs sistema
+- [x] Agregar flag `--log-level` global y `--simulate` en `run` y `test-sensors`
+- [x] Tests del CLI en `gateway/tests/test_cli.py` (9 tests: parser + sub-comandos)
+- [ ] Agregar sub-comando `config` — editar/mostrar variables de entorno desde CLI
+- [ ] Agregar sub-comando `update` — actualizar el paquete vía apt
+- [ ] Agregar sub-comando `logs` — tail de journald desde la CLI
+
+### 12.3 Asistente de Configuración (`echosmart-gateway-setup`)
+
+- [x] Crear `gateway/bin/echosmart-gateway-setup` — wizard bash interactivo
+- [x] Flujo de 4 pasos: red cloud → identidad → MQTT → escribir config
+- [x] Habilitar y arrancar servicio systemd al final del wizard
+- [x] Resumen final con comandos útiles
+- [ ] Agregar validación de conectividad al cloud (curl antes de guardar)
+- [ ] Agregar opción `--non-interactive` para automatización (CI/producción)
+- [ ] Test del wizard en CI con expect/autoexpect
+
+### 12.4 Binario Nativo C (`echosmart-sysinfo`)
+
+- [x] Implementar `gateway/c/echosmart-sysinfo.c` — diagnóstico del sistema
+- [x] Sub-comandos: `(sin args)` = JSON · `--check` = health check · `--version`
+- [x] Métricas: hostname, OS, arch, uptime, temperatura CPU, RAM libre, disco libre
+- [x] Umbrales de salud: RAM < 128 MB, disco < 512 MB, CPU > 80 °C
+- [ ] Compilar y probar en RPi OS arm64 (gcc nativo o cross-compiler)
+- [ ] Integrar `echosmart-sysinfo --check` en el servicio systemd como `ExecStartPre`
+- [ ] Publicar binarios pre-compilados en cada GitHub Release
+
+### 12.5 Makefile Raíz
+
+- [x] Crear `Makefile` en la raíz con targets: `help`, `install`, `gateway-lint`, `frontend-lint`, `lint`, `gateway-test`, `backend-test`, `test`, `build`, `deb`, `docker-up`, `docker-down`, `clean`, `gateway-run-sim`
+- [ ] Agregar target `release` — genera tag Git, build .deb y publica en GitHub Releases
+- [ ] Agregar target `flash` — flashea imagen ISO en microSD automáticamente
+- [ ] Agregar target `qa` — ejecuta checklist de QA en el hardware real
+
+### 12.6 CI/CD para Releases
+
+- [x] Crear `.github/workflows/build-deb.yml` — activa en `v*` tags y workflow_dispatch
+- [x] Incluir: Python 3.11, dependencias Debian, tests del gateway, compilar C, build .deb
+- [x] Subir artefacto `.deb` a GitHub Releases con notas de release automáticas
+- [ ] Agregar firma GPG de los artefactos con `debsigs`
+- [ ] Crear repositorio APT (ppa-like) en `gh-pages` con `reprepro`
+- [ ] Configurar notificaciones de Slack/email en releases exitosos
+- [ ] Agregar job de smoke test post-release en QEMU arm64
+
+### 12.7 Documentación del Kit Comercial
+
+- [x] Crear `docs/production-kit.md` — BOM, costos, precios de venta, guía de ensamblaje, QA checklist, logística, certificaciones
+- [x] Crear `docs/deb-packaging.md` — cómo construir e instalar el .deb, comandos CLI, gestión systemd, resolución de problemas
+- [x] Actualizar `docs/README.md` con los nuevos documentos
+- [x] Actualizar `TASK_LIST.md` con Fase 12 y resumen de plataformas
+- [ ] Crear `docs/sales-guide.md` — argumentario de ventas, comparativa competidores, demos, preguntas frecuentes
+- [ ] Crear `docs/distributor-onboarding.md` — proceso de registro de distribuidores, descuentos por volumen, portal de pedidos
+- [ ] Traducir `docs/production-kit.md` al inglés para mercado internacional
+- [ ] Crear video tutorial de instalación (guión + grabación)
+
+### 12.8 Imagen ISO del Gateway (para kit listo-para-usar)
+
+> Ver también **Fase 9: ISO Personalizado del Raspberry Pi Gateway** para la generación con pi-gen.
+
+- [ ] Integrar paquete `echosmart-gateway` en el pipeline de pi-gen
+- [ ] Pre-instalar SIMULATION_MODE=false en la imagen final de producción
+- [ ] Generar imágenes de 3 tamaños: 16 GB · 32 GB · 64 GB
+- [ ] Subir imágenes comprimidas (.img.xz) a GitHub Releases junto con el .deb
+- [ ] Publicar checksums SHA-256 verificables para cada imagen
+- [ ] Probar la imagen en RPi 3B, RPi 4B y RPi 5
+
+### 12.9 Portal del Cliente (SaaS)
+
+- [ ] Página de landing del kit: `echosmart.io/kit`
+- [ ] Formulario de compra con integración Stripe
+- [ ] Dashboard para distribuidores: inventario, pedidos, comisiones
+- [ ] Sistema de códigos de activación (tarjeta incluida en el kit)
+- [ ] Onboarding automatizado: registro → activar kit → configurar sensores → primera lectura
+- [ ] Email transaccional: bienvenida, activación, alertas de soporte
+
+### 12.10 BOM y Proveedores
+
+- [x] Lista de materiales completa con costos en `docs/production-kit.md`
+- [ ] Crear `bom/` con archivos CSV/Excel para ordenes a proveedores
+- [ ] Comparar 3 proveedores por componente crítico (RPi, sensores, carcasa)
+- [ ] Negociar precios por volumen con proveedor principal de sensores
+- [ ] Documentar lead times por componente para gestión de inventario
+
+---
+
+*Última actualización: 29 de marzo de 2026*

@@ -1,0 +1,11 @@
+echosmart-gateway (1.0.0-1) stable; urgency=medium
+
+  * Versión inicial de producción del paquete .deb.
+  * Incluye CLI echosmart-gateway con sub-comandos: run, status,
+    test-sensors, version.
+  * Asistente de configuración interactivo echosmart-gateway-setup.
+  * Servicio systemd echosmart-gateway con restart automático.
+  * Binario nativo echosmart-sysinfo (diagnóstico de sistema).
+  * Soporte para 5 sensores: DS18B20, DHT22, BH1750, MH-Z19C, Soil+ADS1115.
+
+ -- EchoSmart Team <dev@echosmart.io>  Sun, 29 Mar 2026 00:00:00 +0000
