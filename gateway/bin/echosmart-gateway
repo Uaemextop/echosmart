@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+# echosmart-gateway — wrapper to launch the EchoSmart gateway daemon.
+# Installed to /usr/bin/echosmart-gateway by the .deb package.
+
+set -euo pipefail
+
+BINARY="/usr/bin/echosmart-gateway-bin"
+CONFIG="/etc/echosmart/gateway.env"
+SENSORS="/etc/echosmart/sensors.json"
+
+exec "${BINARY}" --config "${CONFIG}" --sensors "${SENSORS}" "$@"

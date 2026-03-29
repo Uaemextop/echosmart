@@ -7,6 +7,15 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # Optimisation flags for Raspberry Pi
 set(CMAKE_CXX_FLAGS_RELEASE "-O2 -DNDEBUG")
 
+# --- echosmart-gateway (daemon) ----------------------------------------
+add_executable(echosmart-gateway-bin echosmart-gateway.cpp)
+target_compile_definitions(echosmart-gateway-bin PRIVATE
+    VERSION="${PROJECT_VERSION}"
+)
+set_target_properties(echosmart-gateway-bin PROPERTIES
+    OUTPUT_NAME echosmart-gateway-bin
+)
+
 # --- echosmart-sysinfo -------------------------------------------------
 add_executable(echosmart-sysinfo echosmart-sysinfo.cpp)
 target_compile_definitions(echosmart-sysinfo PRIVATE
@@ -20,5 +29,5 @@ target_compile_definitions(echosmart-sensor-read PRIVATE
 )
 
 # Install targets (used by debian/rules)
-install(TARGETS echosmart-sysinfo echosmart-sensor-read
+install(TARGETS echosmart-gateway-bin echosmart-sysinfo echosmart-sensor-read
         RUNTIME DESTINATION bin)
