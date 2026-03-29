@@ -1290,8 +1290,8 @@ gateway/
 
 > La estructura actual agrupa por tipo (`models/`, `routers/`, `services/`). Migrar a estructura por feature.
 
-- [ ] Planificar la migración: documentar el mapa de archivos actual → nuevo
-- [ ] Crear estructura por feature:
+- [x] Planificar la migración: documentar el mapa de archivos actual → nuevo
+- [x] Crear estructura por feature:
   ```
   backend/src/
   ├── auth/
@@ -1338,18 +1338,18 @@ gateway/
   │   └── security.py         # Password hashing, JWT
   └── main.py                 # FastAPI app factory
   ```
-- [ ] Migrar `models/user.py` → `auth/models.py` + `users/models.py`
-- [ ] Migrar `models/sensor.py` → `sensors/models.py`
-- [ ] Migrar `models/gateway.py` → `gateways/models.py`
-- [ ] Migrar `models/alert.py` → `alerts/models.py`
-- [ ] Migrar `models/report.py` → `reports/models.py`
-- [ ] Migrar `models/reading.py` → `sensors/models.py` (junto con Sensor)
-- [ ] Migrar `models/tenant.py` → `tenants/models.py`
-- [ ] Migrar cada router a su feature correspondiente
-- [ ] Migrar cada service a su feature correspondiente
-- [ ] Migrar cada schema a su feature correspondiente
-- [ ] Crear repositorios para cada feature (nueva capa de abstracción)
-- [ ] Actualizar imports en toda la aplicación
+- [x] Migrar `models/user.py` → `auth/models.py` + `users/models.py`
+- [x] Migrar `models/sensor.py` → `sensors/models.py`
+- [x] Migrar `models/gateway.py` → `gateways/models.py`
+- [x] Migrar `models/alert.py` → `alerts/models.py`
+- [x] Migrar `models/report.py` → `reports/models.py`
+- [x] Migrar `models/reading.py` → `sensors/models.py` (junto con Sensor)
+- [x] Migrar `models/tenant.py` → `tenants/models.py`
+- [x] Migrar cada router a su feature correspondiente
+- [x] Migrar cada service a su feature correspondiente
+- [x] Migrar cada schema a su feature correspondiente
+- [x] Crear repositorios para cada feature (nueva capa de abstracción)
+- [x] Actualizar imports en toda la aplicación
 - [ ] Verificar que TODOS los tests pasan después de la migración
 
 ### 2.2 Infraestructura de Base de Datos
