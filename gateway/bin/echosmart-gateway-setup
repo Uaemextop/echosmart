@@ -1,0 +1,91 @@
+#!/usr/bin/env bash
+# EchoSmart Gateway — Setup Wizard
+# Configura el gateway en la Raspberry Pi tras la instalación del .deb
+set -euo pipefail
+
+GATEWAY_HOME="/opt/echosmart/gateway"
+CONFIG_FILE="/etc/echosmart/gateway.env"
+SERVICE_NAME="echosmart-gateway"
+
+echo "========================================"
+echo " EchoSmart Gateway — Setup Wizard"
+echo "========================================"
+echo ""
+
+# Verificar que se ejecuta como root o con sudo
+if [[ "${EUID}" -ne 0 ]]; then
+    echo "ERROR: Este script requiere permisos de root." >&2
+    echo "Ejecuta: sudo echosmart-gateway-setup" >&2
+    exit 1
+fi
+
+# Instalar dependencias Python
+echo "[1/5] Instalando dependencias Python..."
+cd "${GATEWAY_HOME}"
+python3 -m venv venv
+venv/bin/pip install --quiet --upgrade pip
+venv/bin/pip install --quiet -r requirements.txt
+echo "✓ Dependencias instaladas"
+
+# Configurar gateway ID
+echo ""
+echo "[2/5] Configuración del gateway..."
+HOSTNAME=$(hostname)
+DEFAULT_GW_ID="gw-$(hostname | tr '[:upper:]' '[:lower:]' | tr -d '-')"
+read -r -p "  Gateway ID [${DEFAULT_GW_ID}]: " GW_ID
+GW_ID="${GW_ID:-${DEFAULT_GW_ID}}"
+
+read -r -p "  Nombre del invernadero [Invernadero Principal]: " GW_NAME
+GW_NAME="${GW_NAME:-Invernadero Principal}"
+
+read -r -p "  URL del servidor cloud [http://echosmart-server.local:8000]: " CLOUD_URL
+CLOUD_URL="${CLOUD_URL:-http://echosmart-server.local:8000}"
+
+read -r -p "  API Key del servidor: " CLOUD_KEY
+
+# Escribir configuración
+echo ""
+echo "[3/5] Escribiendo configuración en ${CONFIG_FILE}..."
+mkdir -p "$(dirname "${CONFIG_FILE}")"
+cat > "${CONFIG_FILE}" <<EOF
+# EchoSmart Gateway — Configuración generada por setup wizard
+# Editado: $(date -u +"%Y-%m-%dT%H:%M:%SZ")
+
+GATEWAY_ID=${GW_ID}
+GATEWAY_NAME=${GW_NAME}
+CLOUD_API_URL=${CLOUD_URL}
+CLOUD_API_KEY=${CLOUD_KEY}
+MQTT_BROKER=localhost
+MQTT_PORT=1883
+POLLING_INTERVAL=60
+SYNC_INTERVAL=300
+SIMULATION_MODE=false
+LOG_LEVEL=INFO
+EOF
+chmod 600 "${CONFIG_FILE}"
+echo "✓ Configuración guardada"
+
+# Habilitar y arrancar servicio systemd
+echo ""
+echo "[4/5] Configurando servicio systemd..."
+systemctl daemon-reload
+systemctl enable "${SERVICE_NAME}"
+systemctl restart "${SERVICE_NAME}"
+echo "✓ Servicio ${SERVICE_NAME} habilitado y arrancado"
+
+# Verificar estado
+echo ""
+echo "[5/5] Verificando estado del gateway..."
+sleep 2
+if systemctl is-active --quiet "${SERVICE_NAME}"; then
+    echo "✓ Gateway corriendo correctamente"
+else
+    echo "⚠ El servicio no arrancó. Verifica: journalctl -u ${SERVICE_NAME} -n 50"
+fi
+
+echo ""
+echo "========================================"
+echo " Setup completado"
+echo " Dashboard: http://$(hostname).local"
+echo " Logs: journalctl -u ${SERVICE_NAME} -f"
+echo "========================================"

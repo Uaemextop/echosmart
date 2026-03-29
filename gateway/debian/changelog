@@ -1,0 +1,11 @@
+echosmart-gateway (1.0.0-1) stable; urgency=low
+
+  * Primera versión estable para producción.
+  * Clean Architecture: domain, application, infrastructure.
+  * Drivers: DS18B20, DHT22, BH1750, MH-Z19C, Soil+ADS1115.
+  * CLI: run, status, test-sensors, version.
+  * Packaging .deb para Raspberry Pi OS (arm64/armhf).
+  * Servicio systemd con auto-restart.
+  * Setup wizard para configuración inicial.
+
+ -- EchoSmart Team <support@echosmart.io>  Sun, 29 Mar 2026 00:00:00 +0000

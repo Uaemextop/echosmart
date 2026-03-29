@@ -1,0 +1,35 @@
+#!/usr/bin/make -f
+# EchoSmart Gateway — Debian packaging rules
+
+%:
+	dh $@
+
+override_dh_auto_install:
+	# Instalar código del gateway
+	install -d debian/echosmart-gateway/opt/echosmart/gateway
+	cp -r src requirements.txt sensors.json \
+	      debian/echosmart-gateway/opt/echosmart/gateway/
+
+	# Instalar binarios CLI
+	install -d debian/echosmart-gateway/usr/bin
+	install -m 755 bin/echosmart-gateway \
+	               debian/echosmart-gateway/usr/bin/echosmart-gateway
+	install -m 755 bin/echosmart-gateway-setup \
+	               debian/echosmart-gateway/usr/bin/echosmart-gateway-setup
+
+	# Instalar servicio systemd
+	install -d debian/echosmart-gateway/lib/systemd/system
+	install -m 644 debian/echosmart-gateway.service \
+	               debian/echosmart-gateway/lib/systemd/system/echosmart-gateway.service
+
+	# Instalar configuración por defecto
+	install -d debian/echosmart-gateway/etc/echosmart
+	install -m 640 .env.example \
+	               debian/echosmart-gateway/etc/echosmart/gateway.env.example
+
+override_dh_auto_test:
+	# Tests ejecutados en CI, no durante dpkg-buildpackage
+	true
+
+override_dh_strip:
+	true

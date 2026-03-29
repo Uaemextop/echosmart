@@ -3712,7 +3712,8 @@ desktop/
 | 9 | **ISO Raspberry Pi Gateway** | 26–28 | ~100 | 🟠 Pendiente |
 | 10 | Features Avanzadas | 29+ | ~80 | 🟠 Pendiente |
 | 11 | Testing con Hardware Real | Final | ~40 | 🟠 Pendiente |
-| | **TOTAL** | | **~1640+** | |
+| 12 | **Producción & Comercialización** | 30–32 | ~60 | 🟡 En Progreso |
+| | **TOTAL** | | **~1700+** | |
 
 ## Resumen de Assets Generados
 
@@ -3742,4 +3743,86 @@ desktop/
 
 ---
 
-*Última actualización: 25 de marzo de 2026*
+---
+
+## Fase 12: Producción & Comercialización (Semanas 30–32)
+
+> 🚀 **Objetivo**: Empaquetar EchoSmart como producto comercial listo para venta masiva de kits Raspberry Pi + sensores.
+
+### 12.1 Empaquetado .deb para Raspberry Pi OS
+
+- [x] Crear estructura `gateway/debian/` con `control`, `rules`, `postinst`, `prerm`, `changelog`
+- [x] Definir servicio systemd hardened (`echosmart-gateway.service`) con `ProtectSystem=strict`
+- [x] Crear `gateway/bin/echosmart-gateway` (wrapper binary)
+- [x] Crear `gateway/bin/echosmart-gateway-setup` (bash wizard de configuración inicial)
+- [x] CI/CD: `.github/workflows/build-deb.yml` para build automático del `.deb` en push de tags `v*`
+- [ ] Publicar en repositorio APT propio con `reprepro` (dominio `apt.echosmart.io`)
+- [ ] Soporte arm64 + armhf (cross-compilation en CI con QEMU)
+- [ ] Firmar paquetes con GPG key del equipo
+
+### 12.2 Imagen ISO de Gateway (Raspberry Pi OS customizado)
+
+- [ ] Script `infra/iso/gateway/build-gateway-image.sh` usando `pi-gen`
+- [ ] Customizar imagen: OS mínimo + EchoSmart gateway pre-instalado
+- [ ] First-boot script: expandir filesystem, generar hostname único, iniciar wizard
+- [ ] Build en CI con GitHub Actions + QEMU ARM
+- [ ] Distribuir en releases de GitHub (comprimido con xz + checksum SHA256)
+
+### 12.3 CLI Refactorizada (Clean Architecture)
+
+- [x] Refactorizar gateway a Clean Architecture: `domain/`, `application/`, `infrastructure/`
+- [x] `gateway/src/domain/entities/sensor.py` — SensorReading, SensorMetadata
+- [x] `gateway/src/domain/interfaces/sensor_driver.py` — BaseSensorDriver ABC
+- [x] `gateway/src/application/sensor_manager.py` — SensorManager (Observer pattern)
+- [x] `gateway/src/application/alert_engine.py` — AlertEngine (reglas configurables)
+- [x] `gateway/src/application/cloud_sync_service.py` — CloudSyncService (batch + retry)
+- [x] `gateway/src/infrastructure/drivers/` — 5 drivers implementan BaseSensorDriver
+- [x] `gateway/src/cli.py` — CLI con sub-comandos: `run`, `status`, `test-sensors`, `version`
+
+### 12.4 Testing de Producción
+
+- [x] Tests de dominio: `gateway/tests/test_domain.py`
+- [x] Tests de drivers: `gateway/tests/test_drivers.py` (5 drivers × 2+ casos)
+- [x] Tests de CLI: `gateway/tests/test_cli.py` (5 casos)
+- [x] Tests de SensorManager: `gateway/tests/test_sensor_manager.py` (4 casos)
+- [x] Tests de AlertEngine: `gateway/tests/test_alert_engine.py` (4 casos)
+- [ ] Tests end-to-end con hardware simulado (QEMU ARM)
+- [ ] Tests de carga: 1000 lecturas/hora por 24h continuas
+- [ ] Tests de reconexión: caída de red + sincronización offline
+
+### 12.5 Root Makefile
+
+- [x] Crear `Makefile` raíz con targets: `help`, `install`, `lint`, `test`, `build`, `deb`, `docker-up`, `docker-down`, `clean`
+- [x] Target `make deb` construye el paquete `.deb` del gateway
+- [ ] Target `make iso` construye la imagen ISO completa del gateway
+- [ ] Target `make release` prepara la release completa (deb + iso + changelog)
+
+### 12.6 Documentación Comercial
+
+- [x] `docs/production-kit.md` — BOM completo, precios de venta, SKUs, márgenes
+- [x] `docs/deb-packaging.md` — Guía build/install/update del `.deb`
+- [ ] `docs/sales-guide.md` — Guía de ventas, propuesta de valor, comparativa competidores
+- [ ] Guía rápida imprimible (PDF 1 página, A5) para incluir en caja del kit
+- [ ] QR code en empaque apuntando a `https://docs.echosmart.io/start`
+
+### 12.7 Infraestructura de Distribución
+
+- [ ] Repositorio APT en `apt.echosmart.io` con HTTPS y firma GPG
+- [ ] CDN para distribución de imágenes ISO (>500MB)
+- [ ] Portal de descargas en `https://echosmart.io/download`
+- [ ] Página de producto en landing page con precios y botón de compra
+- [ ] Integración Stripe para ventas online del kit hardware
+- [ ] Sistema de licencias de software (para planes Pro/Enterprise)
+
+### 12.8 Post-Venta y Soporte
+
+- [ ] Portal de soporte en `https://support.echosmart.io`
+- [ ] Base de conocimiento: FAQ, troubleshooting, videos
+- [ ] Sistema de tickets (Freshdesk o Zendesk)
+- [ ] Actualización OTA: servidor notifica al gateway via MQTT de nueva versión
+- [ ] Programa de garantía: 12 meses hardware + actualizaciones perpetuas
+- [ ] Canal de distribución: Amazon Business, MercadoLibre, tienda propia
+
+---
+
+*Última actualización: 29 de marzo de 2026*

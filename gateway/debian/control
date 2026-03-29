@@ -1,0 +1,23 @@
+Source: echosmart-gateway
+Section: net
+Priority: optional
+Maintainer: EchoSmart Team <support@echosmart.io>
+Build-Depends: debhelper-compat (= 13), python3, python3-venv, python3-pip
+Standards-Version: 4.6.0
+Homepage: https://github.com/Uaemextop/echosmart
+
+Package: echosmart-gateway
+Architecture: all
+Depends: python3 (>= 3.9), python3-venv, python3-pip, systemd, adduser
+Recommends: mosquitto, mosquitto-clients
+Description: EchoSmart Gateway — Agente IoT para Raspberry Pi
+ Software de gateway para el sistema EchoSmart de monitoreo ambiental
+ inteligente en invernaderos. Se ejecuta en Raspberry Pi y gestiona
+ sensores de temperatura, humedad, CO2, luz y humedad de suelo.
+ .
+ Características:
+  - Drivers para DS18B20, DHT22, BH1750, MH-Z19C, Suelo+ADS1115
+  - Almacenamiento local SQLite para operación offline
+  - Sincronización con backend cloud vía HTTPS y MQTT
+  - Motor de alertas local configurable
+  - CLI completa: echosmart-gateway run|status|test-sensors|version
