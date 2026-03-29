@@ -3677,6 +3677,83 @@ desktop/
 
 ---
 
+## Fase 12: Producción y Comercialización
+
+> 🚀 **OBJETIVO**: Preparar EchoSmart para venta masiva de kits Raspberry Pi + sensores. Empaquetado profesional, binarios optimizados en C++, documentación de usuario final y proceso de fabricación.
+
+### 12.1 Binarios C++ del Sistema
+
+- [x] `gateway/cpp/echosmart-sysinfo.cpp` — Diagnóstico del sistema (CPU, RAM, temperatura)
+- [x] `gateway/cpp/echosmart-sensor-read.cpp` — Lectura de sensores (DS18B20, DHT22, BH1750, soil, MH-Z19C)
+- [x] `gateway/cpp/CMakeLists.txt` — Build system CMake (-O2, C++17, ARM64)
+- [ ] Firmar binarios con clave GPG del proyecto
+- [ ] Tests unitarios C++ con Google Test
+- [ ] Benchmarks: comparar latencia Python vs C++
+
+### 12.2 Empaquetado .deb
+
+- [x] `gateway/debian/control` — Metadata del paquete y dependencias
+- [x] `gateway/debian/rules` — Makefile de empaquetado (cmake + dh)
+- [x] `gateway/debian/postinst` — Script post-instalación (usuario, venv, hardware, systemd)
+- [x] `gateway/debian/prerm` — Script pre-desinstalación
+- [x] `gateway/debian/changelog` — Changelog formato Debian
+- [x] `gateway/debian/compat` — Nivel de compatibilidad debhelper (13)
+- [x] `gateway/debian/echosmart-gateway.service` — Servicio systemd (hardened)
+- [x] `gateway/debian/gateway.env.example` — Config de entorno comentada
+- [ ] Firma GPG del .deb (`dpkg-sig`)
+- [ ] Repositorio APT privado (para OTA updates)
+
+### 12.3 Makefile y Build System
+
+- [x] `Makefile` raíz con targets: `help`, `install`, `build`, `build-cpp-arm64`, `deb`, `test`, `lint`, `clean`, `docker-up`, `docker-down`, `gateway-run-sim`, `sensor-test-sim`
+- [ ] Target `make release VERSION=1.x.x` — bump versión + tag git + build .deb
+- [ ] Cross-compilation toolchain documentada para Windows (WSL2)
+
+### 12.4 CI/CD — Build Automático
+
+- [x] `.github/workflows/build-deb.yml` — Build .deb en push de tag `v*` y manual dispatch
+- [x] Cross-compilation para ARM64 con `gcc-aarch64-linux-gnu`
+- [x] GitHub Release automático con .deb adjunto
+- [ ] Upload automático a repositorio APT privado
+- [ ] Notificación a Slack/email cuando hay nuevo release
+
+### 12.5 Documentación Comercial
+
+- [x] `docs/production-kit.md` — BOM (~$127 total), pricing ($349 sugerido), assembly guide, QA checklist, envío
+- [x] `docs/deb-packaging.md` — Build/install .deb, systemd, troubleshooting completo
+- [ ] Guía rápida imprimible (PDF, 1 página, incluida en caja)
+- [ ] Diagrama de conexión de sensores (impreso, a color)
+- [ ] Política de garantía y soporte
+- [ ] Landing page de ventas (`https://echosmart.io/kit`)
+
+### 12.6 ISO Personalizado para Producción
+
+- [ ] `infra/iso/gateway/build-gateway-image.sh` — Script pi-gen para imagen personalizada
+- [ ] Imagen pre-configurada con EchoSmart gateway instalado
+- [ ] First-boot wizard automático
+- [ ] `echosmart-gateway-vX.X.X-arm64.img.xz` comprimida para distribución
+- [ ] SHA256 checksum para verificación
+
+### 12.7 Portal de Ventas (SaaS)
+
+- [ ] Página de producto con fotos del kit
+- [ ] Proceso de compra (Stripe Checkout)
+- [ ] Portal de activación: serial del kit → licencia de software
+- [ ] Dashboard del cliente: gestión de kits comprados
+- [ ] Soporte: ticket system, base de conocimiento
+
+### 12.8 Proceso de Fabricación (BOM & Assembly)
+
+- [x] BOM detallada con proveedores y precios (Alibaba, Digi-Key, Mouser, Adafruit)
+- [x] QA checklist pre-shipment (hardware + software + red)
+- [x] Instrucciones de ensamblaje con diagrama de conexiones
+- [ ] Proceso de ensamblaje en línea de producción (video + SOP)
+- [ ] Script de burn-in test automatizado
+- [ ] Etiquetas de producto con QR code (serial único por kit)
+- [ ] Packaging: caja foam, caja impresa, guía rápida, tarjeta de soporte
+
+---
+
 ## Resumen de Plataformas
 
 | Plataforma | Tecnología | Directorio | Estado |
@@ -3694,7 +3771,9 @@ desktop/
 | **ISO Servidor** | Ubuntu 22.04 · Docker · echosmart-ctl | `infra/iso/server/` | 🟠 Pendiente |
 | **ISO Gateway RPi** | RPi OS Lite · Python · pi-gen | `infra/iso/gateway/` | 🟠 Pendiente |
 | **Assets / Diseño** | SVG · PNG · JPG · ICO | `assets/` | 🟢 312 archivos generados |
-| **Documentación** | Markdown · SVG | `docs/` | 🟢 26+ documentos |
+| **Documentación** | Markdown · SVG | `docs/` | 🟢 28+ documentos |
+| **Kit Comercial (C++)** | C++17 · CMake · ARM64 | `gateway/cpp/` | 🟡 Scaffolding completo |
+| **Empaquetado .deb** | dpkg · debhelper · systemd | `gateway/debian/` | 🟡 Scaffolding completo |
 
 ## Resumen de Fases
 
@@ -3712,7 +3791,8 @@ desktop/
 | 9 | **ISO Raspberry Pi Gateway** | 26–28 | ~100 | 🟠 Pendiente |
 | 10 | Features Avanzadas | 29+ | ~80 | 🟠 Pendiente |
 | 11 | Testing con Hardware Real | Final | ~40 | 🟠 Pendiente |
-| | **TOTAL** | | **~1640+** | |
+| **12** | **Producción y Comercialización** | Post-final | ~85 | 🟡 Scaffolding |
+| | **TOTAL** | | **~1725+** | |
 
 ## Resumen de Assets Generados
 

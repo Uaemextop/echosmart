@@ -1,0 +1,180 @@
+name: Build .deb Package
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Triggers:
+#   - Push a version tag (e.g. v1.0.0) → builds .deb and creates GitHub Release
+#   - Manual dispatch → builds .deb and uploads as artifact
+# ─────────────────────────────────────────────────────────────────────────────
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version override (e.g. 1.2.3). Leave blank to use changelog version."
+        required: false
+        default: ""
+
+jobs:
+  build-deb:
+    name: Build echosmart-gateway ARM64 .deb
+    runs-on: ubuntu-latest
+
+    steps:
+      # ── 1. Checkout ─────────────────────────────────────────────────────
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # ── 2. Determine version ────────────────────────────────────────────
+      - name: Determine package version
+        id: version
+        run: |
+          if [ -n "${{ github.event.inputs.version }}" ]; then
+            VERSION="${{ github.event.inputs.version }}"
+          elif [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+            VERSION="${GITHUB_REF#refs/tags/v}"
+          else
+            VERSION=$(head -1 gateway/debian/changelog | grep -oP '\(\K[^)]+' | cut -d- -f1)
+          fi
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "→ Building version: $VERSION"
+
+      # ── 3. Install system build dependencies ────────────────────────────
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends \
+            build-essential \
+            dpkg-dev \
+            devscripts \
+            debhelper \
+            cmake \
+            gcc-aarch64-linux-gnu \
+            g++-aarch64-linux-gnu \
+            binutils-aarch64-linux-gnu \
+            linux-libc-dev-arm64-cross \
+            crossbuild-essential-arm64 \
+            python3 \
+            python3-pip \
+            fakeroot \
+            lintian
+
+      # ── 4. Update debian/changelog with the correct version ─────────────
+      - name: Update debian changelog version
+        run: |
+          cd gateway
+          CURRENT_VERSION=$(head -1 debian/changelog | grep -oP '\(\K[^)]+')
+          if [ "$CURRENT_VERSION" != "${VERSION}-1" ]; then
+            # Prepend new changelog entry using dch
+            DEBEMAIL="ci@echosmart.io" DEBFULLNAME="EchoSmart CI" \
+            dch --newversion "${VERSION}-1" \
+                --distribution stable \
+                "Automated build for version ${VERSION}."
+          fi
+
+      # ── 5. Cross-compile C++ binaries for ARM64 ─────────────────────────
+      - name: Build C++ binaries (ARM64 cross-compiled)
+        run: |
+          mkdir -p gateway/debian/build-cpp
+          cd gateway/debian/build-cpp
+          cmake \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_INSTALL_PREFIX="" \
+            -DCMAKE_C_COMPILER=aarch64-linux-gnu-gcc \
+            -DCMAKE_CXX_COMPILER=aarch64-linux-gnu-g++ \
+            -DCMAKE_STRIP=aarch64-linux-gnu-strip \
+            ../../cpp
+          make -j$(nproc)
+          # Verify architecture
+          file echosmart-sysinfo echosmart-sensor-read
+          echo "→ Binary sizes:"
+          ls -lh echosmart-sysinfo echosmart-sensor-read
+
+      # ── 6. Build .deb package ────────────────────────────────────────────
+      - name: Build .deb package
+        run: |
+          cd gateway
+          # Build binary-only package (skip source tarball) for arm64
+          # --host-arch=arm64: produce arm64 .deb on amd64 host
+          dpkg-buildpackage \
+            -b \
+            -us \
+            -uc \
+            --host-arch=arm64 \
+            --build-profiles=nocheck \
+            -rfakeroot
+          echo "→ Package contents:"
+          ls -lh ../*.deb ../*.changes ../*.buildinfo 2>/dev/null || true
+
+      # ── 7. Run lintian (non-blocking, informational) ─────────────────────
+      - name: Run lintian
+        run: |
+          lintian ../*.deb --no-tag-display-limit || true
+        working-directory: gateway
+        continue-on-error: true
+
+      # ── 8. Verify .deb contents ──────────────────────────────────────────
+      - name: Verify .deb contents
+        run: |
+          DEB_FILE=$(ls *.deb | head -1)
+          echo "→ Package: $DEB_FILE"
+          echo ""
+          echo "→ Package info:"
+          dpkg-deb --info "$DEB_FILE"
+          echo ""
+          echo "→ Package contents:"
+          dpkg-deb --contents "$DEB_FILE"
+
+      # ── 9. Upload artifact (always, for manual dispatch) ─────────────────
+      - name: Upload .deb artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: echosmart-gateway-${{ steps.version.outputs.version }}-arm64-deb
+          path: |
+            *.deb
+            *.buildinfo
+            *.changes
+          retention-days: 30
+
+      # ── 10. Create GitHub Release (only on version tags) ─────────────────
+      - name: Create GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: EchoSmart Gateway v${{ steps.version.outputs.version }}
+          draft: false
+          prerelease: ${{ contains(github.ref_name, '-beta') || contains(github.ref_name, '-rc') }}
+          generate_release_notes: true
+          body: |
+            ## EchoSmart Gateway v${{ steps.version.outputs.version }}
+
+            ### Installation on Raspberry Pi (arm64)
+
+            ```bash
+            # Download and install
+            wget https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/echosmart-gateway_${{ steps.version.outputs.version }}-1_arm64.deb
+            sudo dpkg -i echosmart-gateway_${{ steps.version.outputs.version }}-1_arm64.deb
+            sudo apt-get install -f  # fix any missing dependencies
+
+            # Configure and start
+            sudo nano /etc/echosmart/gateway.env
+            sudo reboot
+            ```
+
+            ### Supported Hardware
+            - Raspberry Pi 4 Model B (arm64 / aarch64)
+            - Raspberry Pi OS Bullseye / Bookworm (64-bit)
+
+            ### Included Binaries
+            - `/usr/bin/echosmart-sysinfo` — System diagnostics (CPU, RAM, temperature)
+            - `/usr/bin/echosmart-sensor-read` — Sensor reader (DS18B20, DHT22, BH1750, soil, MH-Z19C)
+          files: |
+            *.deb
+            *.buildinfo
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

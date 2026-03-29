@@ -1,0 +1,43 @@
+[Unit]
+Description=EchoSmart Gateway Service
+Documentation=https://echosmart.io/docs/gateway
+After=network-online.target mosquitto.service
+Wants=network-online.target
+# Soft dependency on mosquitto (start without it if not installed)
+Requires=
+
+[Service]
+Type=simple
+User=echosmart
+Group=echosmart
+WorkingDirectory=/opt/echosmart/gateway
+
+# Environment file with credentials and settings
+EnvironmentFile=-/etc/echosmart/gateway.env
+
+# Run using the isolated virtual environment
+ExecStart=/opt/echosmart/gateway/venv/bin/python main.py
+
+# Restart policy: always restart on failure, wait 10 s between attempts
+Restart=always
+RestartSec=10
+StartLimitIntervalSec=120
+StartLimitBurst=5
+
+# Security hardening
+NoNewPrivileges=true
+ProtectSystem=strict
+ReadWritePaths=/var/lib/echosmart /var/log/echosmart /run/echosmart
+PrivateTmp=true
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=echosmart-gateway
+
+# Environment
+Environment=PYTHONUNBUFFERED=1
+Environment=PYTHONDONTWRITEBYTECODE=1
+
+[Install]
+WantedBy=multi-user.target

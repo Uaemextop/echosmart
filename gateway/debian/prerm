@@ -1,0 +1,39 @@
+#!/bin/sh
+# EchoSmart Gateway — pre-removal script
+# Runs before package files are removed.
+#
+# Tasks:
+#   1. Stop the running service
+#   2. Disable the service (prevent start on boot)
+#
+# NOTE: We do NOT delete /etc/echosmart/gateway.env or /var/lib/echosmart/
+# because those contain user data and configuration that must survive
+# package removal (dpkg policy: conffiles and user data).
+
+set -e
+
+SERVICE_NAME="echosmart-gateway"
+
+case "$1" in
+    remove | deconfigure)
+        if command -v systemctl >/dev/null 2>&1; then
+            echo "  Stopping ${SERVICE_NAME} service..."
+            systemctl stop "$SERVICE_NAME"    2>/dev/null || true
+            systemctl disable "$SERVICE_NAME" 2>/dev/null || true
+            systemctl daemon-reload 2>/dev/null || true
+        fi
+        ;;
+
+    upgrade)
+        # During upgrade, let postinst of new version restart the service
+        if command -v systemctl >/dev/null 2>&1; then
+            echo "  Stopping ${SERVICE_NAME} before upgrade..."
+            systemctl stop "$SERVICE_NAME" 2>/dev/null || true
+        fi
+        ;;
+
+    failed-upgrade)
+        ;;
+esac
+
+exit 0
