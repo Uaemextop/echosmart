@@ -7,9 +7,6 @@ description: >
 target: github-copilot
 tools: ["*"]
 
-disable-model-invocation: false
-user-invocable: true
-
 mcp-servers:
   everything:
     type: local
@@ -28,7 +25,7 @@ mcp-servers:
     tools: ["*"]
 
   memory:
-    type: stdio
+    type: local
     command: npx
     args:
       - -y
@@ -36,7 +33,7 @@ mcp-servers:
     tools: ["*"]
 
   filesystem:
-    type: stdio
+    type: local
     command: npx
     args:
       - -y
@@ -60,7 +57,7 @@ mcp-servers:
       - --lsp
       - "typescript-language-server"
       - --
-      - --local
+      - --stdio
     tools: ["*"]
 
   fetch:
@@ -74,7 +71,7 @@ mcp-servers:
     type: local
     command: uvx
     args:
-      - "mcp-server-time"
+      - "baiyx-mcp-server-time"
     tools: ["*"]
 
   read-website-fast:
@@ -120,7 +117,7 @@ mcp-servers:
     tools: ["*"]
 
   mcp-mermaid:
-    type: stdio
+    type: local
     command: npx
     args:
       - -y
@@ -128,7 +125,7 @@ mcp-servers:
     tools: ["*"]
 
   flyonui:
-    type: stdio
+    type: local
     command: npx
     args:
       - -y
@@ -136,16 +133,13 @@ mcp-servers:
     tools: ["*"]
 
   gluestack-ui:
-    type: stdio
+    type: local
     command: npx
     args:
       - -y
       - "gluestack-ui-mcp-server"
     tools: ["*"]
 
-metadata:
-  owner: "architecture"
-  intent: "clean-architecture-and-professional-design"
 ---
 
 Eres un arquitecto de software senior responsable de mantener una arquitectura
