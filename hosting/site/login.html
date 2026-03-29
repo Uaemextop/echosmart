@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Iniciar Sesión — EchoSmart</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='6' fill='%2300E676'/></svg>">
+</head>
+<body>
+
+<div class="auth-page">
+  <div class="card auth-card">
+    <a href="index.html" class="auth-logo">
+      <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="16" cy="16" r="6" fill="#00E676"/>
+        <path d="M16 4a12 12 0 0 1 12 12" stroke="#00E676" stroke-width="2" stroke-linecap="round" opacity=".7"/>
+        <path d="M16 8a8 8 0 0 1 8 8" stroke="#00E676" stroke-width="2" stroke-linecap="round" opacity=".5"/>
+        <path d="M16 24a12 12 0 0 1-12-12" stroke="#00E676" stroke-width="2" stroke-linecap="round" opacity=".3"/>
+      </svg>
+      EchoSmart
+    </a>
+    <p class="auth-subtitle">Inicia sesión en tu cuenta</p>
+
+    <form id="login-form" novalidate>
+      <div class="input-group">
+        <label for="login-email">Correo electrónico</label>
+        <input type="email" id="login-email" name="email" class="input" placeholder="tu@correo.com" autocomplete="email">
+        <div class="form-error" data-error="email"></div>
+      </div>
+
+      <div class="input-group">
+        <label for="login-password">Contraseña</label>
+        <div class="input-wrapper">
+          <input type="password" id="login-password" name="password" class="input" placeholder="••••••••" autocomplete="current-password">
+          <button type="button" class="toggle-password" aria-label="Mostrar contraseña">👁</button>
+        </div>
+        <div class="form-error" data-error="password"></div>
+      </div>
+
+      <label class="checkbox-group">
+        <input type="checkbox" name="remember"> Recordarme
+      </label>
+
+      <button type="submit" class="btn btn-primary btn-block">Iniciar Sesión</button>
+    </form>
+
+    <div class="auth-links">
+      <a href="forgot-password.html">¿Olvidaste tu contraseña?</a>
+      <a href="register.html">Crear cuenta</a>
+    </div>
+  </div>
+</div>
+
+<script src="assets/js/app.js"></script>
+</body>
+</html>
