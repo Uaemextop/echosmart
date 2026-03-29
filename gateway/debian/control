@@ -1,0 +1,42 @@
+Source: echosmart-gateway
+Section: net
+Priority: optional
+Maintainer: EchoSmart <support@echosmart.io>
+Build-Depends: debhelper-compat (= 13),
+               cmake (>= 3.16),
+               g++ (>= 10),
+               linux-libc-dev
+Standards-Version: 4.6.0
+Homepage: https://echosmart.io
+
+Package: echosmart-gateway
+Version: 1.0.0
+Architecture: arm64
+Maintainer: EchoSmart <support@echosmart.io>
+Description: EchoSmart Gateway for Raspberry Pi
+ IoT gateway for precision agriculture sensor monitoring.
+ Includes Python gateway service and optimized C++ sensor binaries.
+ .
+ Supported sensors:
+  - DS18B20 (1-Wire temperature)
+  - DHT22 (GPIO temperature + humidity)
+  - BH1750 (I2C ambient light)
+  - Capacitive soil moisture via ADS1115 (I2C ADC)
+  - MH-Z19C (UART CO2)
+ .
+ Communicates with EchoSmart Cloud via MQTT and REST API.
+ Stores data locally in SQLite for offline operation.
+Depends: python3 (>= 3.9),
+         python3-pip,
+         python3-venv,
+         libgpiod2,
+         python3-libgpiod,
+         i2c-tools,
+         mosquitto,
+         mosquitto-clients,
+         sqlite3,
+         curl,
+         adduser
+Recommends: pigpio,
+            python3-pigpio
+Suggests: avahi-daemon

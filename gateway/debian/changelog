@@ -1,0 +1,12 @@
+echosmart-gateway (1.0.0-1) stable; urgency=medium
+
+  * Initial release for Raspberry Pi OS Bullseye/Bookworm (arm64).
+  * Python gateway service for IoT sensor monitoring.
+  * C++ binaries: echosmart-sysinfo, echosmart-sensor-read.
+  * Supported sensors: DS18B20, DHT22, BH1750, soil moisture, MH-Z19C.
+  * Automatic hardware interface configuration (I2C, SPI, 1-Wire, UART).
+  * systemd service with auto-restart on failure.
+  * SQLite local storage for offline operation.
+  * MQTT + REST Cloud sync with EchoSmart Cloud.
+
+ -- EchoSmart <support@echosmart.io>  Mon, 25 Mar 2026 00:00:00 +0000

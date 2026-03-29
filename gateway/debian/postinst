@@ -1,0 +1,150 @@
+#!/bin/sh
+# EchoSmart Gateway — post-installation script
+# Runs after the package files are installed.
+#
+# Tasks:
+#   1. Create 'echosmart' system user (no login, no home dir in /home)
+#   2. Set ownership of data and log directories
+#   3. Create Python virtual environment
+#   4. Install Python dependencies
+#   5. Enable hardware interfaces (I2C, SPI, 1-Wire) in /boot/firmware/config.txt
+#   6. Enable and start systemd service
+
+set -e
+
+GATEWAY_DIR="/opt/echosmart/gateway"
+DATA_DIR="/var/lib/echosmart"
+LOG_DIR="/var/log/echosmart"
+CONFIG_DIR="/etc/echosmart"
+BOOT_CONFIG="/boot/firmware/config.txt"
+SERVICE_NAME="echosmart-gateway"
+ES_USER="echosmart"
+
+# ─────────────────────────────────────────────
+# 1. Create system user
+# ─────────────────────────────────────────────
+if ! id -u "$ES_USER" >/dev/null 2>&1; then
+    echo "  Creating system user '${ES_USER}'..."
+    adduser \
+        --system \
+        --group \
+        --no-create-home \
+        --home "$GATEWAY_DIR" \
+        --shell /usr/sbin/nologin \
+        --quiet \
+        "$ES_USER"
+fi
+
+# Add to required system groups for hardware access
+for grp in gpio i2c spi dialout; do
+    if getent group "$grp" >/dev/null 2>&1; then
+        usermod -aG "$grp" "$ES_USER" 2>/dev/null || true
+    fi
+done
+
+# ─────────────────────────────────────────────
+# 2. Directory ownership
+# ─────────────────────────────────────────────
+echo "  Setting directory ownership..."
+chown -R "$ES_USER:$ES_USER" "$DATA_DIR"  2>/dev/null || true
+chown -R "$ES_USER:$ES_USER" "$LOG_DIR"   2>/dev/null || true
+chown -R "$ES_USER:$ES_USER" "$GATEWAY_DIR" 2>/dev/null || true
+chmod 750 "$CONFIG_DIR" 2>/dev/null || true
+
+# ─────────────────────────────────────────────
+# 3. Create Python virtual environment
+# ─────────────────────────────────────────────
+VENV_DIR="$GATEWAY_DIR/venv"
+if [ ! -d "$VENV_DIR" ]; then
+    echo "  Creating Python virtual environment..."
+    python3 -m venv "$VENV_DIR"
+    chown -R "$ES_USER:$ES_USER" "$VENV_DIR"
+fi
+
+# ─────────────────────────────────────────────
+# 4. Install Python dependencies
+# ─────────────────────────────────────────────
+echo "  Installing Python dependencies..."
+"$VENV_DIR/bin/pip" install --quiet --upgrade pip
+"$VENV_DIR/bin/pip" install --quiet -r "$GATEWAY_DIR/requirements.txt"
+
+# ─────────────────────────────────────────────
+# 5. Enable hardware interfaces in /boot/firmware/config.txt
+# ─────────────────────────────────────────────
+if [ -f "$BOOT_CONFIG" ]; then
+    echo "  Configuring hardware interfaces in ${BOOT_CONFIG}..."
+
+    # I2C
+    if ! grep -qE "^dtparam=i2c_arm=on" "$BOOT_CONFIG"; then
+        echo "dtparam=i2c_arm=on" >> "$BOOT_CONFIG"
+        echo "    → I2C enabled"
+    fi
+    # SPI
+    if ! grep -qE "^dtparam=spi=on" "$BOOT_CONFIG"; then
+        echo "dtparam=spi=on" >> "$BOOT_CONFIG"
+        echo "    → SPI enabled"
+    fi
+    # 1-Wire (GPIO4 by default)
+    if ! grep -qE "^dtoverlay=w1-gpio" "$BOOT_CONFIG"; then
+        echo "dtoverlay=w1-gpio,gpiopin=4" >> "$BOOT_CONFIG"
+        echo "    → 1-Wire enabled on GPIO4"
+    fi
+    # UART for MH-Z19C (disable Bluetooth to free hardware UART)
+    if ! grep -qE "^enable_uart=1" "$BOOT_CONFIG"; then
+        echo "enable_uart=1" >> "$BOOT_CONFIG"
+        echo "dtoverlay=disable-bt" >> "$BOOT_CONFIG"
+        echo "    → UART enabled (Bluetooth disabled)"
+    fi
+
+    echo "  NOTE: A reboot is required for hardware interface changes to take effect."
+else
+    echo "  WARNING: ${BOOT_CONFIG} not found. Please enable I2C, SPI, 1-Wire and UART manually."
+fi
+
+# ─────────────────────────────────────────────
+# 6. Create default environment config if not present
+# ─────────────────────────────────────────────
+ENV_FILE="$CONFIG_DIR/gateway.env"
+if [ ! -f "$ENV_FILE" ]; then
+    echo "  Creating default environment config..."
+    cp "$CONFIG_DIR/gateway.env.example" "$ENV_FILE"
+    chown "$ES_USER:$ES_USER" "$ENV_FILE"
+    chmod 640 "$ENV_FILE"
+    echo "  → Edit ${ENV_FILE} to configure CLOUD_API_URL, CLOUD_API_KEY, etc."
+fi
+
+# ─────────────────────────────────────────────
+# 7. Enable and start systemd service
+# ─────────────────────────────────────────────
+if command -v systemctl >/dev/null 2>&1 && systemctl is-system-running >/dev/null 2>&1; then
+    echo "  Enabling ${SERVICE_NAME} service..."
+    systemctl daemon-reload
+    systemctl enable "$SERVICE_NAME"
+
+    # Only start if hardware interfaces are already available (i.e., not first install)
+    if [ -e /dev/i2c-1 ] || [ -e /sys/bus/w1 ]; then
+        echo "  Starting ${SERVICE_NAME} service..."
+        systemctl start "$SERVICE_NAME" || true
+    else
+        echo "  Service will start after reboot (hardware interfaces not yet active)."
+    fi
+else
+    echo "  systemd not available. Start service manually with:"
+    echo "    systemctl enable --now ${SERVICE_NAME}"
+fi
+
+echo ""
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "  EchoSmart Gateway installed successfully! 🌱"
+echo ""
+echo "  Next steps:"
+echo "    1. Edit /etc/echosmart/gateway.env with your credentials"
+echo "    2. Reboot to activate hardware interfaces:"
+echo "         sudo reboot"
+echo "    3. Check service status:"
+echo "         sudo systemctl status echosmart-gateway"
+echo "    4. View logs:"
+echo "         sudo journalctl -u echosmart-gateway -f"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
+exit 0

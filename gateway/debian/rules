@@ -1,0 +1,71 @@
+#!/usr/bin/make -f
+# Debian rules Makefile for echosmart-gateway
+# Uses debhelper (compat 13) for automatic dh_* commands.
+#
+# Build process:
+#   1. cmake: build C++ binaries (cross-compiled for arm64)
+#   2. Install Python gateway to /opt/echosmart/gateway/
+#   3. Install C++ binaries to /usr/bin/
+#   4. Install systemd service and env config
+
+export DH_VERBOSE = 1
+export DEB_BUILD_MAINT_OPTIONS = hardening=+all
+
+# C++ build directory
+CPP_BUILD_DIR = $(CURDIR)/debian/build-cpp
+# Destination root during package build
+DESTDIR        = $(CURDIR)/debian/echosmart-gateway
+
+%:
+	dh $@
+
+# ---------------------------------------------------------------------------
+# Build phase: compile C++ binaries with cmake
+# ---------------------------------------------------------------------------
+override_dh_auto_configure:
+	mkdir -p $(CPP_BUILD_DIR)
+	cd $(CPP_BUILD_DIR) && cmake \
+		-DCMAKE_BUILD_TYPE=Release \
+		-DCMAKE_INSTALL_PREFIX="" \
+		$(CURDIR)/cpp
+
+override_dh_auto_build:
+	$(MAKE) -C $(CPP_BUILD_DIR) -j$(shell nproc)
+
+# ---------------------------------------------------------------------------
+# Install phase
+# ---------------------------------------------------------------------------
+override_dh_auto_install:
+	# Install C++ binaries
+	install -d $(DESTDIR)/usr/bin
+	install -m 755 $(CPP_BUILD_DIR)/echosmart-sysinfo     $(DESTDIR)/usr/bin/
+	install -m 755 $(CPP_BUILD_DIR)/echosmart-sensor-read $(DESTDIR)/usr/bin/
+
+	# Install Python gateway source
+	install -d $(DESTDIR)/opt/echosmart/gateway
+	cp -r $(CURDIR)/src     $(DESTDIR)/opt/echosmart/gateway/
+	cp -r $(CURDIR)/tests   $(DESTDIR)/opt/echosmart/gateway/
+	install -m 644 $(CURDIR)/main.py          $(DESTDIR)/opt/echosmart/gateway/
+	install -m 644 $(CURDIR)/requirements.txt $(DESTDIR)/opt/echosmart/gateway/
+	install -m 644 $(CURDIR)/sensors.json     $(DESTDIR)/opt/echosmart/gateway/
+
+	# Install configuration directory
+	install -d $(DESTDIR)/etc/echosmart
+	install -m 640 $(CURDIR)/debian/gateway.env.example \
+	               $(DESTDIR)/etc/echosmart/gateway.env.example
+
+	# Install systemd service
+	install -d $(DESTDIR)/lib/systemd/system
+	install -m 644 $(CURDIR)/debian/echosmart-gateway.service \
+	               $(DESTDIR)/lib/systemd/system/
+
+	# Create data + runtime directories (postinst will set ownership)
+	install -d $(DESTDIR)/var/lib/echosmart
+	install -d $(DESTDIR)/var/log/echosmart
+
+# ---------------------------------------------------------------------------
+# Clean
+# ---------------------------------------------------------------------------
+override_dh_auto_clean:
+	rm -rf $(CPP_BUILD_DIR)
+	dh_auto_clean
