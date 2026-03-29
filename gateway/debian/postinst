@@ -1,0 +1,47 @@
+#!/bin/bash
+# EchoSmart Gateway — Post-installation script
+set -e
+
+GATEWAY_HOME="/opt/echosmart/gateway"
+CONFIG_FILE="/etc/echosmart/gateway.env"
+SERVICE_USER="echosmart"
+
+case "$1" in
+    configure)
+        # Crear usuario del sistema si no existe
+        if ! id -u "${SERVICE_USER}" &>/dev/null; then
+            adduser --system --group --no-create-home \
+                    --home "${GATEWAY_HOME}" \
+                    --shell /bin/false \
+                    "${SERVICE_USER}"
+        fi
+
+        # Crear configuración inicial si no existe
+        if [[ ! -f "${CONFIG_FILE}" ]]; then
+            cp "${GATEWAY_HOME}/../../../etc/echosmart/gateway.env.example" \
+               "${CONFIG_FILE}" 2>/dev/null || true
+            chmod 640 "${CONFIG_FILE}" || true
+            chown root:echosmart "${CONFIG_FILE}" || true
+        fi
+
+        # Ajustar permisos del directorio de instalación
+        chown -R "${SERVICE_USER}:${SERVICE_USER}" "${GATEWAY_HOME}" || true
+
+        # Activar y arrancar el servicio
+        if command -v systemctl &>/dev/null; then
+            systemctl daemon-reload
+            systemctl enable echosmart-gateway.service || true
+        fi
+
+        echo "EchoSmart Gateway instalado correctamente."
+        echo "Configura el gateway con: sudo echosmart-gateway-setup"
+        ;;
+    abort-upgrade|abort-remove|abort-deconfigure)
+        ;;
+    *)
+        echo "postinst: argumento inesperado '$1'" >&2
+        exit 1
+        ;;
+esac
+
+exit 0

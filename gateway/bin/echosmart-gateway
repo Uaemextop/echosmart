@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+# EchoSmart Gateway — Wrapper binary
+# Instalado en /usr/bin/echosmart-gateway por el paquete .deb
+set -euo pipefail
+
+GATEWAY_HOME="${ECHOSMART_HOME:-/opt/echosmart/gateway}"
+VENV_PYTHON="${GATEWAY_HOME}/venv/bin/python"
+
+if [[ ! -x "${VENV_PYTHON}" ]]; then
+    echo "ERROR: No se encontró el entorno virtual en ${GATEWAY_HOME}/venv" >&2
+    echo "Ejecuta: echosmart-gateway-setup" >&2
+    exit 1
+fi
+
+exec "${VENV_PYTHON}" -m src.cli "$@"
