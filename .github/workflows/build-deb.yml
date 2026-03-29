@@ -1,0 +1,62 @@
+name: Build .deb Package
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-gateway-deb:
+    name: Build EchoPy Gateway .deb (arm64)
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install cross-compilation tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            gcc-aarch64-linux-gnu \
+            g++-aarch64-linux-gnu \
+            dpkg-dev \
+            fakeroot \
+            debhelper
+
+      - name: Cross-compile C++ binaries for arm64
+        run: |
+          mkdir -p gateway/debian/build-cpp
+          cd gateway/cpp
+          aarch64-linux-gnu-g++ -O2 -std=c++17 -o ../debian/build-cpp/echosmart-sysinfo echosmart-sysinfo.cpp
+          aarch64-linux-gnu-g++ -O2 -std=c++17 -o ../debian/build-cpp/echosmart-sensor-read echosmart-sensor-read.cpp
+
+      - name: Test binaries on host (simulate mode)
+        run: |
+          cd gateway/cpp
+          g++ -O2 -std=c++17 -o /tmp/echosmart-sysinfo echosmart-sysinfo.cpp
+          g++ -O2 -std=c++17 -o /tmp/echosmart-sensor-read echosmart-sensor-read.cpp
+          /tmp/echosmart-sysinfo --simulate
+          /tmp/echosmart-sensor-read ds18b20 --simulate
+
+      - name: Build .deb package
+        run: |
+          cd gateway
+          dpkg-buildpackage -b -us -uc --host-arch=arm64 -rfakeroot
+
+      - name: Generate checksums
+        run: |
+          cd ..
+          sha256sum *.deb > checksums-deb.sha256
+
+      - name: Upload .deb to GitHub Releases
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            ../*.deb
+            ../checksums-deb.sha256
+          generate_release_notes: true

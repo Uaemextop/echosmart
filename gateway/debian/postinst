@@ -1,0 +1,31 @@
+#!/bin/bash
+set -e
+
+case "$1" in
+    configure)
+        # Create echosmart system user if it does not exist
+        if ! id -u echosmart >/dev/null 2>&1; then
+            useradd --system --no-create-home --shell /usr/sbin/nologin echosmart
+        fi
+
+        # Ensure config directory permissions
+        mkdir -p /etc/echosmart
+        chown echosmart:echosmart /etc/echosmart
+        chmod 750 /etc/echosmart
+
+        # Enable (but don't start) the service — the user should run setup first
+        systemctl daemon-reload
+        echo ""
+        echo "╔══════════════════════════════════════════════╗"
+        echo "║   EchoSmart Gateway installed successfully   ║"
+        echo "╚══════════════════════════════════════════════╝"
+        echo ""
+        echo "Next steps:"
+        echo "  1. Run the setup wizard:   sudo echosmart-gateway-setup"
+        echo "  2. Enable the service:     sudo systemctl enable --now echosmart-gateway"
+        echo "  3. Check status:           sudo systemctl status echosmart-gateway"
+        echo ""
+        ;;
+esac
+
+exit 0

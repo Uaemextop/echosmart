@@ -1,0 +1,25 @@
+[Unit]
+Description=EchoSmart IoT Gateway Daemon
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=echosmart
+Group=echosmart
+ExecStart=/usr/bin/echosmart-gateway
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=echosmart-gateway
+
+# Hardening
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/etc/echosmart
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
