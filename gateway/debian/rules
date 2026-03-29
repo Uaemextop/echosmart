@@ -12,9 +12,11 @@ override_dh_auto_install:
 	# Application files
 	install -d $(CURDIR)/debian/echosmart-gateway/opt/echosmart/gateway
 	cp -r src  $(CURDIR)/debian/echosmart-gateway/opt/echosmart/gateway/
-	cp -r gateway  $(CURDIR)/debian/echosmart-gateway/opt/echosmart/gateway/ 2>/dev/null || true
-	cp main.py requirements.txt sensors.json \
-	   $(CURDIR)/debian/echosmart-gateway/opt/echosmart/gateway/ 2>/dev/null || true
+	cp main.py requirements.txt \
+	   $(CURDIR)/debian/echosmart-gateway/opt/echosmart/gateway/
+	if [ -f sensors.json ]; then \
+	  cp sensors.json $(CURDIR)/debian/echosmart-gateway/opt/echosmart/gateway/; \
+	fi
 
 	# CLI binary wrapper → /usr/bin/
 	install -d $(CURDIR)/debian/echosmart-gateway/usr/bin
