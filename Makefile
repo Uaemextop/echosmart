@@ -49,7 +49,7 @@ deb: ## Build the echosmart-gateway .deb package
 	cd $(GATEWAY_DIR) && dpkg-buildpackage -us -uc -b
 	@echo ""
 	@echo "Package built — .deb file(s):"
-	@ls -1 echosmart-gateway_*.deb 2>/dev/null || echo "  (check parent directory)"
+	@ls -1 $(GATEWAY_DIR)/../echosmart-gateway_*.deb 2>/dev/null || echo "  (check parent directory of gateway/)"
 
 # ── Docker ───────────────────────────────────────────────────
 docker-up: ## Start all services via Docker Compose

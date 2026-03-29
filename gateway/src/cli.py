@@ -31,7 +31,7 @@ def build_parser() -> argparse.ArgumentParser:
     # run
     run_parser = sub.add_parser("run", help="Start the gateway service")
     run_parser.add_argument(
-        "--simulate", action="store_true", default=None,
+        "--simulate", action="store_true", default=False,
         help="Force simulation mode (no real hardware)",
     )
 
@@ -49,7 +49,7 @@ def build_parser() -> argparse.ArgumentParser:
 
 def cmd_run(args):
     """Start the gateway."""
-    simulation = args.simulate if args.simulate is not None else config.simulation_mode
+    simulation = args.simulate or config.simulation_mode
     logger.info("Starting EchoSmart Gateway v%s", __version__)
     logger.info("Gateway ID: %s", config.gateway_id)
     logger.info("Simulation mode: %s", simulation)

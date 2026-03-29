@@ -9,7 +9,7 @@ SERVICE_NAME="echosmart-gateway.service"
 
 # Create echosmart system user if it does not exist
 if ! id -u echosmart >/dev/null 2>&1; then
-    adduser --system --group --home /opt/echosmart --no-create-home \
+    adduser --system --group --no-create-home \
         --shell /usr/sbin/nologin echosmart
 fi
 

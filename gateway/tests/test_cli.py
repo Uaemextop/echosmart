@@ -13,7 +13,7 @@ def test_cli_parser_run():
     parser = build_parser()
     args = parser.parse_args(["run"])
     assert args.command == "run"
-    assert args.simulate is None
+    assert args.simulate is False
 
 
 def test_cli_parser_run_simulate():
