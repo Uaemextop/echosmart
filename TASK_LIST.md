@@ -767,6 +767,8 @@ gateway/src/
 > La estructura actual agrupa por tipo (`models/`, `routers/`, `services/`). Migrar a estructura por feature.
 
 - [ ] Planificar la migración: documentar el mapa de archivos actual → nuevo
+- [x] Crear `backend/src/shared/app.py` como FastAPI app factory para centralizar bootstrap y middlewares
+- [x] Crear el vertical slice inicial `backend/src/health/` (`router.py`, `service.py`, `schemas.py`) para arrancar la migración por feature sin romper endpoints existentes
 - [ ] Crear estructura por feature:
   ```
   backend/src/
@@ -1042,6 +1044,7 @@ gateway/src/
 > 🏛️ Los routers son FINOS. Solo: 1) Parsear request, 2) Llamar servicio, 3) Devolver response. Sin lógica de negocio.
 
 - [x] Routers básicos implementados
+- [x] Router inicial de health checks con `GET /`, `GET /health` y alias legado `GET /api/v1/health`
 - [ ] **Auth Router** (`/api/v1/auth`):
   - [ ] `POST /register` — Registro de usuario
   - [ ] `POST /login` — Login con email/password

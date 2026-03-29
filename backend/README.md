@@ -37,15 +37,17 @@ pytest tests/ -v --cov=src
 ```
 backend/
 ├── src/
-│   ├── main.py              # Punto de entrada FastAPI
 │   ├── config.py            # Configuración (env vars)
 │   ├── database.py          # Conexión a bases de datos
-│   ├── dependencies.py      # Inyección de dependencias
-│   ├── routers/             # Endpoints REST
-│   ├── services/            # Lógica de negocio
-│   ├── models/              # Modelos SQLAlchemy
-│   ├── schemas/             # Esquemas Pydantic
+│   ├── dependencies.py      # Inyección de dependencias heredada
+│   ├── health/              # Vertical slice inicial por feature
+│   ├── main.py              # Punto de entrada FastAPI
 │   ├── middleware/          # Middlewares
+│   ├── models/              # Modelos SQLAlchemy heredados
+│   ├── routers/             # Endpoints REST heredados
+│   ├── schemas/             # Esquemas Pydantic heredados
+│   ├── services/            # Lógica de negocio heredada
+│   ├── shared/              # App factory y utilidades compartidas
 │   ├── workers/             # Tareas asincrónicas
 │   └── websocket/           # WebSocket tiempo real
 ├── migrations/              # Migraciones Alembic
