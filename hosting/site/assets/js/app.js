@@ -267,7 +267,7 @@ function initRegisterForm() {
     if (currentStep === 1) {
       const serial = form.querySelector('[name="serial_number"]').value.trim();
       if (!validateSerial(serial)) {
-        setError(form, 'serial_number', 'Formato inválido. Usa ES-YYYYMM-XXXX');
+        setError(form, 'serial_number', 'Formato inválido. Usa ES-YYYYMM-XXXX (ej: ES-202601-A1B2)');
         return;
       }
       clearErrors(form);
@@ -321,7 +321,7 @@ function updateSteps(step) {
 async function submitRegistration(form) {
   const payload = {
     serial_number: form.querySelector('[name="serial_number"]').value.trim(),
-    name: form.querySelector('[name="name"]').value.trim(),
+    full_name: form.querySelector('[name="name"]').value.trim(),
     email: form.querySelector('[name="email"]').value.trim(),
     password: form.querySelector('[name="password"]').value,
   };
