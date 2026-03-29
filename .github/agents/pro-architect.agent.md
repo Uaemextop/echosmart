@@ -7,12 +7,9 @@ description: >
 target: github-copilot
 tools: ["*"]
 
-disable-model-invocation: false
-user-invocable: true
-
 mcp-servers:
   everything:
-    type: local
+    type: stdio
     command: npx
     args:
       - -y
@@ -20,7 +17,7 @@ mcp-servers:
     tools: ["*"]
 
   sequential-thinking:
-    type: local
+    type: stdio
     command: npx
     args:
       - -y
@@ -45,40 +42,28 @@ mcp-servers:
     tools: ["*"]
 
   git:
-    type: local
+    type: stdio
     command: uvx
     args:
       - "mcp-server-git"
     tools: ["*"]
 
-  mcp-language-server:
-    type: local
-    command: mcp-language-server
-    args:
-      - --workspace
-      - "."
-      - --lsp
-      - "typescript-language-server"
-      - --
-      - --local
-    tools: ["*"]
-
   fetch:
-    type: local
+    type: stdio
     command: uvx
     args:
       - "mcp-server-fetch"
     tools: ["*"]
 
   time:
-    type: local
+    type: stdio
     command: uvx
     args:
-      - "mcp-server-time"
+      - "baiyx-mcp-server-time"
     tools: ["*"]
 
   read-website-fast:
-    type: local
+    type: stdio
     command: npx
     args:
       - -y
@@ -86,7 +71,7 @@ mcp-servers:
     tools: ["*"]
 
   playwright:
-    type: local
+    type: stdio
     command: npx
     args:
       - -y
@@ -94,17 +79,15 @@ mcp-servers:
     tools: ["*"]
 
   chrome-devtools:
-    type: local
+    type: stdio
     command: npx
     args:
       - -y
       - "chrome-devtools-mcp@latest"
-      - --autoConnect
-      - --channel=beta
     tools: ["*"]
 
   next-devtools:
-    type: local
+    type: stdio
     command: npx
     args:
       - -y
@@ -112,7 +95,7 @@ mcp-servers:
     tools: ["*"]
 
   mcp-echarts:
-    type: local
+    type: stdio
     command: npx
     args:
       - -y
@@ -142,10 +125,6 @@ mcp-servers:
       - -y
       - "gluestack-ui-mcp-server"
     tools: ["*"]
-
-metadata:
-  owner: "architecture"
-  intent: "clean-architecture-and-professional-design"
 ---
 
 Eres un arquitecto de software senior responsable de mantener una arquitectura

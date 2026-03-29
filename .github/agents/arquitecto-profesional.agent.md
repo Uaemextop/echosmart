@@ -5,103 +5,91 @@ target: github-copilot
 tools: ['*']
 mcp-servers:
   everything:
-    type: local
+    type: stdio
     command: npx
     args: ['-y', '@modelcontextprotocol/server-everything']
     tools: ['*']
 
   sequential-thinking:
-    type: local
+    type: stdio
     command: npx
     args: ['-y', '@modelcontextprotocol/server-sequential-thinking']
     tools: ['*']
 
   memory:
-    type: local
+    type: stdio
     command: npx
     args: ['-y', '@modelcontextprotocol/server-memory']
     tools: ['*']
 
   filesystem:
-    type: local
+    type: stdio
     command: npx
     args: ['-y', '@modelcontextprotocol/server-filesystem', '.']
     tools: ['*']
 
   git:
-    type: local
+    type: stdio
     command: uvx
     args: ['mcp-server-git']
     tools: ['*']
 
-  mcp-language-server:
-    type: local
-    command: mcp-language-server
-    args:
-      - --workspace
-      - /path/to/your/project
-      - --lsp
-      - typescript-language-server
-      - --
-      - --stdio
-    tools: ['*']
-
   fetch:
-    type: local
+    type: stdio
     command: uvx
     args: ['mcp-server-fetch']
     tools: ['*']
 
   time:
-    type: local
+    type: stdio
     command: uvx
     args: ['baiyx-mcp-server-time']
     tools: ['*']
 
   read-website-fast:
-    type: local
+    type: stdio
     command: npx
     args: ['-y', '@just-every/mcp-read-website-fast']
     tools: ['*']
 
   playwright:
-    type: local
+    type: stdio
     command: npx
     args: ['-y', '@playwright/mcp@latest']
     tools: ['*']
 
   chrome-devtools:
-    type: local
+    type: stdio
     command: npx
-    args: ['-y', 'chrome-devtools-mcp@latest', '--autoConnect', '--channel=beta']
+    args: ['-y', 'chrome-devtools-mcp@latest']
     tools: ['*']
 
   next-devtools:
-    type: local
+    type: stdio
     command: npx
     args: ['-y', 'next-devtools-mcp']
     tools: ['*']
 
   mcp-echarts:
-    type: local
+    type: stdio
     command: npx
     args: ['-y', 'mcp-echarts']
     tools: ['*']
 
   mcp-mermaid:
-    type: local
+    type: stdio
     command: npx
     args: ['-y', 'mcp-mermaid']
     tools: ['*']
 
   flyonui:
-    type: local
+    type: stdio
     command: npx
     args: ['-y', 'flyonui-mcp']
     tools: ['*']
 
   gluestack-ui:
-    type: local
+    type: stdio
     command: npx
     args: ['-y', 'gluestack-ui-mcp-server']
     tools: ['*']
