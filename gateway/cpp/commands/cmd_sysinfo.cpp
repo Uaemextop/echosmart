@@ -18,6 +18,7 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <sys/statvfs.h>
 #include <vector>
 
 namespace echosmart {
@@ -97,16 +98,18 @@ static void read_memory(double& total_mb, double& available_mb) {
     }
 }
 
-/// Read root filesystem usage via statvfs-style info from /proc/mounts.
+/// Read root filesystem usage via statvfs(2).
 /// Falls back to 0.0 on failure.
 static void read_disk(double& total_gb, double& used_gb) {
     total_gb = 0.0;
     used_gb  = 0.0;
-    // /proc/self/mountstats is complex; use a simpler approach:
-    // read the statfs information for root.
-    // Since we cannot call statvfs without <sys/statvfs.h>, we parse
-    // the output concept differently — just report zeros on failure.
-    // A real deployment would use statvfs(2).
+    struct statvfs buf{};
+    if (statvfs("/", &buf) == 0) {
+        const double block = static_cast<double>(buf.f_frsize);
+        total_gb = (static_cast<double>(buf.f_blocks) * block) / (1024.0 * 1024.0 * 1024.0);
+        double free_gb = (static_cast<double>(buf.f_bavail) * block) / (1024.0 * 1024.0 * 1024.0);
+        used_gb = total_gb - free_gb;
+    }
 }
 
 // -----------------------------------------------------------------------
