@@ -426,7 +426,7 @@ A continuación se definen los **5 sensores** seleccionados para el proyecto. Ca
 | **Alimentación** | 3.0V – 5.5V (compatible con RPi 3.3V) |
 | **Rango óptimo invernadero** | 18°C – 28°C |
 | **¿Por qué este sensor?** | Estándar de facto en proyectos IoT agrícolas. Resistente al agua (versión encapsulada), permite múltiples sensores en el mismo bus 1-Wire con direcciones únicas. Precio bajo (~$2 USD). Compatible nativo con Raspberry Pi. |
-| **Driver** | `gateway/cpp/echosmart read.cpp` (sub-comando `ds18b20`) |
+| **Driver** | `gateway/cpp/echosmart-sensor-read.cpp` (sub-comando `ds18b20`) |
 | **Simulación** | `echosmart read ds18b20 --simulate=true` → valores entre 15.0°C y 35.0°C |
 
 #### 💧 Sensor 2: DHT22 (AM2302) — Temperatura + Humedad Relativa
@@ -441,7 +441,7 @@ A continuación se definen los **5 sensores** seleccionados para el proyecto. Ca
 | **Alimentación** | 3.3V – 6V |
 | **Rango óptimo invernadero** | Temp: 18–28°C, Humedad: 60–80% RH |
 | **¿Por qué este sensor?** | Combina temperatura y humedad en un solo módulo. Mejor precisión que el DHT11. Muy utilizado en agricultura de precisión. Bajo costo (~$3 USD). Lectura vía GPIO con libgpiod en el binario C++. |
-| **Driver** | `gateway/cpp/echosmart read.cpp` (sub-comando `dht22`) |
+| **Driver** | `gateway/cpp/echosmart-sensor-read.cpp` (sub-comando `dht22`) |
 | **Simulación** | `echosmart read dht22 --simulate=true` → Temp: 15.0–35.0°C, Humedad: 40.0–90.0% |
 
 #### ☀️ Sensor 3: BH1750 — Luminosidad (Lux)
@@ -456,7 +456,7 @@ A continuación se definen los **5 sensores** seleccionados para el proyecto. Ca
 | **Alimentación** | 2.4V – 3.6V (compatible con RPi 3.3V) |
 | **Rango óptimo invernadero** | 10,000 – 30,000 lux |
 | **¿Por qué este sensor?** | Sensor digital de luz con salida directa en lux (no requiere conversión). Protocolo I2C estándar. Ideal para determinar si el invernadero necesita iluminación suplementaria o protección contra exceso de luz. Precio muy bajo (~$1.5 USD). |
-| **Driver** | `gateway/cpp/echosmart read.cpp` (sub-comando `bh1750`) |
+| **Driver** | `gateway/cpp/echosmart-sensor-read.cpp` (sub-comando `bh1750`) |
 | **Simulación** | `echosmart read bh1750 --simulate=true` → valores entre 500 y 50,000 lux |
 
 #### 🌱 Sensor 4: Sensor de Humedad de Suelo + ADS1115 (ADC)
@@ -470,7 +470,7 @@ A continuación se definen los **5 sensores** seleccionados para el proyecto. Ca
 | **Alimentación** | 3.3V – 5V |
 | **Rango óptimo invernadero** | 50% – 80% de humedad de suelo |
 | **¿Por qué este sensor?** | El sensor capacitivo (v1.2) es superior al resistivo: no se corroe, vida útil más larga. El ADS1115 proporciona conversión analógico-digital de alta resolución via I2C. Permite conectar hasta 4 sensores de suelo en un solo módulo. Precio combinado ~$4 USD. |
-| **Driver** | `gateway/cpp/echosmart read.cpp` (sub-comando `soil`) |
+| **Driver** | `gateway/cpp/echosmart-sensor-read.cpp` (sub-comando `soil`) |
 | **Simulación** | `echosmart read soil --simulate=true` → valores entre 20.0% y 90.0% |
 
 #### 🏭 Sensor 5: MH-Z19C — Concentración de CO₂
@@ -487,7 +487,7 @@ A continuación se definen los **5 sensores** seleccionados para el proyecto. Ca
 | **Alimentación** | 4.9V – 5.1V (requiere nivel de voltaje estable) |
 | **Rango óptimo invernadero** | 400 – 1,000 ppm |
 | **¿Por qué este sensor?** | Tecnología NDIR (infrarrojo no dispersivo) ofrece mediciones precisas y estables a largo plazo. Autocalibración incorporada (ABC logic). El CO₂ es crítico para la fotosíntesis; niveles altos indican ventilación insuficiente. Compatible con UART del RPi. Precio ~$18 USD. |
-| **Driver** | `gateway/cpp/echosmart read.cpp` (sub-comando `mhz19c`) |
+| **Driver** | `gateway/cpp/echosmart-sensor-read.cpp` (sub-comando `mhz19c`) |
 | **Simulación** | `echosmart read mhz19c --simulate=true` → valores entre 350 y 2,000 ppm |
 
 #### Resumen de Sensores
