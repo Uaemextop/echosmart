@@ -6,6 +6,13 @@ from pydantic_settings import BaseSettings
 class Settings(BaseSettings):
     """Configuración del backend cargada desde variables de entorno."""
 
+    app_name: str = "EchoSmart API"
+    app_service_name: str = "echosmart-backend"
+    app_description: str = (
+        "API REST para la plataforma IoT de monitoreo ambiental en invernaderos."
+    )
+    app_version: str = "1.0.0"
+
     # Base de datos
     database_url: str = "postgresql://echosmart:echosmart@localhost:5432/echosmart"
 
