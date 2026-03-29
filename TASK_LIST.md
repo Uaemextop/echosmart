@@ -4504,7 +4504,7 @@ desktop/
 - [ ] Formato del serial: `ES-YYYYMM-XXXX` (ej: `ES-202603-0001`)
   - [ ] `ES` = EchoSmart
   - [ ] `YYYYMM` = año y mes de producción
-  - [ ] `XXXX` = número secuencial (4 dígitos, 0001-9999 por mes)
+  - [ ] `XXXX` = número secuencial (4 dígitos, 0001-9999 por mes; si se necesitan más de 9,999/mes, extender a 5 dígitos `XXXXX`)
 - [ ] Generación de seriales desde el panel admin: `echosmart-server serials generate --batch=100`
 - [ ] Base de datos de seriales con estados: `available`, `registered`, `revoked`
 - [ ] Etiqueta física:
