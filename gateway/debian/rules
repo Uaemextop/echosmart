@@ -1,0 +1,30 @@
+#!/usr/bin/make -f
+# Debian rules file for echosmart-gateway
+
+%:
+	dh $@ --with python3
+
+override_dh_auto_install:
+	# Application code
+	install -d $(CURDIR)/debian/echosmart-gateway/opt/echosmart/gateway
+	cp -a src/ $(CURDIR)/debian/echosmart-gateway/opt/echosmart/gateway/
+	cp main.py $(CURDIR)/debian/echosmart-gateway/opt/echosmart/gateway/
+	cp sensors.json $(CURDIR)/debian/echosmart-gateway/opt/echosmart/gateway/
+	cp pyproject.toml $(CURDIR)/debian/echosmart-gateway/opt/echosmart/gateway/
+	cp requirements.txt $(CURDIR)/debian/echosmart-gateway/opt/echosmart/gateway/
+
+	# CLI binaries
+	install -d $(CURDIR)/debian/echosmart-gateway/usr/bin
+	install -m 755 bin/echosmart-gateway $(CURDIR)/debian/echosmart-gateway/usr/bin/
+	install -m 755 bin/echosmart-gateway-setup $(CURDIR)/debian/echosmart-gateway/usr/bin/
+
+	# Systemd service
+	install -d $(CURDIR)/debian/echosmart-gateway/lib/systemd/system
+	install -m 644 debian/echosmart-gateway.service $(CURDIR)/debian/echosmart-gateway/lib/systemd/system/
+
+	# Default config directory
+	install -d $(CURDIR)/debian/echosmart-gateway/etc/echosmart
+	install -m 640 debian/gateway.env.default $(CURDIR)/debian/echosmart-gateway/etc/echosmart/gateway.env
+
+override_dh_auto_test:
+	# Tests require simulation mode; skip during package build
