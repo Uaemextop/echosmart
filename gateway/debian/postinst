@@ -21,9 +21,10 @@ case "$1" in
         echo "╚══════════════════════════════════════════════╝"
         echo ""
         echo "Next steps:"
-        echo "  1. Run the setup wizard:   sudo echosmart-gateway-setup"
+        echo "  1. Run the setup wizard:   sudo echosmart setup"
         echo "  2. Enable the service:     sudo systemctl enable --now echosmart-gateway"
         echo "  3. Check status:           sudo systemctl status echosmart-gateway"
+        echo "  4. Test sensors:           echosmart test all --simulate=true"
         echo ""
         ;;
 esac

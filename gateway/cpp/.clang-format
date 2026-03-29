@@ -1,0 +1,39 @@
+---
+# EchoSmart C++ code style — based on Google style with project overrides
+BasedOnStyle: Google
+IndentWidth: 4
+ColumnLimit: 100
+Language: Cpp
+Standard: c++17
+
+# Alignment
+AlignAfterOpenBracket: Align
+AlignConsecutiveAssignments: false
+AlignConsecutiveDeclarations: false
+AlignOperands: true
+AlignTrailingComments: true
+
+# Braces
+BreakBeforeBraces: Attach
+AllowShortBlocksOnASingleLine: Empty
+AllowShortFunctionsOnASingleLine: Inline
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLoopsOnASingleLine: false
+
+# Includes
+SortIncludes: CaseSensitive
+IncludeBlocks: Preserve
+
+# Spacing
+SpaceAfterCStyleCast: false
+SpaceBeforeParens: ControlStatements
+SpaceBeforeRangeBasedForLoopColon: true
+
+# Pointers and references
+PointerAlignment: Left
+
+# Misc
+DerivePointerAlignment: false
+ReflowComments: true
+UseTab: Never
+---
