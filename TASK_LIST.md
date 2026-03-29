@@ -1,6 +1,8 @@
 # EchoSmart — Lista de Tareas de Desarrollo Multiplataforma
 
-> Proyecto IoT de agricultura de precisión para monitoreo ambiental inteligente en invernaderos.
+> Kit IoT de agricultura de precisión para monitoreo ambiental inteligente en invernaderos.
+> Gateway implementado en **C++17 nativo** con empaquetado **.deb** para Raspberry Pi OS (arm64).
+> Producto comercializado como **kit llave en mano** (Raspberry Pi + sensores + microSD pre-grabada).
 
 ---
 
@@ -15,7 +17,7 @@ El proyecto sigue **Clean Architecture** de Robert C. Martin. Las capas son:
 ```
 ┌─────────────────────────────────────────────┐
 │  Capa Externa: Frameworks & Drivers         │
-│  (FastAPI, React, Electron, RPi.GPIO)       │
+│  (FastAPI, React, Electron, C++ binaries)    │
 │  ┌─────────────────────────────────────┐    │
 │  │  Capa de Adaptadores (Interfaces)   │    │
 │  │  (Routers, Controllers, Repos impl) │    │
@@ -43,8 +45,8 @@ El proyecto sigue **Clean Architecture** de Robert C. Martin. Las capas son:
 | Principio | Aplicación en EchoSmart |
 |-----------|------------------------|
 | **S** — Single Responsibility | Cada archivo/clase tiene UNA sola razón para cambiar. `sensor_service.py` NO debe manejar alertas. |
-| **O** — Open/Closed | Nuevos sensores se agregan creando un nuevo driver, SIN modificar `sensor_manager.py`. |
-| **L** — Liskov Substitution | Todos los drivers de sensores implementan la misma interfaz `BaseSensorDriver`. Son intercambiables. |
+| **O** — Open/Closed | Nuevos sensores se agregan creando un nuevo sub-comando en `echosmart-sensor-read`, SIN modificar el daemon `echosmart-gateway`. |
+| **L** — Liskov Substitution | Todos los sensores se leen con la misma interfaz del binario `echosmart-sensor-read <sensor> --simulate`. Son intercambiables. |
 | **I** — Interface Segregation | No forzar a un componente a depender de métodos que no usa. Interfaces pequeñas y específicas. |
 | **D** — Dependency Inversion | Los servicios dependen de abstracciones (interfaces/protocolos), no de implementaciones concretas. |
 
@@ -102,7 +104,7 @@ backend/src/
  ╱              ╲ - DB tests con fixtures
 ╱────────────────╲
 ╱                  ╲ Unit Tests (muchos, rápidos, baratos)
-╱────────────────────╲ - pytest (Python), Vitest (JS)
+╱────────────────────╲ - pytest (Backend Python), CTest/shell (Gateway C++), Vitest (JS)
 ```
 
 - **Cobertura mínima**: 80% en servicios y utilidades
@@ -111,15 +113,15 @@ backend/src/
 
 ### Principio 6: Convenciones de Código
 
-| Aspecto | Python (Backend/Gateway) | JavaScript/TypeScript (Frontend/Mobile/Desktop) |
-|---------|--------------------------|--------------------------------------------------|
-| **Estilo** | PEP 8 + Black formatter | ESLint + Prettier |
-| **Nombrado** | `snake_case` para funciones/variables, `PascalCase` para clases | `camelCase` para funciones/variables, `PascalCase` para componentes |
-| **Imports** | Ordenados: stdlib → third-party → local | Ordenados: react → libs → components → utils |
-| **Docstrings** | Google-style docstrings | JSDoc para funciones públicas |
-| **Type hints** | Obligatorios en funciones públicas | TypeScript/JSDoc types |
-| **Max line length** | 88 caracteres (Black) | 100 caracteres (Prettier) |
-| **Commits** | Conventional Commits: `feat:`, `fix:`, `refactor:`, `test:`, `docs:` | Conventional Commits |
+| Aspecto | C++ (Gateway) | Python (Backend) | JavaScript/TypeScript (Frontend/Mobile/Desktop) |
+|---------|---------------|------------------|--------------------------------------------------|
+| **Estilo** | C++17, clang-format | PEP 8 + Black formatter | ESLint + Prettier |
+| **Nombrado** | `snake_case` para funciones/variables, `PascalCase` para clases | `snake_case` funciones/variables, `PascalCase` clases | `camelCase` para funciones/variables, `PascalCase` para componentes |
+| **Compilación** | CMake + g++/clang++ | N/A | N/A |
+| **Empaquetado** | .deb (dpkg-buildpackage) | pip + requirements.txt | npm |
+| **Type hints** | Tipado estático nativo C++ | Obligatorios en funciones públicas | TypeScript/JSDoc types |
+| **Max line length** | 100 caracteres | 88 caracteres (Black) | 100 caracteres (Prettier) |
+| **Commits** | Conventional Commits: `feat:`, `fix:`, `refactor:`, `test:`, `docs:` | Conventional Commits | Conventional Commits |
 
 ### Principio 7: Patrones de Diseño Aplicados
 
@@ -127,7 +129,7 @@ backend/src/
 |--------|-------------|---------|
 | **Repository** | Backend — acceso a datos | `SensorRepository` encapsula queries SQL |
 | **Service Layer** | Backend — lógica de negocio | `AlertService` orquesta detección y notificación |
-| **Factory** | Gateway — creación de drivers | `SensorDriverFactory.create("ds18b20")` |
+| **Factory** | Gateway — creación de lecturas | `echosmart-sensor-read <tipo>` selecciona el sub-comando correcto |
 | **Observer** | Gateway/Frontend — eventos | Sensor Manager emite eventos, Alert Engine escucha |
 | **Strategy** | Gateway — protocolos de comunicación | Diferentes estrategias para I2C, UART, GPIO |
 | **Adapter** | Frontend — API calls | Adaptar respuesta HTTP a estado Redux |
@@ -137,23 +139,25 @@ backend/src/
 
 ### Principio 8: Manejo de Errores
 
-```python
-# ❌ MAL — Silenciar errores
-try:
-    reading = sensor.read()
-except:
-    pass
+```cpp
+// ❌ MAL — Silenciar errores
+try {
+    reading = sensor.read();
+} catch (...) {
+    // silencio
+}
 
-# ✅ BIEN — Errores específicos con manejo apropiado
-try:
-    reading = sensor.read()
-except SensorTimeoutError as e:
-    logger.warning(f"Sensor {sensor.id} timeout: {e}")
-    return SensorReading.empty(sensor.id, error="timeout")
-except SensorDisconnectedError as e:
-    logger.error(f"Sensor {sensor.id} disconnected: {e}")
-    alert_engine.fire(AlertType.SENSOR_OFFLINE, sensor.id)
-    raise
+// ✅ BIEN — Errores específicos con manejo apropiado
+try {
+    auto reading = sensor.read();
+} catch (const SensorTimeoutError& e) {
+    log_warning("Sensor " + sensor.id + " timeout: " + e.what());
+    return SensorReading::empty(sensor.id, "timeout");
+} catch (const SensorDisconnectedError& e) {
+    log_error("Sensor " + sensor.id + " disconnected: " + e.what());
+    alert_engine.fire(AlertType::SENSOR_OFFLINE, sensor.id);
+    throw;
+}
 ```
 
 **Jerarquía de excepciones personalizadas**:
@@ -174,24 +178,20 @@ EchoSmartError (base)
 
 ### Principio 9: Logging Estructurado
 
-```python
-# ❌ MAL — Print statements
-print(f"Sensor leyó {value}")
+```cpp
+// ❌ MAL — Print statements
+std::cout << "Sensor leyó " << value << std::endl;
 
-# ✅ BIEN — Logging con contexto
-import structlog
-logger = structlog.get_logger()
-
-logger.info("sensor_reading_received",
-    sensor_id=sensor.id,
-    sensor_type="ds18b20",
-    value=25.3,
-    unit="°C",
-    gateway_id=gateway.id
-)
+// ✅ BIEN — Logging con contexto (ISO 8601 + JSON)
+log_info("sensor_reading_received",
+    {{"sensor_id", sensor.id},
+     {"sensor_type", "ds18b20"},
+     {"value", 25.3},
+     {"unit", "°C"},
+     {"gateway_id", gateway.id}});
 ```
 
-- Usar `structlog` (Python) o `pino`/`winston` (Node.js) para logging estructurado
+- Usar logging estructurado a stdout/journal (C++ gateway) o `structlog` (Python backend)
 - Niveles: DEBUG (desarrollo), INFO (operaciones), WARNING (degradación), ERROR (fallos), CRITICAL (sistema down)
 - NUNCA loguear datos sensibles (passwords, tokens, datos personales)
 
@@ -408,7 +408,7 @@ logger.info("sensor_reading_received",
 
 ## Fase 1: MVP — Gateway Local (Semanas 1–3)
 
-> ⚠️ **IMPORTANTE — Enfoque "Simulation-First"**: Todo el desarrollo de drivers y software del gateway se realiza **sin hardware físico**. Cada driver incluye un modo de simulación (`simulation=True`) que genera datos realistas dentro de los rangos del invernadero. El hardware físico (Raspberry Pi + sensores) se integra únicamente en la **Fase 8: Testing con Hardware Real**.
+> ⚠️ **IMPORTANTE — Enfoque "Simulation-First"**: Todo el desarrollo de binarios del gateway se realiza **sin hardware físico**. Cada binario incluye un flag `--simulate` que genera datos realistas dentro de los rangos del invernadero. El hardware físico (Raspberry Pi + sensores) se integra únicamente en la **Fase 11: Testing con Hardware Real**. El gateway se implementa en **C++17** y se empaqueta como **.deb** para Raspberry Pi OS (arm64).
 
 ### 1.1 Definición de Sensores para Invernadero Inteligente
 
@@ -426,8 +426,8 @@ A continuación se definen los **5 sensores** seleccionados para el proyecto. Ca
 | **Alimentación** | 3.0V – 5.5V (compatible con RPi 3.3V) |
 | **Rango óptimo invernadero** | 18°C – 28°C |
 | **¿Por qué este sensor?** | Estándar de facto en proyectos IoT agrícolas. Resistente al agua (versión encapsulada), permite múltiples sensores en el mismo bus 1-Wire con direcciones únicas. Precio bajo (~$2 USD). Compatible nativo con Raspberry Pi. |
-| **Driver** | `gateway/src/sensor_drivers/ds18b20.py` |
-| **Simulación** | Genera valores aleatorios entre 15.0°C y 35.0°C |
+| **Driver** | `gateway/cpp/echosmart-sensor-read.cpp` (sub-comando `ds18b20`) |
+| **Simulación** | `echosmart-sensor-read ds18b20 --simulate` → valores entre 15.0°C y 35.0°C |
 
 #### 💧 Sensor 2: DHT22 (AM2302) — Temperatura + Humedad Relativa
 | Especificación | Valor |
@@ -440,9 +440,9 @@ A continuación se definen los **5 sensores** seleccionados para el proyecto. Ca
 | **Frecuencia de muestreo** | 1 lectura cada 2 segundos (0.5 Hz) |
 | **Alimentación** | 3.3V – 6V |
 | **Rango óptimo invernadero** | Temp: 18–28°C, Humedad: 60–80% RH |
-| **¿Por qué este sensor?** | Combina temperatura y humedad en un solo módulo. Mejor precisión que el DHT11. Muy utilizado en agricultura de precisión. Bajo costo (~$3 USD). Amplia librería de soporte en Python (`adafruit-circuitpython-dht`). |
-| **Driver** | `gateway/src/sensor_drivers/dht22.py` |
-| **Simulación** | Temp: 15.0–35.0°C, Humedad: 40.0–90.0% |
+| **¿Por qué este sensor?** | Combina temperatura y humedad en un solo módulo. Mejor precisión que el DHT11. Muy utilizado en agricultura de precisión. Bajo costo (~$3 USD). Lectura vía GPIO con libgpiod en el binario C++. |
+| **Driver** | `gateway/cpp/echosmart-sensor-read.cpp` (sub-comando `dht22`) |
+| **Simulación** | `echosmart-sensor-read dht22 --simulate` → Temp: 15.0–35.0°C, Humedad: 40.0–90.0% |
 
 #### ☀️ Sensor 3: BH1750 — Luminosidad (Lux)
 | Especificación | Valor |
@@ -456,8 +456,8 @@ A continuación se definen los **5 sensores** seleccionados para el proyecto. Ca
 | **Alimentación** | 2.4V – 3.6V (compatible con RPi 3.3V) |
 | **Rango óptimo invernadero** | 10,000 – 30,000 lux |
 | **¿Por qué este sensor?** | Sensor digital de luz con salida directa en lux (no requiere conversión). Protocolo I2C estándar. Ideal para determinar si el invernadero necesita iluminación suplementaria o protección contra exceso de luz. Precio muy bajo (~$1.5 USD). |
-| **Driver** | `gateway/src/sensor_drivers/bh1750.py` |
-| **Simulación** | Genera valores entre 500 y 50,000 lux |
+| **Driver** | `gateway/cpp/echosmart-sensor-read.cpp` (sub-comando `bh1750`) |
+| **Simulación** | `echosmart-sensor-read bh1750 --simulate` → valores entre 500 y 50,000 lux |
 
 #### 🌱 Sensor 4: Sensor de Humedad de Suelo + ADS1115 (ADC)
 | Especificación | Valor |
@@ -470,8 +470,8 @@ A continuación se definen los **5 sensores** seleccionados para el proyecto. Ca
 | **Alimentación** | 3.3V – 5V |
 | **Rango óptimo invernadero** | 50% – 80% de humedad de suelo |
 | **¿Por qué este sensor?** | El sensor capacitivo (v1.2) es superior al resistivo: no se corroe, vida útil más larga. El ADS1115 proporciona conversión analógico-digital de alta resolución via I2C. Permite conectar hasta 4 sensores de suelo en un solo módulo. Precio combinado ~$4 USD. |
-| **Driver** | `gateway/src/sensor_drivers/soil_moisture.py` |
-| **Simulación** | Genera valores entre 20.0% y 90.0% |
+| **Driver** | `gateway/cpp/echosmart-sensor-read.cpp` (sub-comando `soil`) |
+| **Simulación** | `echosmart-sensor-read soil --simulate` → valores entre 20.0% y 90.0% |
 
 #### 🏭 Sensor 5: MH-Z19C — Concentración de CO₂
 | Especificación | Valor |
@@ -487,8 +487,8 @@ A continuación se definen los **5 sensores** seleccionados para el proyecto. Ca
 | **Alimentación** | 4.9V – 5.1V (requiere nivel de voltaje estable) |
 | **Rango óptimo invernadero** | 400 – 1,000 ppm |
 | **¿Por qué este sensor?** | Tecnología NDIR (infrarrojo no dispersivo) ofrece mediciones precisas y estables a largo plazo. Autocalibración incorporada (ABC logic). El CO₂ es crítico para la fotosíntesis; niveles altos indican ventilación insuficiente. Compatible con UART del RPi. Precio ~$18 USD. |
-| **Driver** | `gateway/src/sensor_drivers/mhz19c.py` |
-| **Simulación** | Genera valores entre 350 y 2,000 ppm |
+| **Driver** | `gateway/cpp/echosmart-sensor-read.cpp` (sub-comando `mhz19c`) |
+| **Simulación** | `echosmart-sensor-read mhz19c --simulate` → valores entre 350 y 2,000 ppm |
 
 #### Resumen de Sensores
 
@@ -504,257 +504,674 @@ A continuación se definen los **5 sensores** seleccionados para el proyecto. Ca
 **Raspberry Pi recomendado**: Raspberry Pi 4 Model B (2GB+ RAM) — $35–55 USD
 **Costo total estimado del hardware**: ~$65–85 USD (RPi + 5 sensores + cables/protoboard)
 
-### 1.2 Arquitectura del Gateway (Clean Architecture)
+### 1.2 Arquitectura del Gateway (Binarios Qt/C++ + .deb)
 
-> 🏛️ El gateway sigue Clean Architecture con estas capas:
+> 🏛️ El gateway se compone de binarios C++/Qt compilados con CMake y empaquetados en .deb.
+> Cada binario tiene su propio directorio con archivos `.cpp`, `.h`, `.qml`, `.qrc` y `.ui`.
 
 ```
-gateway/src/
-├── domain/                     # Capa de dominio (entidades + interfaces)
-│   ├── entities/               # Entidades puras
-│   │   ├── sensor_reading.py   # SensorReading dataclass
-│   │   ├── alert.py            # Alert entity
-│   │   └── gateway_config.py   # GatewayConfig entity
-│   ├── interfaces/             # Contratos (ABC)
-│   │   ├── sensor_driver.py    # BaseSensorDriver ABC
-│   │   ├── storage.py          # IStorageRepository ABC
-│   │   ├── publisher.py        # IMessagePublisher ABC
-│   │   └── sync_client.py      # ISyncClient ABC
-│   └── constants.py            # Constantes del dominio
-├── application/                # Casos de uso
-│   ├── sensor_manager.py       # Orquesta lectura de sensores
-│   ├── alert_engine.py         # Motor de alertas
-│   └── cloud_sync.py           # Sincronización con cloud
-├── infrastructure/             # Implementaciones concretas
-│   ├── drivers/                # Drivers de sensores
-│   │   ├── ds18b20.py
-│   │   ├── dht22.py
-│   │   ├── bh1750.py
-│   │   ├── soil_moisture.py
-│   │   └── mhz19c.py
-│   ├── hal.py                  # Hardware Abstraction Layer
-│   ├── sqlite_storage.py       # Implementación SQLite
-│   ├── mqtt_publisher.py       # Implementación MQTT
-│   ├── http_sync_client.py     # Implementación HTTP sync
-│   └── discovery.py            # Descubrimiento SSDP
-├── config.py                   # Configuración
-├── main.py                     # Entry point
-└── tests/                      # Tests unitarios e integración
+gateway/
+├── cpp/                                          # Código fuente C++ / Qt
+│   ├── CMakeLists.txt                            # Build system raíz (C++17, Qt6, -O2)
+│   │
+│   ├── shared/                                   # Biblioteca compartida entre binarios
+│   │   ├── CMakeLists.txt                        # Target: libechosmart-shared
+│   │   ├── version.h                             # Macros ES_VERSION, ES_VERSION_STRING
+│   │   ├── sensordata.h                          # Struct SensorData (tipo, valor, unidad, ts)
+│   │   ├── sensordata.cpp                        # Serialización JSON de SensorData
+│   │   ├── alertrule.h                           # Struct AlertRule (sensor, condición, umbral)
+│   │   ├── alertrule.cpp                         # Evaluación de AlertRule
+│   │   ├── jsonformatter.h                       # Funciones de formateo JSON
+│   │   ├── jsonformatter.cpp                     # Implementación sin deps externas
+│   │   ├── configloader.h                        # Carga de gateway.env y sensors.json
+│   │   ├── configloader.cpp                      # Parser key=value y JSON minimal
+│   │   ├── logger.h                              # Log a stdout/journal (ISO 8601)
+│   │   ├── logger.cpp                            # Implementación de log_info/warn/error
+│   │   ├── fileutils.h                           # read_file, trim, file_exists
+│   │   ├── fileutils.cpp                         # Helpers de filesystem
+│   │   └── resources.qrc                         # Recursos compartidos (iconos, JSON schemas)
+│   │
+│   ├── echosmart-sensor-read/                    # Binario de lectura de sensores
+│   │   ├── CMakeLists.txt                        # Target: echosmart-sensor-read
+│   │   ├── main.cpp                              # Entry point, parseo de args, dispatch
+│   │   ├── sensorreader.h                        # Clase SensorReader (interfaz base)
+│   │   ├── sensorreader.cpp                      # Lógica común de lectura
+│   │   ├── drivers/                              # Un .h + .cpp por tipo de sensor
+│   │   │   ├── ds18b20driver.h                   # Clase DS18B20Driver : SensorReader
+│   │   │   ├── ds18b20driver.cpp                 # Lectura 1-Wire + simulación
+│   │   │   ├── dht22driver.h                     # Clase DHT22Driver : SensorReader
+│   │   │   ├── dht22driver.cpp                   # Lectura GPIO + simulación
+│   │   │   ├── bh1750driver.h                    # Clase BH1750Driver : SensorReader
+│   │   │   ├── bh1750driver.cpp                  # Lectura I2C + simulación
+│   │   │   ├── soildriver.h                      # Clase SoilDriver : SensorReader
+│   │   │   ├── soildriver.cpp                    # Lectura ADS1115 ADC + simulación
+│   │   │   ├── mhz19cdriver.h                    # Clase MHZ19CDriver : SensorReader
+│   │   │   └── mhz19cdriver.cpp                  # Lectura UART + simulación
+│   │   └── resources.qrc                         # Recursos del binario sensor-read
+│   │
+│   ├── echosmart-sysinfo/                        # Binario de diagnósticos
+│   │   ├── CMakeLists.txt                        # Target: echosmart-sysinfo
+│   │   ├── main.cpp                              # Entry point
+│   │   ├── sysinfo.h                             # Clase SysInfo
+│   │   ├── sysinfo.cpp                           # Lectura CPU, RAM, disco, uptime
+│   │   ├── sysinfo.ui                            # (Reservado) Formulario Qt Designer
+│   │   └── resources.qrc                         # Recursos del binario sysinfo
+│   │
+│   ├── echosmart-gateway/                        # Daemon principal
+│   │   ├── CMakeLists.txt                        # Target: echosmart-gateway-bin
+│   │   ├── main.cpp                              # Entry point, señales, loop principal
+│   │   ├── gateway.h                             # Clase Gateway (orquestador)
+│   │   ├── gateway.cpp                           # Implementación del ciclo de polling
+│   │   ├── sensorpoller.h                        # Clase SensorPoller (invoca sensor-read)
+│   │   ├── sensorpoller.cpp                      # Lógica de polling con QProcess/fork
+│   │   ├── alertengine.h                         # Clase AlertEngine (evaluación de reglas)
+│   │   ├── alertengine.cpp                       # Implementación de reglas y cooldown
+│   │   ├── datastore.h                           # Clase DataStore (persistencia local)
+│   │   ├── datastore.cpp                         # Escritura JSON/SQLite offline
+│   │   ├── cloudsyncer.h                         # Clase CloudSyncer (HTTP POST al backend)
+│   │   ├── cloudsyncer.cpp                       # Sync con retry y backoff
+│   │   ├── mqttpublisher.h                       # Clase MqttPublisher
+│   │   ├── mqttpublisher.cpp                     # Publicación MQTT con reconexión
+│   │   ├── gateway.ui                            # (Reservado) Formulario Qt Designer
+│   │   ├── resources.qrc                         # Recursos del daemon
+│   │   └── qml/                                  # Interfaz QML (pantalla local opcional)
+│   │       ├── main.qml                          # Ventana raíz
+│   │       ├── Dashboard.qml                     # Panel resumen de sensores
+│   │       ├── SensorCard.qml                    # Tarjeta individual de sensor
+│   │       ├── AlertBanner.qml                   # Banner de alertas activas
+│   │       ├── StatusBar.qml                     # Barra de estado (WiFi, cloud, uptime)
+│   │       └── qmldir                            # Registro de módulos QML
+│   │
+│   └── tests/                                    # Tests unitarios y de integración
+│       ├── CMakeLists.txt                        # Targets de test (CTest)
+│       ├── test_sensordata.cpp                   # Tests de SensorData serialización
+│       ├── test_alertrule.cpp                    # Tests de AlertRule evaluación
+│       ├── test_configloader.cpp                 # Tests de carga de config
+│       ├── test_jsonformatter.cpp                # Tests de formateo JSON
+│       ├── test_ds18b20driver.cpp                # Tests DS18B20 simulación
+│       ├── test_dht22driver.cpp                  # Tests DHT22 simulación
+│       ├── test_bh1750driver.cpp                 # Tests BH1750 simulación
+│       ├── test_soildriver.cpp                   # Tests soil simulación
+│       ├── test_mhz19cdriver.cpp                 # Tests MHZ19C simulación
+│       ├── test_sysinfo.cpp                      # Tests sysinfo
+│       ├── test_gateway_cycle.cpp                # Tests ciclo completo del daemon
+│       └── test_datastore.cpp                    # Tests persistencia local
+│
+├── bin/                                          # Scripts wrapper
+│   ├── echosmart-gateway                         # Wrapper bash del daemon
+│   └── echosmart-gateway-setup                   # Wizard interactivo
+├── debian/                                       # Empaquetado .deb (debhelper 13)
+│   ├── control                                   # Metadatos del paquete + deps Qt
+│   ├── rules                                     # cmake build + install
+│   ├── changelog                                 # Historial de versiones
+│   ├── compat                                    # Nivel 13
+│   ├── postinst                                  # Post-instalación (usuario, systemd)
+│   ├── prerm                                     # Pre-remoción (stop servicio)
+│   └── echosmart-gateway.service                 # Unidad systemd hardened
+├── sensors.json                                  # Config sensores por defecto
+├── .env.example                                  # Variables de entorno por defecto
+└── README.md                                     # Instrucciones build + instalación
 ```
 
-- [ ] Crear directorio `domain/entities/` con dataclasses puras
-  - [ ] `sensor_reading.py` — `SensorReading(sensor_id, sensor_type, value, unit, timestamp, is_valid)`
-  - [ ] `alert.py` — `Alert(id, sensor_id, type, severity, message, threshold, value, created_at)`
-  - [ ] `gateway_config.py` — `GatewayConfig(id, name, sensors, polling_interval, cloud_url)`
-- [ ] Crear directorio `domain/interfaces/` con ABCs (Abstract Base Classes)
-  - [ ] `sensor_driver.py` — `BaseSensorDriver(ABC)` con métodos `read()`, `initialize()`, `shutdown()`, `get_info()`
-  - [ ] `storage.py` — `IStorageRepository(ABC)` con `save_reading()`, `get_readings()`, `get_unsynced()`
-  - [ ] `publisher.py` — `IMessagePublisher(ABC)` con `publish()`, `connect()`, `disconnect()`
-  - [ ] `sync_client.py` — `ISyncClient(ABC)` con `sync_readings()`, `sync_alerts()`, `register_gateway()`
-- [ ] Crear `domain/constants.py` con constantes de negocio (rangos, umbrales, timeouts)
-- [ ] Migrar `sensor_manager.py` a `application/sensor_manager.py` usando interfaces
-- [ ] Migrar `alert_engine.py` a `application/alert_engine.py` usando interfaces
-- [ ] Migrar `cloud_sync.py` a `application/cloud_sync.py` usando interfaces
-- [ ] Migrar drivers existentes a `infrastructure/drivers/` implementando `BaseSensorDriver`
-- [ ] Migrar `local_db.py` a `infrastructure/sqlite_storage.py` implementando `IStorageRepository`
-- [ ] Migrar `mqtt_publisher.py` a `infrastructure/mqtt_publisher.py` implementando `IMessagePublisher`
+#### 1.2.1 Build System — CMakeLists.txt raíz
+- [ ] Crear `gateway/cpp/CMakeLists.txt` — proyecto raíz `echosmart`
+  - [ ] `cmake_minimum_required(VERSION 3.16)`
+  - [ ] `project(echosmart VERSION 1.0.0 LANGUAGES CXX)`
+  - [ ] `set(CMAKE_CXX_STANDARD 17)` + `CMAKE_CXX_STANDARD_REQUIRED ON`
+  - [ ] `find_package(Qt6 COMPONENTS Core Quick Widgets QUIET)` (opcional)
+  - [ ] `add_subdirectory(shared)`
+  - [ ] `add_subdirectory(echosmart-sensor-read)`
+  - [ ] `add_subdirectory(echosmart-sysinfo)`
+  - [ ] `add_subdirectory(echosmart-gateway)`
+  - [ ] `add_subdirectory(tests)`
+  - [ ] Opciones: `-DBUILD_QML=ON/OFF`, `-DBUILD_TESTS=ON/OFF`
+  - [ ] Cross-compilación: `CMAKE_TOOLCHAIN_FILE` para arm64
 
-### 1.3 Software del Gateway — Drivers de Sensores (Modo Simulación)
+#### 1.2.2 Build System — CMakeLists.txt por sub-directorio
+- [ ] Crear `gateway/cpp/shared/CMakeLists.txt` — target `echosmart-shared` (STATIC)
+- [ ] Crear `gateway/cpp/echosmart-sensor-read/CMakeLists.txt` — target `echosmart-sensor-read`
+- [ ] Crear `gateway/cpp/echosmart-sysinfo/CMakeLists.txt` — target `echosmart-sysinfo`
+- [ ] Crear `gateway/cpp/echosmart-gateway/CMakeLists.txt` — target `echosmart-gateway-bin`
+- [ ] Crear `gateway/cpp/tests/CMakeLists.txt` — targets de test con CTest
+- [ ] Cada target linkea contra `echosmart-shared`
+- [ ] Flags de compilación: `-Wall -Wextra -Wpedantic -O2`
 
-> 🖥️ **Todo el desarrollo de esta sección se realiza SIN hardware físico.** Los drivers operan en `simulation=True` por defecto, generando datos realistas para pruebas. La implementación de lectura real del hardware (GPIO, I2C, 1-Wire, UART) queda como `TODO` para completar en la Fase 8.
+### 1.3 Biblioteca Compartida (`shared/`)
 
-#### 1.3.1 Interfaz Base de Drivers (Clean Code: Polimorfismo)
-- [ ] Crear `BaseSensorDriver(ABC)` con interfaz estándar:
-  - [ ] Método `read() -> SensorReading` — Lectura del sensor (simulada o real)
-  - [ ] Método `initialize() -> bool` — Inicialización del hardware/simulación
-  - [ ] Método `shutdown() -> None` — Apagado limpio del sensor
-  - [ ] Método `get_info() -> dict` — Metadatos del sensor (tipo, protocolo, estado)
-  - [ ] Método `is_healthy() -> bool` — Health check del sensor
-  - [ ] Método `calibrate(reference_value) -> None` — Calibración con valor de referencia
-  - [ ] Propiedad `sensor_type: str` — Tipo de sensor (temperature, humidity, etc.)
-  - [ ] Propiedad `protocol: str` — Protocolo (1-wire, gpio, i2c, uart)
-  - [ ] Propiedad `is_simulation: bool` — Si está en modo simulación
+#### 1.3.1 `version.h`
+- [ ] Crear `gateway/cpp/shared/version.h`
+  - [ ] `#define ES_VERSION_MAJOR 1`
+  - [ ] `#define ES_VERSION_MINOR 0`
+  - [ ] `#define ES_VERSION_PATCH 0`
+  - [ ] `#define ES_VERSION_STRING "1.0.0"`
+  - [ ] `constexpr const char* es_version()` — retorna string de versión
 
-#### 1.3.2 Driver Factory (Patrón Factory)
-- [ ] Crear `SensorDriverFactory` en `infrastructure/driver_factory.py`
-  - [ ] Método `create(sensor_type: str, config: dict) -> BaseSensorDriver`
-  - [ ] Registro dinámico de drivers disponibles
-  - [ ] Validación de configuración antes de crear instancia
-  - [ ] Tests: factory crea el driver correcto para cada tipo
+#### 1.3.2 `sensordata.h` / `sensordata.cpp`
+- [ ] Crear `gateway/cpp/shared/sensordata.h`
+  - [ ] `struct SensorData` con campos: `std::string sensor_type`, `std::string sensor_name`, `double value`, `std::string unit`, `int64_t timestamp_ms`, `bool is_valid`
+  - [ ] `static SensorData from_json(const std::string& json)` — parsear JSON de sensor-read
+  - [ ] `std::string to_json() const` — serializar a JSON
+  - [ ] `static SensorData empty(const std::string& type, const std::string& error)` — lectura inválida
+- [ ] Crear `gateway/cpp/shared/sensordata.cpp`
+  - [ ] Implementar `from_json()` con parser JSON minimal
+  - [ ] Implementar `to_json()` con formato compacto
+  - [ ] Implementar `empty()` con `is_valid = false`
 
-#### 1.3.3 Driver DS18B20 — Temperatura (1-Wire)
-- [x] Implementar clase `DS18B20Driver(BaseSensorDriver)` con modo simulación
-- [ ] Agregar validación de rangos: rechazar lecturas fuera de -55°C a +125°C
-- [ ] Agregar filtro de outliers: descartar lecturas que varíen >5°C entre muestras consecutivas
-- [ ] Agregar soporte para múltiples sensores DS18B20 en el mismo bus (por device_id)
-- [ ] Agregar método `get_resolution()` / `set_resolution(bits: int)` — Configurar resolución 9-12 bits
-- [ ] Implementar caché: no leer más de 1 vez por segundo (time-based debounce)
-- [ ] Agregar retry con backoff exponencial en caso de error de lectura
-- [ ] Agregar logging estructurado en cada operación
-- [ ] Implementar `__repr__` y `__str__` descriptivos para debugging
-- [ ] Tests unitarios: lectura válida, lectura fuera de rango, sensor desconectado, timeout, múltiples sensores
+#### 1.3.3 `alertrule.h` / `alertrule.cpp`
+- [ ] Crear `gateway/cpp/shared/alertrule.h`
+  - [ ] `enum class AlertSeverity { INFO, WARNING, CRITICAL }`
+  - [ ] `enum class AlertCondition { GT, LT, EQ, RANGE }`
+  - [ ] `struct AlertRule` con: `sensor_type`, `condition`, `threshold`, `threshold_low`, `threshold_high`, `severity`, `message`, `cooldown_seconds`
+  - [ ] `bool evaluate(const SensorData& reading) const` — evalúa regla
+  - [ ] `static std::vector<AlertRule> load_defaults()` — reglas por defecto
+  - [ ] `static std::vector<AlertRule> from_json(const std::string& json)` — desde fichero
+- [ ] Crear `gateway/cpp/shared/alertrule.cpp`
+  - [ ] Implementar `evaluate()` para GT, LT, EQ, RANGE
+  - [ ] Implementar `load_defaults()` con umbrales de invernadero
+  - [ ] Implementar `from_json()` parser
 
-#### 1.3.4 Driver DHT22 — Temperatura + Humedad (GPIO)
-- [x] Implementar clase `DHT22Driver(BaseSensorDriver)` con modo simulación
-- [ ] Agregar validación de rangos: temp -40°C–80°C, humedad 0%–100%
-- [ ] Agregar rate limiting: no leer más de 1 vez cada 2 segundos (limitación del sensor)
-- [ ] Agregar checksum validation (CRC8) para verificar integridad de datos
-- [ ] Agregar filtro de lecturas espurias: descartar si humedad = 0% o > 100%
-- [ ] Agregar retry (máx 3 intentos) en caso de CRC error
-- [ ] Devolver `SensorReading` con ambos valores: temperatura y humedad separados
-- [ ] Agregar logging con nivel y timestamp
-- [ ] Tests unitarios: lectura normal, CRC error, rate limit excedido, valores fuera de rango
+#### 1.3.4 `jsonformatter.h` / `jsonformatter.cpp`
+- [ ] Crear `gateway/cpp/shared/jsonformatter.h`
+  - [ ] `std::string json_object(const std::vector<std::pair<std::string, std::string>>& fields)`
+  - [ ] `std::string json_string(const std::string& key, const std::string& value)`
+  - [ ] `std::string json_number(const std::string& key, double value, int precision)`
+  - [ ] `std::string json_int(const std::string& key, int64_t value)`
+  - [ ] `std::string json_bool(const std::string& key, bool value)`
+  - [ ] `std::string json_array(const std::vector<std::string>& items)`
+- [ ] Crear `gateway/cpp/shared/jsonformatter.cpp`
+  - [ ] Implementar todas las funciones sin dependencias externas
+  - [ ] Escapar caracteres especiales en strings JSON
 
-#### 1.3.5 Driver BH1750 — Luminosidad (I2C)
-- [x] Implementar clase `BH1750Driver(BaseSensorDriver)` con modo simulación
-- [ ] Agregar modos de medición: `CONTINUOUS_HIGH_RES`, `CONTINUOUS_HIGH_RES2`, `ONE_TIME`
-- [ ] Agregar configuración de dirección I2C (0x23 por defecto, 0x5C alternativa)
-- [ ] Agregar validación: descartar lecturas > 65535 lux (overflow del sensor)
-- [ ] Agregar suavizado: promedio móvil de las últimas N lecturas
-- [ ] Implementar `power_on()` / `power_off()` para ahorro de energía
-- [ ] Tests unitarios: lectura normal, cambio de modo, dirección I2C alternativa, power management
+#### 1.3.5 `configloader.h` / `configloader.cpp`
+- [ ] Crear `gateway/cpp/shared/configloader.h`
+  - [ ] `struct GatewayConfig` con: `gateway_id`, `gateway_name`, `cloud_api_url`, `cloud_api_key`, `mqtt_broker`, `mqtt_port`, `polling_interval`, `sync_interval`, `simulation_mode`, `log_level`
+  - [ ] `static GatewayConfig load(const std::string& env_path)` — parsear gateway.env
+  - [ ] `struct SensorEntry` con: `type`, `name`, `device_id`, `pin`, `address`, `channel`, `port`
+  - [ ] `static std::vector<SensorEntry> load_sensors(const std::string& json_path)`
+- [ ] Crear `gateway/cpp/shared/configloader.cpp`
+  - [ ] Implementar parser key=value para `.env`
+  - [ ] Implementar parser JSON minimal para `sensors.json`
+  - [ ] Valores por defecto si fichero no existe
+  - [ ] Validación de campos obligatorios
 
-#### 1.3.6 Driver Soil Moisture + ADS1115 — Humedad de Suelo (ADC)
-- [x] Implementar clase `SoilMoistureDriver(BaseSensorDriver)` con modo simulación
-- [ ] Agregar calibración: mapear voltaje crudo a porcentaje (dry_value, wet_value)
-- [ ] Agregar selección de canal ADC (A0-A3 del ADS1115)
-- [ ] Agregar configuración de ganancia del ADS1115 (2/3, 1, 2, 4, 8, 16)
-- [ ] Agregar filtro de ruido: mediana de 5 lecturas consecutivas
-- [ ] Agregar validación: descartar si porcentaje < 0% o > 100%
-- [ ] Implementar método `auto_calibrate(dry_reading, wet_reading)`
-- [ ] Tests unitarios: calibración, canal correcto, rango de ganancia, filtro de mediana
+#### 1.3.6 `logger.h` / `logger.cpp`
+- [ ] Crear `gateway/cpp/shared/logger.h`
+  - [ ] `enum class LogLevel { DEBUG, INFO, WARNING, ERROR, CRITICAL }`
+  - [ ] `void log_debug(const std::string& msg)`
+  - [ ] `void log_info(const std::string& msg)`
+  - [ ] `void log_warning(const std::string& msg)`
+  - [ ] `void log_error(const std::string& msg)`
+  - [ ] `void log_critical(const std::string& msg)`
+  - [ ] `void set_log_level(LogLevel level)`
+  - [ ] `std::string now_iso8601()` — timestamp ISO 8601
+- [ ] Crear `gateway/cpp/shared/logger.cpp`
+  - [ ] Formato: `2026-03-29T08:00:00 [INFO]  mensaje`
+  - [ ] Salida a stdout (INFO+) y stderr (ERROR+)
+  - [ ] Filtrado por nivel configurado
 
-#### 1.3.7 Driver MH-Z19C — CO₂ (UART)
-- [x] Implementar clase `MHZ19CDriver(BaseSensorDriver)` con modo simulación
-- [ ] Agregar envío de comando UART para lectura (9 bytes: 0xFF 0x01 0x86 ...)
-- [ ] Agregar parsing de respuesta UART (extraer ppm de bytes 2-3)
-- [ ] Agregar checksum validation en la respuesta
-- [ ] Agregar comando de auto-calibración (ABC enable/disable)
-- [ ] Agregar comando de calibración a punto cero (Zero Point Calibration)
-- [ ] Agregar warmup tracking: ignorar lecturas durante los primeros 3 minutos
-- [ ] Agregar timeout de comunicación UART (default: 5 segundos)
-- [ ] Tests unitarios: lectura normal, checksum inválido, timeout, warmup, calibración
+#### 1.3.7 `fileutils.h` / `fileutils.cpp`
+- [ ] Crear `gateway/cpp/shared/fileutils.h`
+  - [ ] `std::string read_file(const std::string& path)`
+  - [ ] `bool write_file(const std::string& path, const std::string& content)`
+  - [ ] `bool file_exists(const std::string& path)`
+  - [ ] `std::string trim(const std::string& s)`
+  - [ ] `std::vector<std::string> split(const std::string& s, char delim)`
+  - [ ] `std::string get_hostname()`
+  - [ ] `std::string get_mac_address()`
+- [ ] Crear `gateway/cpp/shared/fileutils.cpp`
+  - [ ] Implementar con `<fstream>`, `<filesystem>` (C++17)
+  - [ ] `get_mac_address()` lee de `/sys/class/net/eth0/address`
 
-### 1.4 Hardware Abstraction Layer (HAL)
+#### 1.3.8 `resources.qrc` (shared)
+- [ ] Crear `gateway/cpp/shared/resources.qrc`
+  - [ ] Embeber `sensors-schema.json` (schema de validación de sensors.json)
+  - [ ] Embeber `default-alerts.json` (reglas de alerta por defecto)
+  - [ ] Embeber `version.txt` (versión del build para runtime)
 
-- [x] Implementar clase `HAL` con abstracción de hardware
-- [ ] Refactorizar HAL como interfaz abstracta + implementaciones:
-  - [ ] `IHardwareInterface(ABC)` — Interfaz abstracta
-  - [ ] `SimulatedHAL(IHardwareInterface)` — Para desarrollo sin hardware
-  - [ ] `RaspberryPiHAL(IHardwareInterface)` — Para hardware real (Fase 8)
-- [ ] Agregar health check de bus I2C (`scan()` devuelve dispositivos detectados)
-- [ ] Agregar health check de bus 1-Wire (`list_devices()` devuelve IDs)
-- [ ] Agregar health check de UART (`ping()` verifica conexión serial)
-- [ ] Agregar manejo de errores con excepciones específicas: `I2CError`, `GPIOError`, `UARTError`
-- [ ] Implementar `__enter__` / `__exit__` para context managers (limpieza automática de GPIO)
-- [ ] Tests: cada método del HAL simulado devuelve datos consistentes
+### 1.4 Binario `echosmart-sensor-read` (lectura de sensores)
 
-### 1.5 Sensor Manager (Orquestador)
+#### 1.4.1 `main.cpp` — Entry point
+- [ ] Crear `gateway/cpp/echosmart-sensor-read/main.cpp`
+  - [ ] Parsear argumentos: `<sensor_type> [--simulate] [--json] [--version] [--help]`
+  - [ ] Dispatch a la clase driver correcta según `sensor_type`
+  - [ ] `printUsage()` — lista de sensores y flags
+  - [ ] `printVersion()` — versión desde `version.h`
+  - [ ] Return 0 éxito, 1 error, 2 sensor no encontrado
 
-- [x] Implementar `SensorManager` con polling configurable
-- [ ] Refactorizar para inyección de dependencias (recibir interfaces, no implementaciones)
-- [ ] Implementar registro dinámico de sensores via configuración JSON
-- [ ] Implementar polling asíncrono con `asyncio` (no bloquear entre lecturas)
-- [ ] Implementar prioridad de sensores (los críticos se leen con más frecuencia)
-- [ ] Implementar circuit breaker: deshabilitar sensor temporalmente si falla N veces seguidas
-- [ ] Implementar métricas internas: lecturas/minuto, errores/minuto, latencia promedio
-- [ ] Implementar graceful shutdown: detener polling y cerrar todos los drivers
-- [ ] Implementar hot-reload de configuración (agregar/quitar sensores sin reiniciar)
-- [ ] Agregar eventos/callbacks: `on_reading`, `on_error`, `on_sensor_offline`
-- [ ] Tests: polling correcto, circuit breaker, graceful shutdown, hot-reload
+#### 1.4.2 `sensorreader.h` / `sensorreader.cpp` — Interfaz base
+- [ ] Crear `gateway/cpp/echosmart-sensor-read/sensorreader.h`
+  - [ ] `class SensorReader` (base abstracta)
+  - [ ] `virtual SensorData read(bool simulate) = 0` — lectura (simulada o real)
+  - [ ] `virtual std::string sensorType() const = 0` — tipo ("ds18b20", etc.)
+  - [ ] `virtual std::string protocol() const = 0` — protocolo ("1-wire", etc.)
+  - [ ] `virtual bool isAvailable() const` — verifica hardware disponible
+  - [ ] `virtual ~SensorReader() = default`
+- [ ] Crear `gateway/cpp/echosmart-sensor-read/sensorreader.cpp`
+  - [ ] Implementar `isAvailable()` por defecto (return true en simulación)
+  - [ ] Helper `simulateValue(double lo, double hi)` — random uniforme
 
-### 1.6 Almacenamiento Local (SQLite)
+#### 1.4.3 `ds18b20driver.h` / `ds18b20driver.cpp`
+- [ ] Crear `gateway/cpp/echosmart-sensor-read/drivers/ds18b20driver.h`
+  - [ ] `class DS18B20Driver : public SensorReader`
+  - [ ] Constructor: `DS18B20Driver(const std::string& device_id = "")`
+  - [ ] `SensorData read(bool simulate) override`
+  - [ ] `std::string sensorType() const override` → `"ds18b20"`
+  - [ ] `std::string protocol() const override` → `"1-wire"`
+  - [ ] `bool isAvailable() const override` — verifica `/sys/bus/w1/devices/28-*`
+  - [ ] `std::vector<std::string> listDevices()` — enumerar sensores en bus
+- [ ] Crear `gateway/cpp/echosmart-sensor-read/drivers/ds18b20driver.cpp`
+  - [ ] `read(simulate=true)`: random entre 15.0 y 35.0 °C
+  - [ ] `read(simulate=false)`: abrir `/sys/bus/w1/devices/{id}/w1_slave`, parsear `t=XXXXX`
+  - [ ] Validación: rechazar si temp < -55 o > 125
+  - [ ] `listDevices()`: listar directorios `28-*` en `/sys/bus/w1/devices/`
 
-- [x] Implementar `local_db.py` con SQLite
-- [ ] Refactorizar como `SqliteStorageRepository` implementando `IStorageRepository`
-- [ ] Diseñar esquema de tablas:
-  - [ ] `readings(id, sensor_id, sensor_type, value, unit, timestamp, synced)`
-  - [ ] `alerts(id, sensor_id, type, severity, message, timestamp, synced)`
-  - [ ] `sync_log(id, batch_id, records_sent, records_failed, timestamp)`
-- [ ] Implementar índices para queries frecuentes (por sensor_id, por timestamp, por synced)
-- [ ] Implementar retención de datos: auto-delete lecturas mayores a 7 días (configurable)
-- [ ] Implementar vacuum automático para compactar la base de datos
-- [ ] Implementar método `get_unsynced_readings(limit=100)` para sincronización batch
-- [ ] Implementar método `mark_as_synced(reading_ids)` después de sync exitosa
-- [ ] Implementar método `get_stats()` — conteo de lecturas, espacio usado, lecturas pendientes
-- [ ] Agregar WAL mode para evitar bloqueos en lectura/escritura concurrente
-- [ ] Tests: CRUD, retención, vacuum, concurrencia, stats
+#### 1.4.4 `dht22driver.h` / `dht22driver.cpp`
+- [ ] Crear `gateway/cpp/echosmart-sensor-read/drivers/dht22driver.h`
+  - [ ] `class DHT22Driver : public SensorReader`
+  - [ ] Constructor: `DHT22Driver(int gpio_pin = 17)`
+  - [ ] `SensorData read(bool simulate) override` — retorna temp (humidity en campo extra)
+  - [ ] `double lastHumidity() const` — último valor de humedad leído
+  - [ ] `std::string sensorType() const override` → `"dht22"`
+  - [ ] `std::string protocol() const override` → `"gpio"`
+- [ ] Crear `gateway/cpp/echosmart-sensor-read/drivers/dht22driver.cpp`
+  - [ ] `read(simulate=true)`: random temp 15-35, humidity 40-90
+  - [ ] `read(simulate=false)`: lectura GPIO con libgpiod o bit-banging
+  - [ ] CRC8 checksum validation
+  - [ ] Rate limiting: ≥2 segundos entre lecturas
 
-### 1.7 Motor de Alertas Local
+#### 1.4.5 `bh1750driver.h` / `bh1750driver.cpp`
+- [ ] Crear `gateway/cpp/echosmart-sensor-read/drivers/bh1750driver.h`
+  - [ ] `class BH1750Driver : public SensorReader`
+  - [ ] Constructor: `BH1750Driver(int i2c_bus = 1, uint8_t address = 0x23)`
+  - [ ] `SensorData read(bool simulate) override`
+  - [ ] `std::string sensorType() const override` → `"bh1750"`
+  - [ ] `std::string protocol() const override` → `"i2c"`
+  - [ ] `bool isAvailable() const override` — verifica `/dev/i2c-{bus}`
+- [ ] Crear `gateway/cpp/echosmart-sensor-read/drivers/bh1750driver.cpp`
+  - [ ] `read(simulate=true)`: random entre 100 y 50000 lux
+  - [ ] `read(simulate=false)`: `open("/dev/i2c-1")`, `ioctl(fd, I2C_SLAVE, addr)`, write cmd 0x10, read 2 bytes, convertir a lux
+  - [ ] Validación: descartar > 65535 lux
 
-- [x] Implementar `alert_engine.py`
-- [ ] Refactorizar para usar reglas configurables desde JSON/YAML
-- [ ] Implementar tipos de reglas:
-  - [ ] `ThresholdRule` — Valor excede umbral (ej: temp > 35°C)
-  - [ ] `RangeRule` — Valor fuera de rango (ej: humedad < 40% o > 90%)
-  - [ ] `RateOfChangeRule` — Cambio rápido (ej: temp sube >2°C en 5 min)
-  - [ ] `StaleDataRule` — Sin datos por N minutos (sensor offline)
-  - [ ] `CompoundRule` — Combinación de reglas (ej: temp alta Y humedad baja)
-- [ ] Implementar severidades: `INFO`, `WARNING`, `CRITICAL`
-- [ ] Implementar cooldown: no repetir la misma alerta en N minutos
-- [ ] Implementar escalamiento: si alerta no se atiende en N min, subir severidad
-- [ ] Implementar acciones locales: log, LED indicador (GPIO), buzzer
-- [ ] Implementar historial de alertas en SQLite
-- [ ] Tests: cada tipo de regla, cooldown, escalamiento, persistencia
+#### 1.4.6 `soildriver.h` / `soildriver.cpp`
+- [ ] Crear `gateway/cpp/echosmart-sensor-read/drivers/soildriver.h`
+  - [ ] `class SoilDriver : public SensorReader`
+  - [ ] Constructor: `SoilDriver(int i2c_bus = 1, uint8_t ads_address = 0x48, int channel = 0)`
+  - [ ] `SensorData read(bool simulate) override`
+  - [ ] `std::string sensorType() const override` → `"soil_moisture"`
+  - [ ] `std::string protocol() const override` → `"i2c"`
+  - [ ] `void calibrate(int dry_raw, int wet_raw)` — establecer curva de calibración
+  - [ ] `double rawToPercent(int raw_value) const` — conversión
+- [ ] Crear `gateway/cpp/echosmart-sensor-read/drivers/soildriver.cpp`
+  - [ ] `read(simulate=true)`: random entre 10% y 95%
+  - [ ] `read(simulate=false)`: configurar ADS1115 canal via I2C, leer 16-bit ADC, convertir a %
+  - [ ] Calibración lineal: `pct = (raw - dry) / (wet - dry) * 100`
+  - [ ] Validación: clamp a 0-100%
 
-### 1.8 Comunicaciones (MQTT + Sync)
+#### 1.4.7 `mhz19cdriver.h` / `mhz19cdriver.cpp`
+- [ ] Crear `gateway/cpp/echosmart-sensor-read/drivers/mhz19cdriver.h`
+  - [ ] `class MHZ19CDriver : public SensorReader`
+  - [ ] Constructor: `MHZ19CDriver(const std::string& uart_port = "/dev/serial0", int baudrate = 9600)`
+  - [ ] `SensorData read(bool simulate) override`
+  - [ ] `std::string sensorType() const override` → `"mhz19c"`
+  - [ ] `std::string protocol() const override` → `"uart"`
+  - [ ] `bool isAvailable() const override` — verifica puerto serial existe
+  - [ ] `bool sendCalibration()` — enviar comando de calibración ABC
+  - [ ] `bool isWarmedUp() const` — ≥3 minutos desde inicio
+- [ ] Crear `gateway/cpp/echosmart-sensor-read/drivers/mhz19cdriver.cpp`
+  - [ ] `read(simulate=true)`: random entre 400 y 2000 ppm
+  - [ ] `read(simulate=false)`: abrir serial con `termios`, enviar `{0xFF,0x01,0x86,0x00,...}`, leer 9 bytes, parsear ppm = byte[2]*256 + byte[3], verificar checksum
+  - [ ] Checksum: `0xFF - (sum bytes 1..7)` + 1
+  - [ ] Timeout: 5 segundos, retornar error si no hay respuesta
 
-- [x] Implementar `mqtt_publisher.py`
-- [x] Implementar `cloud_sync.py`
-- [ ] Refactorizar MQTT publisher como `MqttPublisher(IMessagePublisher)`
-- [ ] Implementar reconexión automática MQTT con backoff exponencial
-- [ ] Implementar Quality of Service (QoS) configurable: 0 (at most once), 1 (at least once), 2 (exactly once)
-- [ ] Implementar topics MQTT estructurados: `echosmart/{gateway_id}/sensors/{sensor_type}/reading`
-- [ ] Implementar payload JSON estandarizado con schema versioning
-- [ ] Implementar Last Will and Testament (LWT) para detectar gateway offline
+#### 1.4.8 `resources.qrc` (sensor-read)
+- [ ] Crear `gateway/cpp/echosmart-sensor-read/resources.qrc`
+  - [ ] Embeber texto de ayuda (`usage.txt`)
+  - [ ] Embeber schemas JSON de validación de salida
+
+### 1.5 Binario `echosmart-sysinfo` (diagnósticos del sistema)
+
+#### 1.5.1 `main.cpp`
+- [ ] Crear `gateway/cpp/echosmart-sysinfo/main.cpp`
+  - [ ] Parsear argumentos: `[--version] [--help] [--format json|text]`
+  - [ ] Instanciar `SysInfo`, llamar `collect()`, imprimir resultado
+  - [ ] Return 0 siempre (diagnósticos no fallan)
+
+#### 1.5.2 `sysinfo.h` / `sysinfo.cpp`
+- [ ] Crear `gateway/cpp/echosmart-sysinfo/sysinfo.h`
+  - [ ] `struct SystemInfo` con: `hostname`, `model`, `cpu_temp_c`, `uptime_s`, `load_avg[3]`, `mem_total_kb`, `mem_available_kb`, `disk_total_bytes`, `disk_free_bytes`, `version`
+  - [ ] `class SysInfo`
+  - [ ] `SystemInfo collect()` — recopilar todos los datos
+  - [ ] `std::string toJson(const SystemInfo& info)` — serializar a JSON
+  - [ ] `std::string toText(const SystemInfo& info)` — serializar a texto legible
+- [ ] Crear `gateway/cpp/echosmart-sysinfo/sysinfo.cpp`
+  - [ ] `getHostname()` — leer `/etc/hostname`
+  - [ ] `getModel()` — leer `/proc/device-tree/model`
+  - [ ] `getCpuTemp()` — leer `/sys/class/thermal/thermal_zone0/temp`, dividir /1000
+  - [ ] `getUptime()` — leer `/proc/uptime`, primer campo
+  - [ ] `getLoadAvg()` — leer `/proc/loadavg`, primeros 3 campos
+  - [ ] `getMemory()` — leer `/proc/meminfo`, parsear MemTotal y MemAvailable
+  - [ ] `getDisk()` — ejecutar `df -B1 /`, parsear total y available
+
+#### 1.5.3 `sysinfo.ui`
+- [ ] Crear `gateway/cpp/echosmart-sysinfo/sysinfo.ui` (reservado para futuro GUI diagnóstico)
+  - [ ] Formulario Qt Designer con labels para CPU, RAM, disco, uptime
+  - [ ] Layout vertical con QGroupBox por categoría
+
+#### 1.5.4 `resources.qrc` (sysinfo)
+- [ ] Crear `gateway/cpp/echosmart-sysinfo/resources.qrc`
+  - [ ] Embeber plantilla de salida texto
+
+### 1.6 Binario `echosmart-gateway` (daemon principal)
+
+#### 1.6.1 `main.cpp` — Entry point del daemon
+- [ ] Crear `gateway/cpp/echosmart-gateway/main.cpp`
+  - [ ] Parsear argumentos: `[--config path] [--sensors path] [--simulate] [--once] [--interval N] [--version] [--help]`
+  - [ ] Instalar signal handlers: SIGINT, SIGTERM → `g_running = false`
+  - [ ] Instanciar `Gateway` con config y sensor list
+  - [ ] Llamar `gateway.run()` (loop principal)
+  - [ ] Return 0 en apagado limpio, 1 en error
+
+#### 1.6.2 `gateway.h` / `gateway.cpp` — Orquestador
+- [ ] Crear `gateway/cpp/echosmart-gateway/gateway.h`
+  - [ ] `class Gateway`
+  - [ ] Constructor: `Gateway(const GatewayConfig& cfg, const std::vector<SensorEntry>& sensors)`
+  - [ ] `void run()` — loop principal (while g_running)
+  - [ ] `void runOnce()` — un solo ciclo de polling
+  - [ ] `void shutdown()` — apagado limpio
+  - [ ] `int pollCount() const` — número de ciclos ejecutados
+  - [ ] `bool isRunning() const`
+- [ ] Crear `gateway/cpp/echosmart-gateway/gateway.cpp`
+  - [ ] `run()`: log inicio, loop { `runOnce()`, sleep interval }, log fin
+  - [ ] `runOnce()`: para cada sensor → `poller.poll()` → `alertEngine.evaluate()` → `dataStore.save()` → `cloudSyncer.sync()`
+  - [ ] Sleep en incrementos de 1s para reaccionar a SIGTERM rápido
+
+#### 1.6.3 `sensorpoller.h` / `sensorpoller.cpp`
+- [ ] Crear `gateway/cpp/echosmart-gateway/sensorpoller.h`
+  - [ ] `class SensorPoller`
+  - [ ] Constructor: `SensorPoller(bool simulate)`
+  - [ ] `SensorData poll(const SensorEntry& sensor)` — invoca binario sensor-read
+  - [ ] `std::vector<SensorData> pollAll(const std::vector<SensorEntry>& sensors)`
+  - [ ] Private: `std::string execBinary(const std::string& cmd)` — fork+exec
+- [ ] Crear `gateway/cpp/echosmart-gateway/sensorpoller.cpp`
+  - [ ] `poll()`: construir comando `echosmart-sensor-read <type> [--simulate]`, ejecutar con `popen()`, parsear JSON de stdout
+  - [ ] `pollAll()`: iterar sensores, recopilar `SensorData`, log errores
+  - [ ] Timeout de 10s por sensor (kill proceso si no responde)
+
+#### 1.6.4 `alertengine.h` / `alertengine.cpp`
+- [ ] Crear `gateway/cpp/echosmart-gateway/alertengine.h`
+  - [ ] `class AlertEngine`
+  - [ ] Constructor: `AlertEngine(const std::vector<AlertRule>& rules)`
+  - [ ] `std::vector<std::string> evaluate(const SensorData& reading)` — evaluar y retornar alertas
+  - [ ] `void addRule(const AlertRule& rule)`
+  - [ ] `void clearRules()`
+  - [ ] `int alertCount() const` — total de alertas generadas
+  - [ ] Private: `std::map<std::string, int64_t> cooldowns_` — última alerta por regla
+- [ ] Crear `gateway/cpp/echosmart-gateway/alertengine.cpp`
+  - [ ] `evaluate()`: iterar reglas, evaluar cada una, verificar cooldown, log alertas
+  - [ ] Cooldown: no repetir misma alerta dentro de `rule.cooldown_seconds`
+  - [ ] Formato de alerta: `"ALERT [CRITICAL] Temperatura above 40°C (value=42.5)"`
+
+#### 1.6.5 `datastore.h` / `datastore.cpp`
+- [ ] Crear `gateway/cpp/echosmart-gateway/datastore.h`
+  - [ ] `class DataStore`
+  - [ ] Constructor: `DataStore(const std::string& data_dir = "/var/lib/echosmart/")`
+  - [ ] `void save(const SensorData& reading)` — persistir a disco
+  - [ ] `void saveAlert(const std::string& alert_msg)` — persistir alerta
+  - [ ] `std::vector<SensorData> getUnsynced(int limit = 100)` — lecturas no sincronizadas
+  - [ ] `void markSynced(const std::vector<int64_t>& timestamps)` — marcar como sincronizadas
+  - [ ] `void cleanup(int max_age_days = 7)` — eliminar datos antiguos
+  - [ ] `int pendingCount() const`
+- [ ] Crear `gateway/cpp/echosmart-gateway/datastore.cpp`
+  - [ ] `save()`: append a fichero JSONL rotativo (`readings-YYYYMMDD.jsonl`)
+  - [ ] `saveAlert()`: append a `alerts-YYYYMMDD.jsonl`
+  - [ ] `getUnsynced()`: leer ficheros recientes, filtrar no sincronizados
+  - [ ] `cleanup()`: eliminar ficheros más antiguos que max_age_days
+  - [ ] Crear directorio si no existe
+
+#### 1.6.6 `cloudsyncer.h` / `cloudsyncer.cpp`
+- [ ] Crear `gateway/cpp/echosmart-gateway/cloudsyncer.h`
+  - [ ] `class CloudSyncer`
+  - [ ] Constructor: `CloudSyncer(const std::string& api_url, const std::string& api_key, const std::string& gateway_id)`
+  - [ ] `bool sync(const std::vector<SensorData>& readings)` — HTTP POST batch
+  - [ ] `bool isOnline() const` — último sync exitoso < 5 min
+  - [ ] `int failedAttempts() const`
+  - [ ] Private: `int backoff_seconds_` — backoff actual
+- [ ] Crear `gateway/cpp/echosmart-gateway/cloudsyncer.cpp`
+  - [ ] `sync()`: construir JSON array, HTTP POST a `{api_url}/api/v1/readings`, verificar 200/201
+  - [ ] HTTP con `libcurl` o `popen("curl ...")` como fallback
+  - [ ] Retry con backoff exponencial: 1s, 2s, 4s, 8s... max 5 min
+  - [ ] Log: lecturas enviadas, respuesta del servidor, errores
+
+#### 1.6.7 `mqttpublisher.h` / `mqttpublisher.cpp`
+- [ ] Crear `gateway/cpp/echosmart-gateway/mqttpublisher.h`
+  - [ ] `class MqttPublisher`
+  - [ ] Constructor: `MqttPublisher(const std::string& broker, int port, const std::string& gateway_id)`
+  - [ ] `bool connect()` — conectar al broker MQTT
+  - [ ] `bool publish(const SensorData& reading)` — publicar lectura
+  - [ ] `bool publishAlert(const std::string& alert_msg)` — publicar alerta
+  - [ ] `void disconnect()`
+  - [ ] `bool isConnected() const`
+  - [ ] Topic format: `echosmart/{gateway_id}/sensors/{sensor_type}/reading`
+- [ ] Crear `gateway/cpp/echosmart-gateway/mqttpublisher.cpp`
+  - [ ] Implementar con `mosquitto_pub` via `popen()` (sin dependencia de libmosquitto)
+  - [ ] Fallback si mosquitto_pub no está: log warning y continuar
+  - [ ] LWT (Last Will): `echosmart/{gateway_id}/status` → `"offline"`
+
+#### 1.6.8 `gateway.ui` (reservado)
+- [ ] Crear `gateway/cpp/echosmart-gateway/gateway.ui`
+  - [ ] Formulario Qt Designer para futuro GUI de configuración local
+  - [ ] Tabs: "Sensores", "Alertas", "Configuración", "Sistema"
+  - [ ] Tabla de lecturas en tiempo real
+
+#### 1.6.9 `resources.qrc` (gateway)
+- [ ] Crear `gateway/cpp/echosmart-gateway/resources.qrc`
+  - [ ] Embeber `default-gateway.env` (configuración por defecto)
+  - [ ] Embeber `default-sensors.json` (sensores por defecto)
+  - [ ] Embeber `default-alerts.json` (reglas de alerta por defecto)
+  - [ ] Embeber QML files si `BUILD_QML=ON`
+
+#### 1.6.10 Interfaz QML — UI local (pantalla conectada al RPi)
+- [ ] Crear `gateway/cpp/echosmart-gateway/qml/main.qml`
+  - [ ] `ApplicationWindow` con título "EchoSmart Gateway"
+  - [ ] `StackView` para navegación entre paneles
+  - [ ] Barra lateral con iconos: Dashboard, Sensores, Alertas, Config
+  - [ ] Conexión a backend C++ via `Q_PROPERTY` / `Q_INVOKABLE`
+- [ ] Crear `gateway/cpp/echosmart-gateway/qml/Dashboard.qml`
+  - [ ] Grid de `SensorCard` para cada sensor registrado
+  - [ ] `StatusBar` en la parte superior
+  - [ ] `AlertBanner` si hay alertas activas
+  - [ ] Refresh automático cada polling interval
+- [ ] Crear `gateway/cpp/echosmart-gateway/qml/SensorCard.qml`
+  - [ ] Nombre del sensor (title)
+  - [ ] Valor actual + unidad (text grande)
+  - [ ] Indicador de estado: verde (OK), amarillo (warning), rojo (critical)
+  - [ ] Timestamp de última lectura
+  - [ ] Mini gráfica de últimas 10 lecturas (sparkline)
+- [ ] Crear `gateway/cpp/echosmart-gateway/qml/AlertBanner.qml`
+  - [ ] Lista de alertas activas con severidad y mensaje
+  - [ ] Color de fondo según severidad (amarillo/rojo)
+  - [ ] Botón "Dismiss" para limpiar alertas reconocidas
+- [ ] Crear `gateway/cpp/echosmart-gateway/qml/StatusBar.qml`
+  - [ ] Indicador de conexión WiFi (verde/rojo)
+  - [ ] Indicador de conexión cloud (verde/amarillo/rojo)
+  - [ ] Uptime del gateway
+  - [ ] Versión del software
+  - [ ] Temperatura CPU
+- [ ] Crear `gateway/cpp/echosmart-gateway/qml/qmldir`
+  - [ ] Registrar módulos: Dashboard, SensorCard, AlertBanner, StatusBar
+
+### 1.7 Tests Unitarios y de Integración (CTest)
+
+#### 1.7.1 Tests de la biblioteca compartida
+- [ ] Crear `gateway/cpp/tests/CMakeLists.txt`
+  - [ ] `enable_testing()`
+  - [ ] `add_executable` + `add_test` para cada test
+  - [ ] Linkear contra `echosmart-shared`
+- [ ] Crear `gateway/cpp/tests/test_sensordata.cpp`
+  - [ ] Test: `SensorData::to_json()` produce JSON válido
+  - [ ] Test: `SensorData::from_json()` parsea correctamente
+  - [ ] Test: `SensorData::empty()` tiene `is_valid = false`
+  - [ ] Test: round-trip `to_json()` → `from_json()` preserva datos
+  - [ ] Test: caracteres especiales en nombre se escapan
+- [ ] Crear `gateway/cpp/tests/test_alertrule.cpp`
+  - [ ] Test: `AlertRule` con condición GT evalúa correctamente
+  - [ ] Test: `AlertRule` con condición LT evalúa correctamente
+  - [ ] Test: `AlertRule` con condición EQ evalúa correctamente
+  - [ ] Test: `AlertRule` con condición RANGE evalúa correctamente
+  - [ ] Test: `AlertRule` no genera alerta si valor está dentro del rango
+  - [ ] Test: `load_defaults()` retorna reglas con umbrales válidos
+- [ ] Crear `gateway/cpp/tests/test_configloader.cpp`
+  - [ ] Test: cargar gateway.env válido
+  - [ ] Test: cargar gateway.env con comentarios y líneas vacías
+  - [ ] Test: valores por defecto si fichero no existe
+  - [ ] Test: cargar sensors.json con 5 sensores
+  - [ ] Test: cargar sensors.json vacío retorna lista por defecto
+  - [ ] Test: campo faltante usa valor por defecto
+- [ ] Crear `gateway/cpp/tests/test_jsonformatter.cpp`
+  - [ ] Test: `json_object()` produce objeto válido
+  - [ ] Test: `json_string()` escapa comillas y backslashes
+  - [ ] Test: `json_number()` respeta precision
+  - [ ] Test: `json_array()` con 0, 1, N elementos
+  - [ ] Test: `json_bool()` produce true/false
+
+#### 1.7.2 Tests de drivers de sensores
+- [ ] Crear `gateway/cpp/tests/test_ds18b20driver.cpp`
+  - [ ] Test: `read(simulate=true)` retorna valor entre 15 y 35
+  - [ ] Test: `sensorType()` retorna `"ds18b20"`
+  - [ ] Test: `protocol()` retorna `"1-wire"`
+  - [ ] Test: valor fuera de rango [-55, 125] se rechaza
+  - [ ] Test: `listDevices()` en directorio mock
+- [ ] Crear `gateway/cpp/tests/test_dht22driver.cpp`
+  - [ ] Test: `read(simulate=true)` retorna temp y humidity válidos
+  - [ ] Test: `sensorType()` retorna `"dht22"`
+  - [ ] Test: temp en rango [-40, 80], humidity en [0, 100]
+  - [ ] Test: `lastHumidity()` retorna último valor leído
+- [ ] Crear `gateway/cpp/tests/test_bh1750driver.cpp`
+  - [ ] Test: `read(simulate=true)` retorna valor entre 100 y 50000
+  - [ ] Test: `sensorType()` retorna `"bh1750"`
+  - [ ] Test: valor > 65535 se descarta
+- [ ] Crear `gateway/cpp/tests/test_soildriver.cpp`
+  - [ ] Test: `read(simulate=true)` retorna valor entre 10 y 95
+  - [ ] Test: `sensorType()` retorna `"soil_moisture"`
+  - [ ] Test: `calibrate()` ajusta mapeo crudo → porcentaje
+  - [ ] Test: `rawToPercent()` clamp a [0, 100]
+- [ ] Crear `gateway/cpp/tests/test_mhz19cdriver.cpp`
+  - [ ] Test: `read(simulate=true)` retorna valor entre 400 y 2000
+  - [ ] Test: `sensorType()` retorna `"mhz19c"`
+  - [ ] Test: checksum validation correcto e incorrecto
+  - [ ] Test: `isWarmedUp()` retorna false antes de 3 min
+
+#### 1.7.3 Tests del daemon
+- [ ] Crear `gateway/cpp/tests/test_sysinfo.cpp`
+  - [ ] Test: `collect()` retorna todos los campos no vacíos
+  - [ ] Test: `toJson()` produce JSON válido
+  - [ ] Test: `toText()` produce texto legible
+  - [ ] Test: `cpu_temp_c` es razonable (> -50, < 120)
+- [ ] Crear `gateway/cpp/tests/test_gateway_cycle.cpp`
+  - [ ] Test: `Gateway::runOnce()` completa un ciclo sin error
+  - [ ] Test: `Gateway::pollCount()` incrementa después de cada ciclo
+  - [ ] Test: `Gateway::shutdown()` establece `isRunning() = false`
+  - [ ] Test: alertas se generan cuando valor excede umbral
+  - [ ] Test: ciclo con sensores vacíos no crashea
+- [ ] Crear `gateway/cpp/tests/test_datastore.cpp`
+  - [ ] Test: `save()` crea fichero JSONL
+  - [ ] Test: `saveAlert()` crea fichero de alertas
+  - [ ] Test: `getUnsynced()` retorna lecturas guardadas
+  - [ ] Test: `cleanup()` elimina ficheros viejos
+  - [ ] Test: `pendingCount()` retorna conteo correcto
+
+#### 1.7.4 Tests de integración (binarios compilados)
+- [ ] Test de integración: compilar todos los binarios → verificar exit code 0
+- [ ] Test de integración: `echosmart-sysinfo --version` → contiene "1.0.0"
+- [ ] Test de integración: `echosmart-sensor-read ds18b20 --simulate` → JSON con "sensor":"ds18b20"
+- [ ] Test de integración: `echosmart-sensor-read dht22 --simulate` → JSON con "temperature" y "humidity"
+- [ ] Test de integración: `echosmart-sensor-read bh1750 --simulate` → JSON con "sensor":"bh1750"
+- [ ] Test de integración: `echosmart-sensor-read soil --simulate` → JSON con "sensor":"soil_moisture"
+- [ ] Test de integración: `echosmart-sensor-read mhz19c --simulate` → JSON con "sensor":"mhz19c"
+- [ ] Test de integración: `echosmart-sensor-read invalid_sensor` → exit code ≠ 0
+- [ ] Test de integración: `echosmart-gateway --simulate --once` → log "polling cycle start" y "polling cycle end"
+- [ ] Test de integración: `echosmart-gateway --version` → contiene "1.0.0"
+- [ ] Test de integración: verificar .deb se construye sin errores
+
+### 1.8 Comunicaciones (MQTT + HTTP Sync)
+
+- [ ] Implementar `mqttpublisher.h` / `mqttpublisher.cpp`:
+  - [ ] `MqttPublisher::MqttPublisher(broker, port, gateway_id)` — constructor
+  - [ ] `MqttPublisher::connect()` — conectar al broker MQTT
+  - [ ] `MqttPublisher::publish(const SensorData&)` — publicar lectura en topic
+  - [ ] `MqttPublisher::publishAlert(const std::string&)` — publicar alerta
+  - [ ] `MqttPublisher::disconnect()` — desconexión limpia
+  - [ ] `MqttPublisher::isConnected() const` — estado de conexión
+  - [ ] Topics: `echosmart/{gw_id}/sensors/{type}/reading`
+  - [ ] Topic alertas: `echosmart/{gw_id}/alerts`
+  - [ ] LWT: `echosmart/{gw_id}/status` → `"offline"`
+- [ ] Implementar `cloudsyncer.h` / `cloudsyncer.cpp`:
+  - [ ] `CloudSyncer::CloudSyncer(api_url, api_key, gateway_id)` — constructor
+  - [ ] `CloudSyncer::sync(vector<SensorData>)` — HTTP POST batch
+  - [ ] `CloudSyncer::isOnline() const` — último sync < 5 min
+  - [ ] `CloudSyncer::failedAttempts() const` — contador de fallos
+  - [ ] Retry con backoff exponencial (1s, 2s, 4s... max 5 min)
+  - [ ] HTTP vía `libcurl` o `popen("curl ...")` como fallback
+- [ ] Implementar reconexión automática MQTT con backoff
+- [ ] Implementar QoS configurable: 0 (at most once), 1 (at least once), 2 (exactly once)
 - [ ] Implementar TLS/SSL para comunicación MQTT segura
-- [ ] Refactorizar cloud_sync como `HttpSyncClient(ISyncClient)`
-- [ ] Implementar batch sync: enviar N lecturas por request (reducir llamadas HTTP)
-- [ ] Implementar retry con backoff exponencial y jitter
-- [ ] Implementar offline queue: almacenar datos en SQLite si no hay conexión
-- [ ] Implementar compresión gzip para payloads grandes
-- [ ] Implementar health check endpoint: verificar conectividad con cloud
-- [ ] Tests: reconexión MQTT, batch sync, offline queue, retry, compresión
+- [ ] Implementar offline queue: almacenar datos localmente si no hay conexión
+- [ ] Tests: publicación MQTT mock, sync HTTP mock, retry, offline queue
 
-### 1.9 Auto-descubrimiento y Configuración
+### 1.9 Empaquetado .deb del Gateway
 
-- [x] Implementar `discovery.py` con SSDP
-- [ ] Implementar mDNS/Zeroconf como alternativa a SSDP
-- [ ] Implementar API REST local en el gateway (Flask/FastAPI ligero, puerto 8080)
-  - [ ] `GET /api/status` — Estado del gateway y sensores
-  - [ ] `GET /api/readings` — Últimas lecturas de cada sensor
-  - [ ] `GET /api/config` — Configuración actual
-  - [ ] `POST /api/config` — Actualizar configuración
-  - [ ] `POST /api/restart` — Reiniciar sensor manager
-- [ ] Implementar identificación del gateway (hostname, MAC, serial number)
+#### 1.9.1 Metadatos Debian
+- [ ] Actualizar `gateway/debian/control` con dependencias Qt opcionales
+- [ ] Actualizar `gateway/debian/rules` con cmake + install de todos los binarios
+- [ ] Actualizar `gateway/debian/postinst` con creación de usuario y directorios
+- [ ] Actualizar `gateway/debian/prerm` con stop y disable de servicio
+
+#### 1.9.2 Contenido del .deb
+- [ ] `/usr/bin/echosmart-gateway` — wrapper shell del daemon
+- [ ] `/usr/bin/echosmart-gateway-bin` — binario C++ compilado
+- [ ] `/usr/bin/echosmart-sysinfo` — diagnósticos del sistema (C++)
+- [ ] `/usr/bin/echosmart-sensor-read` — lectura de sensores (C++)
+- [ ] `/usr/bin/echosmart-gateway-setup` — wizard de configuración (bash)
+- [ ] `/etc/echosmart/gateway.env` — configuración por defecto (conffile)
+- [ ] `/etc/echosmart/sensors.json` — definición de sensores (conffile)
+- [ ] `/lib/systemd/system/echosmart-gateway.service` — unidad systemd
+
+#### 1.9.3 Verificación del .deb
+- [ ] Build nativo: `dpkg-buildpackage -b -us -uc` → exit 0
+- [ ] Build cross: `dpkg-buildpackage -b -us -uc --host-arch=arm64` → exit 0
+- [ ] Lintian: `lintian echosmart-gateway_*.deb` → sin errores E:
+- [ ] Instalar: `dpkg -i echosmart-gateway_*.deb` → exit 0
+- [ ] Listar ficheros: `dpkg -L echosmart-gateway` → 8 rutas esperadas
+- [ ] Servicio: `systemctl status echosmart-gateway` → loaded
+- [ ] Desinstalar: `dpkg -r echosmart-gateway` → limpio
+
+### 1.10 Auto-descubrimiento y API Local
+
+- [ ] Implementar mDNS/Zeroconf para descubrimiento en red local
+- [ ] Implementar API REST local ligera en el gateway (puerto 8080)
+  - [ ] `GET /api/status` — invoca `echosmart-sysinfo`, retorna JSON
+  - [ ] `GET /api/readings` — últimas lecturas de cada sensor
+  - [ ] `GET /api/config` — lee `/etc/echosmart/gateway.env`
+  - [ ] `POST /api/config` — actualiza configuración y reinicia servicio
+  - [ ] `POST /api/restart` — `systemctl restart echosmart-gateway`
+- [ ] Identificación del gateway: hostname, MAC, serial, versión
 - [ ] Tests: descubrimiento, API local, actualización de config
-
-### 1.10 Gateway — Tests Completos
-
-- [x] Tests básicos unitarios
-- [ ] Tests para CADA driver individual con mocking del HAL
-- [ ] Tests para SensorManager con drivers mockeados
-- [ ] Tests para AlertEngine con reglas predefinidas
-- [ ] Tests para SqliteStorage (CRUD, retención, concurrencia)
-- [ ] Tests para MqttPublisher con broker mockeado
-- [ ] Tests para CloudSync con HTTP mockeado (responses library)
-- [ ] Tests de integración: flujo completo sensor → storage → mqtt → sync
-- [ ] Tests de configuración: carga de JSON, validación, defaults
-- [ ] Tests de error handling: sensor offline, DB corrupta, red caída
-- [ ] Verificar cobertura ≥ 80% con `pytest --cov`
-- [ ] Configurar `pytest.ini` con markers y configuración de test
 
 ### 1.11 Gateway — Calidad de Código
 
-- [ ] Configurar `black` para formateo automático
-- [ ] Configurar `isort` para ordenar imports
-- [ ] Configurar `flake8` o `ruff` para linting
-- [ ] Configurar `mypy` para type checking
-- [ ] Agregar `pre-commit` hooks: black + isort + flake8 + mypy
-- [ ] Agregar type hints a TODAS las funciones públicas
-- [ ] Agregar docstrings Google-style a TODAS las clases y funciones públicas
-- [ ] Crear `gateway/README.md` con instrucciones de desarrollo y testing
-- [ ] Crear `gateway/Makefile` con targets: `lint`, `format`, `test`, `coverage`, `run`
+- [ ] Crear `gateway/cpp/.clang-format` con estilo Google, IndentWidth 4, ColumnLimit 100
+- [ ] Configurar `cppcheck` para análisis estático de `gateway/cpp/`
+- [ ] Agregar CI step: compilar con `-Wall -Wextra -Wpedantic` → 0 warnings
+- [ ] Agregar CI step: ejecutar `cppcheck --error-exitcode=1`
+- [ ] Agregar CI step: ejecutar CTest → todos los tests pasan
+- [ ] Agregar CI step: construir .deb sin errores
+- [ ] Crear `gateway/README.md` con:
+  - [ ] Requisitos de build (cmake ≥ 3.16, g++ ≥ 10, qt6 opcional)
+  - [ ] Instrucciones de compilación: `cmake -S cpp -B build && cmake --build build`
+  - [ ] Instrucciones de testing: `ctest --test-dir build --output-on-failure`
+  - [ ] Instrucciones de empaquetado: `cd gateway && dpkg-buildpackage -b -us -uc`
+  - [ ] Tabla de binarios con todos sus flags y sub-comandos
+  - [ ] Tabla de archivos `.h`, `.cpp`, `.qml`, `.qrc`, `.ui` con descripción
 
 ---
 
@@ -3036,7 +3453,7 @@ desktop/
 - [ ] **Gateway Dockerfile** (`infra/docker/gateway.Dockerfile`):
   - [ ] Para testing en contenedor (sin GPIO real)
   - [ ] Modo simulación por defecto
-  - [ ] Health check: `python -c "import gateway; print('ok')"`
+  - [ ] Health check: `echosmart-sysinfo --version`
 - [ ] `docker-compose.prod.yml`:
   - [ ] Backend: gunicorn con 4 workers + uvicorn
   - [ ] Frontend: nginx optimizado
@@ -3091,10 +3508,10 @@ desktop/
   - [ ] Jobs paralelos:
     - [ ] `lint-backend`: black + isort + ruff + mypy
     - [ ] `lint-frontend`: ESLint + Prettier + TypeScript check
-    - [ ] `lint-gateway`: black + isort + ruff
+    - [ ] `lint-gateway`: cppcheck + clang-format
     - [ ] `test-backend`: pytest con PostgreSQL service container + coverage
     - [ ] `test-frontend`: vitest con coverage
-    - [ ] `test-gateway`: pytest con coverage
+    - [ ] `test-gateway`: compilar y ejecutar binarios con --simulate
     - [ ] `security-scan`: bandit (Python) + npm audit (Node.js) + trivy (Docker)
   - [ ] Reportar cobertura como comentario en PR (codecov/coveralls)
   - [ ] Bloquear merge si cobertura < 80% o lint falla
@@ -3408,10 +3825,17 @@ desktop/
 ### 9.2 Software Pre-instalado en el Gateway
 
 - [ ] **Raspberry Pi OS Lite** con actualizaciones de seguridad
-- [ ] **Python 3.11+** con virtualenv
-- [ ] **Mosquitto client** (paho-mqtt)
+- [ ] **Paquete .deb `echosmart-gateway`** pre-instalado con:
+  - [ ] `/usr/bin/echosmart-gateway` — wrapper del daemon
+  - [ ] `/usr/bin/echosmart-gateway-bin` — binario C++ del daemon
+  - [ ] `/usr/bin/echosmart-sysinfo` — diagnósticos del sistema (C++)
+  - [ ] `/usr/bin/echosmart-sensor-read` — lectura de sensores (C++)
+  - [ ] `/usr/bin/echosmart-gateway-setup` — wizard de configuración
+  - [ ] `/etc/echosmart/gateway.env` — configuración por defecto
+  - [ ] `/etc/echosmart/sensors.json` — definición de sensores
+  - [ ] `/lib/systemd/system/echosmart-gateway.service` — unidad systemd
 - [ ] **SQLite3** para almacenamiento local
-- [ ] **Git** para actualizaciones
+- [ ] **Mosquitto client** para MQTT
 - [ ] **Interfaces habilitadas**: I2C, 1-Wire, UART, SPI
 - [ ] **Device tree overlays** configurados:
   - [ ] `dtoverlay=w1-gpio,gpiopin=4` (DS18B20)
@@ -3419,11 +3843,6 @@ desktop/
   - [ ] `dtparam=i2c_arm=on` (BH1750, ADS1115)
   - [ ] `dtoverlay=disable-bt` (liberar UART principal)
   - [ ] `gpu_mem=16` (mínima GPU, es headless)
-- [ ] **Dependencias Python pre-instaladas** en virtualenv `/opt/echosmart/venv/`:
-  - [ ] `RPi.GPIO`, `adafruit-circuitpython-dht`, `adafruit-circuitpython-bh1750`
-  - [ ] `adafruit-circuitpython-ads1x15`, `smbus2`, `pyserial`
-  - [ ] `paho-mqtt`, `requests`, `structlog`, `schedule`
-- [ ] **Código del gateway** en `/opt/echosmart/gateway/`
 - [ ] **Watchdog de hardware** habilitado (reinicio automático si se congela)
 - [ ] **Servicios systemd**:
   - [ ] `echosmart-gateway.service` — Servicio principal del gateway
@@ -3489,7 +3908,7 @@ desktop/
   - [ ] Stage 0: Bootstrap Debian
   - [ ] Stage 1: Mínimo OS (sin desktop)
   - [ ] Stage 2: Sistema base con networking
-  - [ ] Stage 3: Dependencias EchoSmart (Python, libs, gateway code)
+  - [ ] Stage 3: Paquete .deb EchoSmart (binarios C++, systemd, config)
   - [ ] Stage 4: Configuración final (services, config, first-boot script)
 - [ ] First-boot script (`/opt/echosmart/first-boot.sh`):
   - [ ] Expandir filesystem a toda la SD
@@ -3677,13 +4096,141 @@ desktop/
 
 ---
 
+## Fase 12: Producción y Comercialización del Kit
+
+> 🏭 **El kit EchoSmart se comercializa como producto llave en mano.** Esta fase cubre
+> la producción en masa, control de calidad, empaque y canales de venta.
+
+### 12.1 BOM (Bill of Materials) por Kit
+
+- [ ] Definir BOM final con proveedores y costos unitarios:
+  - [ ] Raspberry Pi 4B 4 GB (~$55)
+  - [ ] Fuente USB-C 5V 3A (~$8)
+  - [ ] microSD 32 GB con imagen pre-grabada (~$7)
+  - [ ] DS18B20 encapsulado impermeable (~$2)
+  - [ ] DHT22 módulo (~$3)
+  - [ ] BH1750 breakout (~$2)
+  - [ ] Sensor suelo capacitivo v1.2 (~$2)
+  - [ ] ADS1115 módulo ADC (~$3)
+  - [ ] MH-Z19C CO₂ NDIR (~$18)
+  - [ ] Carcasa Raspberry Pi (~$5)
+  - [ ] Protoboard + cables + resistencias 4.7kΩ/10kΩ (~$5)
+  - [ ] Caja del kit + manual impreso + sticker GPIO (~$8)
+  - [ ] **COGS total estimado: ~$118 USD**
+- [ ] Negociar precios por volumen con proveedores (lotes de 100+)
+- [ ] Establecer proveedor de respaldo para cada componente crítico
+
+### 12.2 Precios de Venta y Planes
+
+- [ ] Definir estructura de precios:
+  - [ ] **Kit Básico** ($299) — Hardware + microSD + manual impreso
+  - [ ] **Kit Pro** ($449) — Kit Básico + 1 año soporte + dashboard cloud
+  - [ ] **Enterprise** (cotización) — 10× Kit Pro + instalación + SLA 24/7
+- [ ] Crear landing page `echosmart.io` con planes y checkout
+- [ ] Integrar Stripe para pagos online
+- [ ] Crear programa de distribuidores / revendedores
+
+### 12.3 Proceso de Ensamblaje (Producción en Masa)
+
+- [ ] Definir línea de ensamblaje (objetivo: 10 unidades/hora)
+- [ ] Crear checklist de ensamblaje por unidad:
+  - [ ] Flashear microSD con imagen ISO (batch de 50)
+  - [ ] Insertar Raspberry Pi en carcasa
+  - [ ] Empaquetar sensores en bolsa antiestática
+  - [ ] Incluir protoboard, cables, resistencias
+  - [ ] Incluir manual impreso y sticker GPIO
+  - [ ] Etiquetar con número de serie (formato: `ES-YYYYMM-XXXX`)
+  - [ ] Colocar todo en caja del kit
+  - [ ] Sellar caja
+- [ ] Crear estación de flasheo de microSD (duplicador para lotes grandes)
+
+### 12.4 Control de Calidad (QA) por Unidad
+
+- [ ] Crear procedimiento de QA por unidad antes de empaquetar:
+  - [ ] Encender Raspberry Pi → boot completo < 60 s
+  - [ ] Ejecutar `echosmart-sysinfo` → JSON válido con modelo y versión
+  - [ ] Ejecutar `echosmart-sensor-read ds18b20 --simulate` → JSON válido
+  - [ ] Ejecutar `echosmart-gateway --simulate --once` → ciclo completo OK
+  - [ ] Verificar `systemctl status echosmart-gateway` → loaded
+  - [ ] Verificar wizard `echosmart-gateway-setup` → escribe config
+- [ ] Criterios de PASS/FAIL documentados
+- [ ] Registro de resultados QA por número de serie
+- [ ] Tasa de rechazo objetivo: < 2%
+
+### 12.5 Makefile de Producción
+
+- [ ] Crear `Makefile` en raíz del repositorio con targets:
+  - [ ] `help` — lista de targets disponibles
+  - [ ] `build` — compilar binarios C++ (host)
+  - [ ] `build-arm64` — cross-compilar para arm64
+  - [ ] `deb` — construir paquete .deb
+  - [ ] `test` — ejecutar binarios con --simulate y verificar salida
+  - [ ] `lint` — cppcheck / clang-tidy sobre gateway/cpp/
+  - [ ] `clean` — limpiar artefactos de compilación
+  - [ ] `install` — instalar binarios localmente
+  - [ ] `docker-up` / `docker-down` — infraestructura local
+
+### 12.6 CI/CD para .deb (GitHub Actions)
+
+- [ ] Crear `.github/workflows/build-deb.yml`:
+  - [ ] Trigger: tags `v*` (e.g. `v1.0.0`)
+  - [ ] Instalar `gcc-aarch64-linux-gnu` y `g++-aarch64-linux-gnu`
+  - [ ] Cross-compilar binarios C++ para arm64
+  - [ ] Construir .deb con `dpkg-buildpackage`
+  - [ ] Ejecutar tests con `--simulate` en host
+  - [ ] Subir .deb como artefacto a GitHub Releases
+  - [ ] Generar checksum SHA256
+- [ ] Actualizar `ci.yml` para incluir compilación y tests de binarios C++
+
+### 12.7 Documentación de Producción
+
+- [ ] Crear `docs/production-kit.md` — BOM, precios, ensamblaje, QA
+- [ ] Crear `docs/deb-packaging.md` — cómo construir, instalar y actualizar .deb
+- [ ] Actualizar `docs/gateway-edge-computing.md` — binarios C++, systemd, sin Python
+- [ ] Actualizar `docs/project-structure.md` — nueva estructura gateway/cpp/
+- [ ] Actualizar `docs/getting-started.md` — instrucciones con binarios C++
+- [ ] Actualizar `docs/README.md` — índice con nuevos documentos
+- [ ] Manual de inicio rápido impreso (4 páginas, incluido en caja)
+- [ ] Guía de conexión de sensores con diagramas GPIO
+- [ ] Sticker con pinout GPIO para pegar en la carcasa
+
+### 12.8 Portal SaaS (Dashboard Cloud)
+
+- [ ] Landing page: `echosmart.io`
+- [ ] Registro de kits por número de serie
+- [ ] Dashboard cloud por suscripción (Kit Pro y Enterprise)
+- [ ] API de provisioning para gateways nuevos
+- [ ] Stripe para pagos recurrentes
+- [ ] Documentación para el usuario final
+
+### 12.9 Logística y Envío
+
+- [ ] Definir métodos de envío por zona:
+  - [ ] Nacional (México): Fedex/Estafeta, 3-5 días, ~$10-15
+  - [ ] EE.UU./Canadá: DHL Express, 5-7 días, ~$25-35
+  - [ ] Internacional: DHL/UPS, 7-14 días, ~$35-50
+- [ ] Definir política de garantía:
+  - [ ] Hardware: 1 año contra defectos de fabricación
+  - [ ] Software: actualizaciones de seguridad vía `apt upgrade`
+  - [ ] Soporte: email + chat (Kit Pro y Enterprise)
+
+### 12.10 Actualización de Software en Campo
+
+- [ ] Documentar proceso de actualización para el cliente:
+  - [ ] `sudo dpkg -i echosmart-gateway_X.Y.Z-1_arm64.deb`
+  - [ ] O via repositorio APT: `sudo apt update && sudo apt upgrade echosmart-gateway`
+- [ ] Implementar notificación al dashboard cuando hay nueva versión disponible
+- [ ] Implementar OTA (Over-The-Air) update via MQTT comando remoto
+
+---
+
 ## Resumen de Plataformas
 
 | Plataforma | Tecnología | Directorio | Estado |
 |------------|-----------|------------|--------|
 | **Backend (Cloud)** | FastAPI · PostgreSQL · InfluxDB · Redis | `backend/` | 🟡 Scaffolding completo |
 | **Frontend (Web)** | React 18 · Vite · Redux Toolkit · Recharts | `frontend/` | 🟡 Scaffolding completo |
-| **Gateway (Edge)** | Python · Raspberry Pi · SQLite · MQTT | `gateway/` | 🟡 Scaffolding completo |
+| **Gateway (Edge)** | C++17 · CMake · .deb · systemd · Raspberry Pi | `gateway/` | 🟡 Binarios C++ completos |
 | **Móvil (Android)** | React Native · Expo | `mobile/` | 🟠 Estructura inicial |
 | **Móvil (iOS)** | React Native · Expo | `mobile/` | 🟠 Estructura inicial |
 | **Escritorio (Windows)** | Electron · React | `desktop/` | 🟠 Estructura inicial |
@@ -3692,7 +4239,7 @@ desktop/
 | **Infra Local (Dev)** | Docker Compose · Makefile · Scripts | `infra/` | 🟠 Pendiente |
 | **Infra Producción** | Docker · K8s · Nginx · Prometheus · Grafana | `infra/` | 🟡 Docker + K8s parcial |
 | **ISO Servidor** | Ubuntu 22.04 · Docker · echosmart-ctl | `infra/iso/server/` | 🟠 Pendiente |
-| **ISO Gateway RPi** | RPi OS Lite · Python · pi-gen | `infra/iso/gateway/` | 🟠 Pendiente |
+| **ISO Gateway RPi** | RPi OS Lite · .deb (C++) · pi-gen | `infra/iso/gateway/` | 🟠 Pendiente |
 | **Assets / Diseño** | SVG · PNG · JPG · ICO | `assets/` | 🟢 312 archivos generados |
 | **Documentación** | Markdown · SVG | `docs/` | 🟢 26+ documentos |
 
@@ -3701,7 +4248,7 @@ desktop/
 | Fase | Nombre | Semanas | Tareas | Estado |
 |------|--------|---------|--------|--------|
 | 0 | Estructura y Assets | — | ~130 | ✅ Completado |
-| 1 | Gateway Local (Simulación) | 1–3 | ~180 | 🟡 Scaffolding |
+| 1 | Gateway C++ (Binarios + .deb) | 1–3 | ~180 | 🟡 Binarios completos |
 | 2 | Backend Cloud | 4–7 | ~300 | 🟡 Scaffolding |
 | 3 | Frontend Web | 8–10 | ~250 | 🟡 Scaffolding |
 | 4 | Mobile (Android + iOS) | 11–16 | ~120 | 🟠 Estructura |
@@ -3712,7 +4259,8 @@ desktop/
 | 9 | **ISO Raspberry Pi Gateway** | 26–28 | ~100 | 🟠 Pendiente |
 | 10 | Features Avanzadas | 29+ | ~80 | 🟠 Pendiente |
 | 11 | Testing con Hardware Real | Final | ~40 | 🟠 Pendiente |
-| | **TOTAL** | | **~1640+** | |
+| 12 | **Producción y Comercialización** | Final | ~80 | 🟠 Pendiente |
+| | **TOTAL** | | **~1720+** | |
 
 ## Resumen de Assets Generados
 
@@ -3742,4 +4290,4 @@ desktop/
 
 ---
 
-*Última actualización: 25 de marzo de 2026*
+*Última actualización: 29 de marzo de 2026*
