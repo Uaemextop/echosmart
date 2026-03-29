@@ -7,7 +7,7 @@ Wants=network-online.target
 Type=simple
 User=echosmart
 Group=echosmart
-ExecStart=/usr/bin/echosmart-gateway
+ExecStart=/usr/bin/echosmart run --config=/etc/echosmart/gateway.env --sensors=/etc/echosmart/sensors.json
 Restart=always
 RestartSec=10
 StandardOutput=journal

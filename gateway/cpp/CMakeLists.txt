@@ -82,3 +82,10 @@ target_compile_definitions(echosmart-sensor-read PRIVATE
 # Install targets (used by debian/rules)
 install(TARGETS echosmart echosmart-gateway-bin echosmart-sysinfo echosmart-sensor-read
         RUNTIME DESTINATION bin)
+
+# --- Tests (CTest) -------------------------------------------------------
+option(BUILD_TESTS "Build CTest test suite" ON)
+if(BUILD_TESTS)
+    enable_testing()
+    add_subdirectory(tests)
+endif()
