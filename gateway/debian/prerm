@@ -1,0 +1,17 @@
+#!/bin/bash
+set -e
+
+case "$1" in
+    remove|upgrade|deconfigure)
+        # Stop and disable the service before removal
+        if systemctl is-active --quiet echosmart-gateway 2>/dev/null; then
+            systemctl stop echosmart-gateway
+        fi
+        if systemctl is-enabled --quiet echosmart-gateway 2>/dev/null; then
+            systemctl disable echosmart-gateway
+        fi
+        systemctl daemon-reload
+        ;;
+esac
+
+exit 0

@@ -10,8 +10,9 @@ Descripción detallada de la organización de carpetas, módulos y dependencias 
 echosmart/
 │
 ├── README.md                          # Descripción del proyecto y enlaces a docs
-├── LICENSE                            # Licencia MIT
+├── LICENSE                            # Software propietario
 ├── CHANGELOG.md                       # Registro de cambios por versión
+├── Makefile                           # Build, test, lint, deb, docker
 ├── docker-compose.yml                 # Orquestación de servicios para desarrollo
 ├── .gitignore                         # Archivos ignorados por Git
 ├── .env.example                       # Plantilla de variables de entorno
@@ -19,7 +20,12 @@ echosmart/
 ├── .github/                           # Configuración de GitHub
 │   ├── workflows/                     # Pipelines CI/CD
 │   │   ├── ci.yml                     # Tests y linting en cada push/PR
-│   │   └── deploy.yml                 # Build y despliegue a producción
+│   │   ├── deploy.yml                 # Build y despliegue a producción
+│   │   ├── build-deb.yml              # Build .deb package para EchoPy
+│   │   ├── mobile.yml                 # Build app mobile (EAS)
+│   │   ├── iso.yml                    # Build ISO EchoPy + Servidor
+│   │   └── demo.yml                   # Deploy demo a GitHub Pages
+│   ├── dependabot.yml                 # Actualización automática de dependencias
 │   ├── ISSUE_TEMPLATE/                # Plantillas de issues
 │   │   ├── bug_report.md              # Reporte de bug
 │   │   └── feature_request.md         # Solicitud de funcionalidad
@@ -63,8 +69,11 @@ echosmart/
 │   │   ├── dependencies.py            # Inyección de dependencias FastAPI
 │   │   ├── routers/                   # Endpoints REST agrupados por recurso
 │   │   │   ├── __init__.py
-│   │   │   ├── auth.py                # /api/v1/auth/*
-│   │   │   ├── gateways.py            # /api/v1/gateways/*
+│   │   │   ├── auth.py                # /api/v1/auth/* (login, register con serial, admin login)
+│   │   │   ├── serials.py             # /api/v1/serials/* (generar, validar, revocar)
+│   │   │   ├── echopy.py              # /api/v1/echopy/* (bind, suspend, remote, diagnostics)
+│   │   │   ├── updates.py             # /api/v1/updates/* (Cosmuodate: check, download, apply)
+│   │   │   ├── gateways.py            # /api/v1/gateways/* (compatibilidad)
 │   │   │   ├── sensors.py             # /api/v1/sensors/*
 │   │   │   ├── alerts.py              # /api/v1/alerts/*
 │   │   │   ├── reports.py             # /api/v1/reports/*
@@ -81,9 +90,11 @@ echosmart/
 │   │   │   └── tenant_service.py      # Gestión multi-tenant
 │   │   ├── models/                    # Modelos SQLAlchemy (ORM)
 │   │   │   ├── __init__.py
-│   │   │   ├── user.py
+│   │   │   ├── user.py                # Usuario (con serial_number, role admin/user)
 │   │   │   ├── tenant.py
-│   │   │   ├── gateway.py
+│   │   │   ├── gateway.py             # Gateway (compatibilidad con EchoPy)
+│   │   │   ├── echopy.py              # Dispositivo EchoPy (RPi del kit)
+│   │   │   ├── serial.py              # Número de serie (ES-YYYYMM-XXXX)
 │   │   │   ├── sensor.py
 │   │   │   ├── reading.py
 │   │   │   ├── alert.py
@@ -91,6 +102,8 @@ echosmart/
 │   │   ├── schemas/                   # Esquemas Pydantic (validación)
 │   │   │   ├── __init__.py
 │   │   │   ├── auth.py
+│   │   │   ├── serial.py              # Validación y generación de seriales
+│   │   │   ├── echopy.py              # Bind, diagnósticos, remote
 │   │   │   ├── gateway.py
 │   │   │   ├── sensor.py
 │   │   │   ├── alert.py

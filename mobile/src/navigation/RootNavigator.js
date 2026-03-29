@@ -2,13 +2,18 @@ import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
-// Screens
+// Auth Screens
+import LoginScreen from '../screens/Auth/LoginScreen';
+import RegisterScreen from '../screens/Auth/RegisterScreen';
+import SearchEchoPyScreen from '../screens/Auth/SearchEchoPyScreen';
+import PairEchoPyScreen from '../screens/Auth/PairEchoPyScreen';
+
+// Main Screens
 import DashboardScreen from '../screens/Dashboard/DashboardScreen';
 import SensorsScreen from '../screens/Sensors/SensorsScreen';
 import AlertsScreen from '../screens/Alerts/AlertsScreen';
 import ReportsScreen from '../screens/Reports/ReportsScreen';
 import SettingsScreen from '../screens/Settings/SettingsScreen';
-import LoginScreen from '../screens/Auth/LoginScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -35,7 +40,13 @@ export default function RootNavigator() {
   // TODO: Verificar autenticación para mostrar Login o MainTabs
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
+      {/* Auth Flow */}
       <Stack.Screen name="Login" component={LoginScreen} />
+      <Stack.Screen name="Register" component={RegisterScreen} />
+      <Stack.Screen name="SearchEchoPy" component={SearchEchoPyScreen} />
+      <Stack.Screen name="PairEchoPy" component={PairEchoPyScreen} />
+
+      {/* Main App */}
       <Stack.Screen name="Main" component={MainTabs} />
     </Stack.Navigator>
   );

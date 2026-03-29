@@ -1,0 +1,9 @@
+echosmart-gateway (1.0.0-1) unstable; urgency=medium
+
+  * Initial release.
+  * C++ binaries: echosmart-gateway-bin, echosmart-sysinfo, echosmart-sensor-read.
+  * Systemd service for automatic startup.
+  * Setup wizard for first-run configuration.
+  * Supports DS18B20, DHT22, BH1750, soil moisture and MH-Z19C sensors.
+
+ -- EchoSmart Team <soporte@echosmart.io>  Sat, 29 Mar 2026 08:00:00 +0000

@@ -1,0 +1,31 @@
+#!/usr/bin/make -f
+%:
+	dh $@
+
+override_dh_auto_configure:
+	cmake -S cpp -B debian/build-cpp -DCMAKE_BUILD_TYPE=Release \
+	      -DCMAKE_INSTALL_PREFIX=/usr
+
+override_dh_auto_build:
+	cmake --build debian/build-cpp --parallel
+
+override_dh_auto_install:
+	# C++ binaries
+	install -Dm755 debian/build-cpp/echosmart-gateway-bin  debian/echosmart-gateway/usr/bin/echosmart-gateway-bin
+	install -Dm755 debian/build-cpp/echosmart-sysinfo      debian/echosmart-gateway/usr/bin/echosmart-sysinfo
+	install -Dm755 debian/build-cpp/echosmart-sensor-read  debian/echosmart-gateway/usr/bin/echosmart-sensor-read
+	# Shell wrappers
+	install -Dm755 bin/echosmart-gateway        debian/echosmart-gateway/usr/bin/echosmart-gateway
+	install -Dm755 bin/echosmart-gateway-setup  debian/echosmart-gateway/usr/bin/echosmart-gateway-setup
+	# Config defaults
+	install -Dm644 .env.example    debian/echosmart-gateway/etc/echosmart/gateway.env
+	install -Dm644 sensors.json    debian/echosmart-gateway/etc/echosmart/sensors.json
+	# systemd unit
+	install -Dm644 debian/echosmart-gateway.service debian/echosmart-gateway/lib/systemd/system/echosmart-gateway.service
+
+override_dh_auto_test:
+	# Binaries are tested in CI with --simulate; skip dh test
+	true
+
+override_dh_auto_clean:
+	rm -rf debian/build-cpp
