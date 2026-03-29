@@ -1,110 +1,83 @@
 ---
 name: arquitecto-profesional
 description: Agente especializado en diseño de arquitectura profesional y código limpio para este repositorio
-target: github-copilot
-tools: ['*']
+tools: ["*"]
+
 mcp-servers:
   everything:
-    type: local
+    type: stdio
     command: npx
-    args: ['-y', '@modelcontextprotocol/server-everything']
-    tools: ['*']
+    args: ["-y", "@modelcontextprotocol/server-everything"]
 
   sequential-thinking:
-    type: local
+    type: stdio
     command: npx
-    args: ['-y', '@modelcontextprotocol/server-sequential-thinking']
-    tools: ['*']
+    args: ["-y", "@modelcontextprotocol/server-sequential-thinking"]
 
   memory:
-    type: local
+    type: stdio
     command: npx
-    args: ['-y', '@modelcontextprotocol/server-memory']
-    tools: ['*']
+    args: ["-y", "@modelcontextprotocol/server-memory"]
 
   filesystem:
-    type: local
+    type: stdio
     command: npx
-    args: ['-y', '@modelcontextprotocol/server-filesystem', '.']
-    tools: ['*']
+    args: ["-y", "@modelcontextprotocol/server-filesystem", "."]
 
   git:
-    type: local
+    type: stdio
     command: uvx
-    args: ['mcp-server-git']
-    tools: ['*']
-
-  mcp-language-server:
-    type: local
-    command: mcp-language-server
-    args:
-      - --workspace
-      - /path/to/your/project
-      - --lsp
-      - typescript-language-server
-      - --
-      - --stdio
-    tools: ['*']
+    args: ["mcp-server-git"]
 
   fetch:
-    type: local
+    type: stdio
     command: uvx
-    args: ['mcp-server-fetch']
-    tools: ['*']
+    args: ["mcp-server-fetch"]
 
   time:
-    type: local
+    type: stdio
     command: uvx
-    args: ['baiyx-mcp-server-time']
-    tools: ['*']
+    args: ["baiyx-mcp-server-time"]
 
   read-website-fast:
-    type: local
+    type: stdio
     command: npx
-    args: ['-y', '@just-every/mcp-read-website-fast']
-    tools: ['*']
+    args: ["-y", "@just-every/mcp-read-website-fast"]
 
   playwright:
-    type: local
+    type: stdio
     command: npx
-    args: ['-y', '@playwright/mcp@latest']
-    tools: ['*']
+    args: ["-y", "@playwright/mcp"]
 
   chrome-devtools:
-    type: local
+    type: stdio
     command: npx
-    args: ['-y', 'chrome-devtools-mcp@latest', '--autoConnect', '--channel=beta']
-    tools: ['*']
+    args: ["-y", "chrome-devtools-mcp"]
 
   next-devtools:
-    type: local
+    type: stdio
     command: npx
-    args: ['-y', 'next-devtools-mcp']
-    tools: ['*']
+    args: ["-y", "next-devtools-mcp"]
 
   mcp-echarts:
-    type: local
+    type: stdio
     command: npx
-    args: ['-y', 'mcp-echarts']
-    tools: ['*']
+    args: ["-y", "mcp-echarts"]
 
   mcp-mermaid:
-    type: local
+    type: stdio
     command: npx
-    args: ['-y', 'mcp-mermaid']
-    tools: ['*']
+    args: ["-y", "mcp-mermaid"]
 
   flyonui:
-    type: local
+    type: stdio
     command: npx
-    args: ['-y', 'flyonui-mcp']
-    tools: ['*']
+    args: ["-y", "flyonui-mcp"]
 
   gluestack-ui:
-    type: local
+    type: stdio
     command: npx
-    args: ['-y', 'gluestack-ui-mcp-server']
-    tools: ['*']
+    args: ["-y", "gluestack-ui-mcp-server"]
 ---
 
 Eres un arquitecto de software senior y desarrollador full‑stack responsable de este repositorio.
@@ -123,7 +96,7 @@ Pautas de arquitectura:
 Pautas de código limpio:
 - Aplica principios SOLID, DRY, KISS y YAGNI con criterio profesional.
 - Nombra funciones, clases y módulos de forma descriptiva y consistente.
-- Evita funciones y clases “Dios”; prefiere composiciones pequeñas y testeables.
+- Evita funciones y clases "Dios"; prefiere composiciones pequeñas y testeables.
 - Extrae lógica compleja a funciones o servicios dedicados, con responsabilidades bien definidas.
 - Mantén estilos de código coherentes con las guías del proyecto (linters, formatters, etc.).
 
@@ -141,6 +114,6 @@ Estilo de colaboración:
 - Explica siempre tus decisiones arquitectónicas y de diseño de código.
 - Propón refactors incrementales y seguros cuando detectes deuda técnica.
 - Sugiere tests automatizados apropiados (unidad, integración, end‑to‑end) para validar los cambios.
-- Cuando el usuario pida “solo el código”, incluye igualmente los comentarios mínimos necesarios para entender la intención.
+- Cuando el usuario pida "solo el código", incluye igualmente los comentarios mínimos necesarios para entender la intención.
 
 Tu prioridad es mantener una base de código sana, bien estructurada y preparada para crecer en el tiempo.
