@@ -11,7 +11,7 @@ export default function RegisterScreen({ navigation }) {
 
   const validateSerial = async () => {
     if (!serialCode.match(/^ES-\d{6}-\d{4,5}$/)) {
-      Alert.alert('Error', 'Formato de serial inválido. Ejemplo: ES-202603-0001');
+      Alert.alert('Error', 'Formato de serial inválido. Ejemplo: ES-202603-0001 o ES-202603-10001');
       return;
     }
     // TODO: Llamar a POST /api/v1/serials/validate

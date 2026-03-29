@@ -167,12 +167,12 @@ jobs:
       - name: Install security tools
         run: pip install bandit safety
       - name: Run bandit (Python security)
-        run: bandit -r backend/src/ -ll --skip B101 || true
+        run: bandit -r backend/src/ -ll --skip B101 || true  # Advisory: don't block CI until baseline is established
       - name: Check dependencies for vulnerabilities
         run: |
           cd backend
-          safety check -r requirements.txt --output text || true
+          safety check -r requirements.txt --output text || true  # Advisory: don't block CI until baseline is established
       - name: npm audit (frontend)
         run: |
           cd frontend
-          npm audit --audit-level=high || true
+          npm audit --audit-level=high || true  # Advisory: don't block CI until baseline is established

@@ -23,7 +23,11 @@ class EchoPyCreate(EchoPyBase):
 
 
 class EchoPyUpdate(EchoPyBase):
-    """Schema para actualizar EchoPy."""
+    """Schema para actualizar EchoPy.
+
+    Hereda campos opcionales de EchoPyBase (name, location, greenhouse_name).
+    Se extiende cuando se agreguen más campos configurables.
+    """
 
     pass
 
