@@ -524,7 +524,7 @@ A continuación se definen los **5 sensores** seleccionados para el proyecto. Ca
 | `echosmart api` | `<resource>` | `--method=GET\|POST\|PUT\|DELETE`, `--path=<route>`, `--body=<json>`, `--token=<jwt>`, `--output=<file>` | Consumir la API backend y automatizar provisioning |
 | `echosmart web` | `<action>` | `--host=<host>`, `--port=<port>`, `--open=true`, `--profile=dev\|prod` | Servir o abrir consola web/local UI del gateway |
 | `echosmart server` | `<action>` | `--url=<server>`, `--api-key=<key>`, `--gateway-id=<id>`, `--format=json\|text` | Registrar, provisionar, diagnosticar o actualizar vínculo con servidor |
-| `echosmart iso` | `<target>` | `--build=true`, `--verify=true`, `--flash=<device>`, `--version=<semver>` | Construir, verificar o flashear ISOs del gateway/servidor |
+| `echosmart cosmuodate` | `<component>` | `--check=true`, `--download=true`, `--apply=true`, `--channel=stable|beta`, `--version=<semver>` | Descargar, verificar y aplicar actualizaciones del ISO/sistema/app/sensores |
 | `echosmart app` | `<target>` | `--platform=web\|mobile\|desktop`, `--pair=true`, `--bundle=true`, `--qr=true` | Integrar gateway con apps cliente |
 | `echosmart infra` | `<action>` | `--profile=dev\|staging\|prod`, `--compose=<file>`, `--check=true` | Orquestar infraestructura local/remota |
 | `echosmart calibrate` | `<sensor>` | `--dry=<val>`, `--wet=<val>`, `--ref=<val>` | Calibrar sensor |
@@ -552,7 +552,7 @@ echosmart discover server --timeout=5             # Buscar servidor en la red lo
 echosmart api gateways --method=GET --path=/api/v1/gateways  # Consumir API backend
 echosmart web serve --host=0.0.0.0 --port=8080    # Servir consola web local
 echosmart server register --url=https://api.echosmart.io --api-key=XXX  # Registrar gateway
-echosmart iso gateway --verify=true               # Verificar imagen ISO del gateway
+echosmart cosmuodate gateway --check=true         # Buscar actualización disponible del gateway/ISO
 echosmart app mobile --pair=true --qr=true        # Emparejar app móvil con QR
 echosmart infra up --profile=dev                  # Levantar infraestructura local
 echosmart calibrate soil --dry=3200 --wet=1400    # Calibrar sensor de suelo
@@ -594,8 +594,8 @@ gateway/
 │   │   ├── cmd_web.cpp                           # Servidor/consola web local
 │   │   ├── cmd_server.h                          # Comando `echosmart server <action>`
 │   │   ├── cmd_server.cpp                        # Registro, provision y diagnóstico remoto
-│   │   ├── cmd_iso.h                             # Comando `echosmart iso <target>`
-│   │   ├── cmd_iso.cpp                           # Build/verify/flash de imágenes ISO
+│   │   ├── cmd_cosmuodate.h                      # Comando `echosmart cosmuodate <component>`
+│   │   ├── cmd_cosmuodate.cpp                    # Descarga, validación y aplicación de updates
 │   │   ├── cmd_app.h                             # Comando `echosmart app <target>`
 │   │   ├── cmd_app.cpp                           # Integración con web/mobile/desktop
 │   │   ├── cmd_infra.h                           # Comando `echosmart infra <action>`
@@ -688,7 +688,7 @@ gateway/
 │       ├── test_cmd_api.cpp                      # Tests comando api
 │       ├── test_cmd_web.cpp                      # Tests comando web
 │       ├── test_cmd_server.cpp                   # Tests comando server
-│       ├── test_cmd_iso.cpp                      # Tests comando iso
+│       ├── test_cmd_cosmuodate.cpp               # Tests comando cosmuodate
 │       ├── test_cmd_app.cpp                      # Tests comando app
 │       ├── test_cmd_infra.cpp                    # Tests comando infra
 │       ├── test_ds18b20.cpp                      # Tests DS18B20
@@ -735,7 +735,7 @@ gateway/
 - [ ] Crear `gateway/cpp/main.cpp`
   - [ ] `int main(int argc, char* argv[])` — parsear args, dispatch a comando
   - [ ] Si `argc < 2` → imprimir ayuda y salir con código 1
-  - [ ] Mapa de comandos: `{"read", "sysinfo", "run", "setup", "status", "config", "discover", "api", "web", "server", "iso", "app", "infra", "calibrate", "list", "test", "version", "help"}`
+  - [ ] Mapa de comandos: `{"read", "sysinfo", "run", "setup", "status", "config", "discover", "api", "web", "server", "cosmuodate", "app", "infra", "calibrate", "list", "test", "version", "help"}`
   - [ ] Dispatch: `cmd_map[argv[1]](argc, argv)` → código de salida
   - [ ] Comando desconocido → `"error: unknown command '<cmd>'. Run 'echosmart help'.\n"` + exit 1
 - [ ] Crear `gateway/cpp/cli.h`
@@ -987,13 +987,15 @@ gateway/
   - [ ] `echosmart server provision --gateway-id=<id>` — descargar config, mqtt creds y políticas
   - [ ] `echosmart server update --gateway-id=<id>` — consultar actualización disponible
   - [ ] `echosmart server unpair --gateway-id=<id>` — desvincular gateway del tenant
-- [ ] `commands/cmd_iso.h/.cpp` — imágenes ISO
-  - [ ] `echosmart iso gateway --build=true --version=<semver>` — construir imagen RPi
-  - [ ] `echosmart iso gateway --verify=true --file=<img>` — verificar checksum y estructura
-  - [ ] `echosmart iso gateway --flash=<device>` — flashear a microSD
-  - [ ] `echosmart iso server --build=true` — construir ISO del servidor
-  - [ ] `echosmart iso server --verify=true --file=<iso>` — verificar ISO del servidor
-  - [ ] `echosmart iso catalog --format=json` — listar artefactos disponibles
+- [ ] `commands/cmd_cosmuodate.h/.cpp` — actualizaciones OTA e ISO
+  - [ ] `echosmart cosmuodate gateway --check=true` — consultar actualización disponible del gateway/ISO
+  - [ ] `echosmart cosmuodate gateway --download=true --version=<semver>` — descargar update del gateway
+  - [ ] `echosmart cosmuodate gateway --apply=true --file=<pkg>` — aplicar actualización con rollback
+  - [ ] `echosmart cosmuodate system --check=true` — consultar actualización del sistema base
+  - [ ] `echosmart cosmuodate system --download=true --channel=stable` — descargar actualización del sistema
+  - [ ] `echosmart cosmuodate app --download=true --platform=web|mobile|desktop` — descargar actualización de la app
+  - [ ] `echosmart cosmuodate sensor --download=true --sensor=<type>` — descargar firmware o perfil de sensor
+  - [ ] `echosmart cosmuodate catalog --format=json` — listar paquetes de actualización disponibles
 - [ ] `commands/cmd_app.h/.cpp` — integración con apps cliente
   - [ ] `echosmart app web --open=true` — abrir dashboard web asociado
   - [ ] `echosmart app mobile --pair=true --qr=true` — generar pairing QR móvil
@@ -1159,7 +1161,7 @@ gateway/
 - [ ] Test de integración: `echosmart api gateways --method=GET --path=/api/v1/gateways` con mock server → 200 OK
 - [ ] Test de integración: `echosmart web health --format=json` → estructura de health válida
 - [ ] Test de integración: `echosmart server register --url=http://localhost:8000 --api-key=test` con mock → provisioning OK
-- [ ] Test de integración: `echosmart iso gateway --verify=true --file=/tmp/test.img` → validación correcta
+- [ ] Test de integración: `echosmart cosmuodate gateway --check=true` → metadata de actualización válida
 - [ ] Test de integración: `echosmart app mobile --pair=true --qr=true` → payload de pairing válido
 - [ ] Test de integración: `echosmart infra doctor --check=true` → reporte de dependencias
 - [ ] Test de integración: verificar .deb se construye sin errores
@@ -1227,7 +1229,9 @@ gateway/
   - [ ] `POST /api/cli/api/proxy` — ejecuta `echosmart api <resource>`
   - [ ] `POST /api/cli/web/serve` — ejecuta `echosmart web serve`
   - [ ] `POST /api/cli/server/provision` — ejecuta `echosmart server provision`
-  - [ ] `POST /api/cli/iso/verify` — ejecuta `echosmart iso <target> --verify=true`
+  - [ ] `POST /api/cli/cosmuodate/check` — ejecuta `echosmart cosmuodate <component> --check=true`
+  - [ ] `POST /api/cli/cosmuodate/download` — ejecuta `echosmart cosmuodate <component> --download=true`
+  - [ ] `POST /api/cli/cosmuodate/apply` — ejecuta `echosmart cosmuodate <component> --apply=true`
   - [ ] `POST /api/cli/app/pair` — ejecuta `echosmart app <target> --pair=true`
   - [ ] `POST /api/cli/infra/doctor` — ejecuta `echosmart infra doctor --check=true`
 - [ ] Identificación del gateway: hostname, MAC, serial, versión
@@ -1610,11 +1614,14 @@ gateway/
   - [ ] `GET /templates` — Plantillas default para `echosmart config export`
   - [ ] `POST /validate` — Validar archivos enviados por `echosmart config validate`
   - [ ] `POST /import` — Importar configuración desde CLI o portal
-- [ ] **Artifacts Router** (`/api/v1/artifacts`):
-  - [ ] `GET /iso/gateway/latest` — Última imagen gateway para `echosmart iso gateway`
-  - [ ] `GET /iso/server/latest` — Última imagen server para `echosmart iso server`
-  - [ ] `GET /deb/gateway/latest` — Último paquete `.deb`
-  - [ ] `GET /checksums/{artifact}` — SHA256 de artefactos
+- [ ] **Updates Router** (`/api/v1/updates`):
+  - [ ] `GET /gateway/latest` — Última actualización gateway para `echosmart cosmuodate gateway`
+  - [ ] `GET /system/latest` — Última actualización del sistema base
+  - [ ] `GET /app/{platform}/latest` — Última actualización de app web/mobile/desktop
+  - [ ] `GET /sensor/{sensor_type}/latest` — Último firmware o perfil de sensor
+  - [ ] `POST /{component}/{update_id}/download` — Registrar/autorizar descarga de update
+  - [ ] `POST /{component}/{update_id}/apply` — Confirmar despliegue aplicado
+  - [ ] `GET /checksums/{artifact}` — SHA256 y firma de artefactos
 - [ ] **Apps Router** (`/api/v1/apps`):
   - [ ] `POST /pair` — Pairing móvil/desktop desde `echosmart app <target>`
   - [ ] `GET /bundle/{platform}` — Bundle/config para integración de app
@@ -2063,7 +2070,7 @@ frontend/src/
   - [ ] `/gateway-console` → GatewayConsolePage (MainLayout)
   - [ ] `/gateway-config` → GatewayConfigPage (MainLayout)
   - [ ] `/provisioning` → ProvisioningPage (MainLayout)
-  - [ ] `/artifacts/iso` → IsoArtifactsPage (MainLayout)
+  - [ ] `/updates` → UpdatesCenterPage (MainLayout)
   - [ ] `/apps/integrations` → AppIntegrationsPage (MainLayout)
   - [ ] `/settings` → SettingsPage (MainLayout)
   - [ ] `/admin/users` → UsersPage (MainLayout, admin only)
@@ -2073,7 +2080,7 @@ frontend/src/
 - [ ] Loading fallback con Spinner componente
 - [ ] Error boundary con página de error amigable
 - [ ] Tests: navegación entre rutas, guards, redirects, 404
-- [ ] Agregar sección "CLI snippets" en la UI para copiar comandos `echosmart api`, `echosmart server`, `echosmart iso`, `echosmart app`
+- [ ] Agregar sección "CLI snippets" en la UI para copiar comandos `echosmart api`, `echosmart server`, `echosmart cosmuodate`, `echosmart app`
 
 ### 3.6 Feature: Autenticación
 
@@ -3540,7 +3547,7 @@ desktop/
   - [ ] `make cli-api-smoke` — Ejecutar `echosmart api health --method=GET --path=/health`
   - [ ] `make cli-web-smoke` — Ejecutar `echosmart web health --format=json`
   - [ ] `make cli-server-smoke` — Ejecutar `echosmart server heartbeat --gateway-id=demo`
-  - [ ] `make cli-iso-verify` — Ejecutar `echosmart iso gateway --verify=true`
+  - [ ] `make cli-cosmuodate-check` — Ejecutar `echosmart cosmuodate gateway --check=true`
   - [ ] `make cli-app-pair` — Ejecutar `echosmart app mobile --pair=true --qr=true`
   - [ ] `make cli-infra-doctor` — Ejecutar `echosmart infra doctor --check=true`
   - [ ] Documentar cada target con `make help`
@@ -3633,7 +3640,7 @@ desktop/
     - [ ] `test-cli-api`: mock server para `echosmart api`
     - [ ] `test-cli-web`: smoke tests de `echosmart web`
     - [ ] `test-cli-server`: provisioning y heartbeat mockeados
-    - [ ] `test-cli-iso`: verificar comandos `echosmart iso gateway/server`
+    - [ ] `test-cli-cosmuodate`: verificar comandos `echosmart cosmuodate gateway/system/app/sensor`
     - [ ] `test-cli-app`: pairing y bundle mockeados
     - [ ] `test-cli-infra`: doctor/up/down mockeados
     - [ ] `security-scan`: bandit (Python) + npm audit (Node.js) + trivy (Docker)
@@ -3848,7 +3855,7 @@ desktop/
     - [ ] Email "From" (ej: `noreply@echosmart.io`)
   - [ ] **Paso 5: Red** — Configurar IP estática o DHCP
   - [ ] **Paso 6: Timezone** — Seleccionar zona horaria
-  - [ ] **Paso 7: Artefactos CLI** — Mostrar comandos `echosmart server`, `echosmart iso server`, `echosmart infra doctor`
+  - [ ] **Paso 7: Artefactos CLI** — Mostrar comandos `echosmart server`, `echosmart cosmuodate system`, `echosmart infra doctor`
 - [ ] Generar todas las credenciales automáticamente:
   - [ ] Contraseña PostgreSQL (32 chars random)
   - [ ] Contraseña InfluxDB (32 chars random)
@@ -3867,7 +3874,7 @@ desktop/
 - [ ] Iniciar todos los servicios Docker
 - [ ] Verificar que todos los servicios están healthy
 - [ ] Publicar endpoint de provisioning para `echosmart server provision`
-- [ ] Publicar catálogo de artefactos para `echosmart iso server --verify=true`
+- [ ] Publicar catálogo de updates para `echosmart cosmuodate system --check=true`
 - [ ] Enviar email de prueba al admin
 - [ ] Imprimir resumen de la instalación con URLs
 
@@ -3933,6 +3940,41 @@ desktop/
 - [ ] Versionado semántico del servidor (major.minor.patch)
 - [ ] Changelog automático entre versiones
 - [ ] Política de soporte: LTS para versiones major
+
+### 8.8 Servidor de Actualizaciones — Cosmuodate
+
+> 🚀 **Cosmuodate** es el servidor central que publica y despliega actualizaciones para gateway, sistema, apps cliente y sensores.
+
+- [ ] Crear servicio `cosmuodate-server` en `backend/src/updates/`
+  - [ ] API REST `GET /api/v1/updates/{component}/latest`
+  - [ ] API REST `POST /api/v1/updates/{component}/{update_id}/download`
+  - [ ] API REST `POST /api/v1/updates/{component}/{update_id}/apply`
+  - [ ] API REST `GET /api/v1/updates/{component}/history`
+- [ ] Componentes soportados por el servidor de updates:
+  - [ ] `gateway` — paquetes del gateway y su imagen/ISO asociada
+  - [ ] `system` — actualizaciones del sistema base y servicios del servidor
+  - [ ] `app-web` — dashboard/portal web
+  - [ ] `app-mobile` — app móvil
+  - [ ] `app-desktop` — app de escritorio
+  - [ ] `sensor-*` — firmware, perfiles y calibraciones de sensores
+- [ ] Almacenamiento de artefactos:
+  - [ ] Bucket S3/MinIO con versiones, checksums y changelog
+  - [ ] Firma de artefactos y validación SHA256/GPG
+  - [ ] Canales `stable`, `beta`, `hotfix`
+- [ ] Estrategia de despliegue:
+  - [ ] Rollout gradual por tenant/grupo de gateways
+  - [ ] Ventanas programadas de mantenimiento
+  - [ ] Rollback automático si health check falla
+  - [ ] Auditoría de quién aprobó/inició cada update
+- [ ] Integración con CLI:
+  - [ ] `echosmart cosmuodate gateway --check=true` consulta Cosmuodate
+  - [ ] `echosmart cosmuodate system --download=true` descarga paquete firmado
+  - [ ] `echosmart cosmuodate app --apply=true --platform=mobile` despliega update cliente
+  - [ ] `echosmart cosmuodate sensor --download=true --sensor=<type>` actualiza firmware/perfil
+- [ ] Integración con notificaciones:
+  - [ ] Email de nueva versión disponible
+  - [ ] WebSocket/MQTT para avisar updates pendientes a gateways
+  - [ ] Panel web con progreso de despliegue por componente
 
 ---
 
@@ -4010,7 +4052,7 @@ desktop/
 
 - [ ] Actualización OTA del software del gateway:
   - [ ] El servidor envía comando MQTT `echosmart/gw/{id}/update`
-  - [ ] El gateway descarga nueva versión desde servidor o GitHub
+  - [ ] El gateway descarga nueva versión desde `cosmuodate-server`
   - [ ] Aplica actualización y reinicia servicio
   - [ ] Reporta versión nueva al servidor
   - [ ] Rollback si la nueva versión falla
@@ -4025,6 +4067,8 @@ desktop/
   - [ ] Comando MQTT `echosmart/gw/{id}/diagnostics`
   - [ ] El gateway responde con: CPU, RAM, disk, uptime, sensor status, network, versión
 - [ ] SSH tunneling inverso (opcional, para soporte remoto)
+- [ ] Integración con `echosmart cosmuodate gateway` para consulta, descarga y aplicación local del update
+- [ ] Integración con `echosmart cosmuodate sensor --sensor=<type>` para firmware/perfiles de sensores
 
 ### 9.6 Generación del ISO del Gateway — Build System
 
@@ -4333,7 +4377,7 @@ desktop/
   - [ ] Botón "Copiar `echosmart server register ...`"
   - [ ] Botón "Copiar `echosmart api gateways --method=GET ...`"
   - [ ] Botón "Copiar `echosmart config gateway --get=polling_interval`"
-  - [ ] Botón "Copiar `echosmart iso gateway --verify=true`"
+  - [ ] Botón "Copiar `echosmart cosmuodate gateway --check=true`"
   - [ ] Botón "Copiar `echosmart app mobile --pair=true --qr=true`"
 - [ ] Portal de descargas:
   - [ ] Último `.deb` del gateway
@@ -4341,6 +4385,7 @@ desktop/
   - [ ] Última ISO del servidor
   - [ ] Checksums SHA256
   - [ ] Historial de versiones
+  - [ ] Centro de actualizaciones Cosmuodate para app, sistema y sensores
 
 ### 12.9 Logística y Envío
 
