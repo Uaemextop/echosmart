@@ -1,0 +1,40 @@
+#!/usr/bin/make -f
+# debian/rules for echosmart-gateway
+
+export DH_VERBOSE = 1
+DESTDIR = debian/echosmart-gateway
+
+%:
+	dh $@
+
+override_dh_auto_build:
+	@echo "No compilation needed (Python project)"
+
+override_dh_auto_install:
+	# Application files
+	install -d $(DESTDIR)/opt/echosmart/gateway/src
+	install -d $(DESTDIR)/opt/echosmart/gateway/src/sensor_drivers
+	cp -r src/*.py $(DESTDIR)/opt/echosmart/gateway/src/
+	cp -r src/sensor_drivers/*.py $(DESTDIR)/opt/echosmart/gateway/src/sensor_drivers/
+	cp main.py $(DESTDIR)/opt/echosmart/gateway/
+	cp requirements.txt $(DESTDIR)/opt/echosmart/gateway/
+	cp sensors.json $(DESTDIR)/opt/echosmart/gateway/
+
+	# CLI binary
+	install -d $(DESTDIR)/usr/bin
+	install -m 0755 bin/echosmart-gateway $(DESTDIR)/usr/bin/echosmart-gateway
+	install -m 0755 bin/echosmart-gateway-setup $(DESTDIR)/usr/bin/echosmart-gateway-setup
+
+	# Configuration directory
+	install -d $(DESTDIR)/etc/echosmart
+	install -m 0644 .env.example $(DESTDIR)/etc/echosmart/gateway.env
+
+	# systemd service
+	install -d $(DESTDIR)/lib/systemd/system
+	install -m 0644 debian/echosmart-gateway.service $(DESTDIR)/lib/systemd/system/
+
+	# Log directory
+	install -d $(DESTDIR)/var/log/echosmart
+
+override_dh_auto_test:
+	@echo "Skipping tests during package build"

@@ -3677,6 +3677,84 @@ desktop/
 
 ---
 
+## Fase 12: Producción y Comercialización (Kit IoT)
+
+> Preparar el proyecto para despliegue en producción y venta masiva como kit de hardware + software.
+
+### 12.1 Empaquetado Debian (.deb)
+
+- [x] Crear `gateway/debian/control` con metadatos del paquete
+- [x] Crear `gateway/debian/rules` con reglas de construcción
+- [x] Crear `gateway/debian/postinst` (crea venv, usuario, habilita servicio)
+- [x] Crear `gateway/debian/prerm` (detiene y deshabilita servicio)
+- [x] Crear `gateway/debian/changelog` con historial de versiones
+- [x] Crear `gateway/debian/compat` (nivel debhelper 12)
+- [x] Crear `gateway/debian/echosmart-gateway.service` (systemd hardened)
+- [ ] Validar `dpkg-buildpackage` en Raspberry Pi OS (armhf)
+- [ ] Validar `dpkg-buildpackage` en Raspberry Pi OS (arm64)
+- [ ] Publicar `.deb` en GitHub Releases
+
+### 12.2 CLI Binario y Wrapper
+
+- [x] Crear `gateway/src/cli.py` con subcomandos: run, status, test-sensors, version
+- [x] Crear `gateway/bin/echosmart-gateway` (wrapper bash → CLI Python)
+- [x] Crear `gateway/bin/echosmart-gateway-setup` (wizard interactivo)
+- [x] Tests del CLI (9 tests)
+- [ ] Man page: `echosmart-gateway(1)`
+
+### 12.3 CI/CD para Producción
+
+- [x] Crear `.github/workflows/build-deb.yml` (build en tags `v*`)
+- [ ] Publicación automática en GitHub Releases
+- [ ] Pipeline de QA automatizado (test sensores + integración)
+
+### 12.4 Documentación de Producción
+
+- [x] Crear `docs/production-kit.md` (BOM, precios, ensamblaje, proveedores)
+- [x] Crear `docs/deb-packaging.md` (build, install, distribución .deb)
+- [x] Actualizar `docs/README.md` con sección de producción
+- [ ] Guía de inicio rápido impresa (1 hoja, PDF)
+- [ ] Diagrama de conexiones para impresión
+
+### 12.5 Kit de Hardware — BOM
+
+- [x] Definir BOM Kit Básico (1 zona, ~$113 USD)
+- [x] Definir BOM Kit Profesional (3 zonas, ~$143 USD)
+- [x] Definir precios de venta sugeridos
+- [ ] Validar BOM con proveedores reales
+- [ ] Negociar precios por volumen (100+ unidades)
+
+### 12.6 Imagen Pre-grabada (microSD)
+
+- [ ] Crear script de generación de imagen con pi-gen
+- [ ] Incluir `echosmart-gateway.deb` pre-instalado
+- [ ] Configurar arranque automático con wizard
+- [ ] Optimizar imagen (eliminar paquetes innecesarios)
+- [ ] Automatizar grabado de microSD en lote
+
+### 12.7 Makefile y Build System
+
+- [x] Crear `Makefile` raíz con targets: help, install, lint, test, build, deb, clean
+- [ ] Target `make iso` para generar imagen de Raspberry Pi
+- [ ] Target `make release` para crear release completo
+
+### 12.8 Control de Calidad
+
+- [ ] Checklist de QA por unidad (hardware + software)
+- [ ] Script de prueba de estrés automatizado
+- [ ] Procedimiento de RMA (devoluciones)
+- [ ] Garantía y soporte técnico (SLA)
+
+### 12.9 Comercialización
+
+- [ ] Página web de producto (landing page)
+- [ ] Tienda en línea (Shopify / WooCommerce)
+- [ ] Documentación de API para integradores
+- [ ] Programa de distribuidores / revendedores
+- [ ] Certificaciones (CE, FCC si aplica)
+
+---
+
 ## Resumen de Plataformas
 
 | Plataforma | Tecnología | Directorio | Estado |
@@ -3712,7 +3790,8 @@ desktop/
 | 9 | **ISO Raspberry Pi Gateway** | 26–28 | ~100 | 🟠 Pendiente |
 | 10 | Features Avanzadas | 29+ | ~80 | 🟠 Pendiente |
 | 11 | Testing con Hardware Real | Final | ~40 | 🟠 Pendiente |
-| | **TOTAL** | | **~1640+** | |
+| 12 | **Producción y Comercialización** | Final | ~55 | 🟡 En progreso |
+| | **TOTAL** | | **~1695+** | |
 
 ## Resumen de Assets Generados
 

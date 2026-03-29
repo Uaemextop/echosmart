@@ -69,6 +69,15 @@ Bienvenido a la documentación técnica de **EchoSmart**, la plataforma IoT de a
 
 ---
 
+## Producción y Comercialización
+
+| Documento | Descripción |
+|-----------|-------------|
+| [Kit de Producción](production-kit.md) | BOM, precios, guía de ensamblaje, proveedores y logística de producción en masa |
+| [Empaquetado .deb del Gateway](deb-packaging.md) | Cómo construir, instalar y distribuir el paquete Debian para Raspberry Pi OS |
+
+---
+
 ## Comunidad
 
 | Documento | Descripción |
@@ -103,7 +112,8 @@ Bienvenido a la documentación técnica de **EchoSmart**, la plataforma IoT de a
 2. [Sensores y Hardware](sensors-hardware.md)
 3. [Gateway y Edge Computing](gateway-edge-computing.md)
 4. [Protocolos de Comunicación](communication-protocols.md)
-5. [Resolución de Problemas](troubleshooting.md)
+5. [Kit de Producción](production-kit.md)
+6. [Resolución de Problemas](troubleshooting.md)
 
 ### DevOps / Operaciones
 1. [Infraestructura Local de Desarrollo](local-dev-infrastructure.md)
@@ -111,9 +121,10 @@ Bienvenido a la documentación técnica de **EchoSmart**, la plataforma IoT de a
 3. [ISO del Gateway Raspberry Pi](gateway-iso-setup.md)
 4. [Despliegue en la Nube](cloud-deployment.md)
 5. [Despliegue General](deployment.md)
-6. [Variables de Entorno](environment-variables.md)
-7. [Seguridad](security.md)
-8. [Resolución de Problemas](troubleshooting.md)
+6. [Empaquetado .deb del Gateway](deb-packaging.md)
+7. [Variables de Entorno](environment-variables.md)
+8. [Seguridad](security.md)
+9. [Resolución de Problemas](troubleshooting.md)
 
 ---
 
@@ -121,7 +132,7 @@ Bienvenido a la documentación técnica de **EchoSmart**, la plataforma IoT de a
 
 | Métrica | Valor |
 |---------|-------|
-| Total de documentos | 24 |
+| Total de documentos | 26 |
 | Endpoints API documentados | 30+ |
 | Sensores documentados | 5 tipos (+8 futuros) |
 | Protocolos documentados | 7 (MQTT, 1-Wire, I2C, UART, GPIO, HTTP, WebSocket) |

@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+# EchoSmart Gateway — binary wrapper
+# Installed to /usr/bin/echosmart-gateway by the .deb package.
+# Invokes the Python CLI with the system Python or the bundled venv.
+
+set -euo pipefail
+
+INSTALL_DIR="/opt/echosmart/gateway"
+VENV_PYTHON="${INSTALL_DIR}/venv/bin/python3"
+SYSTEM_PYTHON="python3"
+ENV_FILE="/etc/echosmart/gateway.env"
+
+# Load environment if available
+if [ -f "$ENV_FILE" ]; then
+    set -a
+    # shellcheck source=/dev/null
+    . "$ENV_FILE"
+    set +a
+fi
+
+# Prefer venv Python, fall back to system Python
+if [ -x "$VENV_PYTHON" ]; then
+    PYTHON="$VENV_PYTHON"
+elif command -v "$SYSTEM_PYTHON" &>/dev/null; then
+    PYTHON="$SYSTEM_PYTHON"
+else
+    echo "Error: Python 3 not found. Install python3 or run echosmart-gateway-setup." >&2
+    exit 1
+fi
+
+exec "$PYTHON" "${INSTALL_DIR}/src/cli.py" "$@"
