@@ -54,6 +54,15 @@ Bienvenido a la documentación técnica de **EchoSmart**, la plataforma IoT de a
 
 ---
 
+## Producción y Comercialización
+
+| Documento | Descripción |
+|-----------|-------------|
+| [Kit de Producción](production-kit.md) | BOM, ensamblaje, empaquetado, precios y flujo de producción en masa |
+| [Empaquetado .deb](deb-packaging.md) | Construcción, instalación y distribución del paquete Debian del gateway |
+
+---
+
 ## Operaciones
 
 | Documento | Descripción |
@@ -105,6 +114,10 @@ Bienvenido a la documentación técnica de **EchoSmart**, la plataforma IoT de a
 4. [Protocolos de Comunicación](communication-protocols.md)
 5. [Resolución de Problemas](troubleshooting.md)
 
+### Producción / Comercialización
+1. [Kit de Producción](production-kit.md)
+2. [Empaquetado .deb](deb-packaging.md)
+
 ### DevOps / Operaciones
 1. [Infraestructura Local de Desarrollo](local-dev-infrastructure.md)
 2. [ISO del Servidor](server-iso-setup.md)
@@ -121,7 +134,7 @@ Bienvenido a la documentación técnica de **EchoSmart**, la plataforma IoT de a
 
 | Métrica | Valor |
 |---------|-------|
-| Total de documentos | 24 |
+| Total de documentos | 26 |
 | Endpoints API documentados | 30+ |
 | Sensores documentados | 5 tipos (+8 futuros) |
 | Protocolos documentados | 7 (MQTT, 1-Wire, I2C, UART, GPIO, HTTP, WebSocket) |

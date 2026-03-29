@@ -1,0 +1,16 @@
+#!/bin/bash
+# Pre-removal script for echosmart-gateway
+
+set -e
+
+SERVICE_NAME="echosmart-gateway.service"
+
+# Stop and disable the service before removal
+if systemctl is-active --quiet "$SERVICE_NAME" 2>/dev/null; then
+    systemctl stop "$SERVICE_NAME"
+fi
+if systemctl is-enabled --quiet "$SERVICE_NAME" 2>/dev/null; then
+    systemctl disable "$SERVICE_NAME"
+fi
+
+#DEBHELPER#

@@ -1,0 +1,25 @@
+#!/usr/bin/env python3
+"""EchoSmart Gateway — executable wrapper.
+
+Installed to /usr/bin/echosmart-gateway by the .deb package.
+When running from a development checkout, use:
+    python -m src.cli <command>
+"""
+
+import sys
+import os
+
+# When installed via .deb, sources live under /opt/echosmart/gateway/
+_INSTALL_DIR = "/opt/echosmart/gateway"
+if os.path.isdir(_INSTALL_DIR):
+    sys.path.insert(0, _INSTALL_DIR)
+
+# When running from a development checkout
+_DEV_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if os.path.isdir(os.path.join(_DEV_DIR, "src")):
+    sys.path.insert(0, _DEV_DIR)
+
+from src.cli import main  # noqa: E402
+
+if __name__ == "__main__":
+    main()

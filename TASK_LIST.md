@@ -3677,6 +3677,93 @@ desktop/
 
 ---
 
+## Fase 12: Producción, Empaquetado y Comercialización
+
+> 📦 **Fase de industrialización.** Aquí se construyen los artefactos de producción (.deb, binarios, imágenes), se documenta el proceso de ensamblaje del kit, y se prepara todo para la venta en masa del producto EchoSmart.
+
+### 12.1 Empaquetado Debian (.deb) del Gateway
+
+- [x] Crear `gateway/pyproject.toml` — Packaging Python estándar con setuptools
+- [x] Crear `gateway/src/cli.py` — CLI entry point (`echosmart-gateway run|status|test-sensors`)
+- [x] Crear `gateway/bin/echosmart-gateway` — Wrapper ejecutable para `/usr/bin/`
+- [x] Crear `gateway/bin/echosmart-gateway-setup` — Wizard de configuración de primer boot
+- [x] Crear `gateway/debian/control` — Metadatos del paquete Debian
+- [x] Crear `gateway/debian/rules` — Reglas de build del .deb
+- [x] Crear `gateway/debian/postinst` — Script post-instalación (crea usuario, venv, deps)
+- [x] Crear `gateway/debian/prerm` — Script pre-remoción (detiene servicio)
+- [x] Crear `gateway/debian/changelog` — Historial de versiones
+- [x] Crear `gateway/debian/copyright` — Información de licencia
+- [x] Crear `gateway/debian/compat` — Nivel de compatibilidad debhelper
+- [x] Crear `gateway/debian/gateway.env.default` — Configuración por defecto
+- [x] Crear `gateway/debian/echosmart-gateway.service` — Servicio systemd (producción)
+- [ ] Validar build del .deb en arm64 (RPi OS Bookworm)
+- [ ] Validar instalación limpia del .deb en RPi 4
+- [ ] Validar desinstalación limpia del .deb
+
+### 12.2 Servicio Systemd de Producción
+
+- [x] Actualizar `gateway/echosmart-gateway.service` con rutas de producción (`/opt/echosmart/`)
+- [x] Usuario dedicado `echosmart` (no `pi`)
+- [x] Hardening: `NoNewPrivileges`, `ProtectSystem`, `PrivateTmp`
+- [x] `EnvironmentFile` para configuración externada (`/etc/echosmart/gateway.env`)
+- [x] `WatchdogSec` para reinicio automático ante congelamiento
+- [ ] Test: verificar arranque automático al boot
+- [ ] Test: verificar reinicio automático tras crash
+
+### 12.3 Build Automatizado (CI/CD)
+
+- [x] Crear `.github/workflows/build-deb.yml` — Workflow para build del .deb
+- [x] Trigger: tag `v*` o cambios en `gateway/`
+- [x] Adjuntar `.deb` a GitHub Releases automáticamente
+- [x] Upload del `.deb` como artefacto de GitHub Actions
+- [ ] Agregar build cross-compilation arm64 para RPi
+- [ ] Firmar el .deb con GPG para distribución confiable
+- [ ] Crear repositorio APT propio (`apt.echosmart.io`)
+
+### 12.4 Makefile y Herramientas de Build
+
+- [x] Crear `Makefile` raíz con targets: `help`, `install`, `lint`, `test`, `build`, `deb`, `clean`
+- [x] Target `deb` para construir el paquete .deb
+- [x] Target `docker-up` / `docker-down` para Docker Compose
+- [ ] Target `iso-server` para generar ISO del servidor
+- [ ] Target `iso-gateway` para generar imagen del RPi
+
+### 12.5 Kit de Producción
+
+- [x] Documentar BOM (Bill of Materials) completo — `docs/production-kit.md`
+- [x] Definir variantes del kit (Starter, Standard, Pro, Enterprise)
+- [x] Diagrama de conexión de sensores imprimible
+- [x] Flujo de producción en masa (flasheo, ensamblaje, QA, empaque)
+- [x] Test QA rápido (3 minutos por unidad)
+- [x] Contenido de la caja (hardware + impresos + branding)
+- [x] Estructura de precios sugerida
+- [ ] Diseñar caja del producto (mockup)
+- [ ] Diseñar guía rápida impresa (1 hoja)
+- [ ] Diseñar diagrama de conexiones impreso (1 hoja)
+- [ ] Diseñar tarjeta QR con enlace a docs online
+
+### 12.6 Documentación de Producción
+
+- [x] Crear `docs/production-kit.md` — Guía completa de producción y comercialización
+- [x] Crear `docs/deb-packaging.md` — Guía de empaquetado .deb
+- [x] Actualizar `docs/README.md` con sección de Producción
+- [ ] Crear guía de usuario final en PDF (imprimible)
+- [ ] Crear video de instalación para YouTube
+- [ ] Crear página de producto (`echosmart.io/kit`)
+
+### 12.7 Imagen Pre-flasheada del Gateway
+
+- [ ] Automatizar creación de imagen con pi-gen
+- [ ] Pre-instalar paquete `.deb` en la imagen
+- [ ] Pre-configurar interfaces de hardware (I2C, 1-Wire, UART)
+- [ ] Pre-instalar dependencias Python en virtualenv
+- [ ] Comprimir imagen con xz (<500MB)
+- [ ] Checksum SHA256 para verificación
+- [ ] Script de primer boot automático
+- [ ] CI/CD: GitHub Action para build de imagen
+
+---
+
 ## Resumen de Plataformas
 
 | Plataforma | Tecnología | Directorio | Estado |
@@ -3684,15 +3771,17 @@ desktop/
 | **Backend (Cloud)** | FastAPI · PostgreSQL · InfluxDB · Redis | `backend/` | 🟡 Scaffolding completo |
 | **Frontend (Web)** | React 18 · Vite · Redux Toolkit · Recharts | `frontend/` | 🟡 Scaffolding completo |
 | **Gateway (Edge)** | Python · Raspberry Pi · SQLite · MQTT | `gateway/` | 🟡 Scaffolding completo |
+| **Gateway .deb** | dpkg · systemd · CLI binarios | `gateway/debian/` | 🟢 Implementado |
 | **Móvil (Android)** | React Native · Expo | `mobile/` | 🟠 Estructura inicial |
 | **Móvil (iOS)** | React Native · Expo | `mobile/` | 🟠 Estructura inicial |
 | **Escritorio (Windows)** | Electron · React | `desktop/` | 🟠 Estructura inicial |
 | **Escritorio (macOS)** | Electron · React | `desktop/` | 🟠 Estructura inicial |
 | **Escritorio (Linux)** | Electron · React | `desktop/` | 🟠 Estructura inicial |
-| **Infra Local (Dev)** | Docker Compose · Makefile · Scripts | `infra/` | 🟠 Pendiente |
+| **Infra Local (Dev)** | Docker Compose · Makefile · Scripts | `infra/` | 🟡 Makefile creado |
 | **Infra Producción** | Docker · K8s · Nginx · Prometheus · Grafana | `infra/` | 🟡 Docker + K8s parcial |
 | **ISO Servidor** | Ubuntu 22.04 · Docker · echosmart-ctl | `infra/iso/server/` | 🟠 Pendiente |
 | **ISO Gateway RPi** | RPi OS Lite · Python · pi-gen | `infra/iso/gateway/` | 🟠 Pendiente |
+| **Producción / Kit** | BOM · .deb · CI/CD · docs comerciales | `docs/`, `gateway/debian/` | 🟢 Documentado |
 | **Assets / Diseño** | SVG · PNG · JPG · ICO | `assets/` | 🟢 312 archivos generados |
 | **Documentación** | Markdown · SVG | `docs/` | 🟢 26+ documentos |
 
@@ -3712,7 +3801,8 @@ desktop/
 | 9 | **ISO Raspberry Pi Gateway** | 26–28 | ~100 | 🟠 Pendiente |
 | 10 | Features Avanzadas | 29+ | ~80 | 🟠 Pendiente |
 | 11 | Testing con Hardware Real | Final | ~40 | 🟠 Pendiente |
-| | **TOTAL** | | **~1640+** | |
+| 12 | **Producción y Comercialización** | Continuo | ~55 | 🟢 En progreso |
+| | **TOTAL** | | **~1695+** | |
 
 ## Resumen de Assets Generados
 

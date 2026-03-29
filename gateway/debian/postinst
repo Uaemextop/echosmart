@@ -1,0 +1,40 @@
+#!/bin/bash
+# Post-installation script for echosmart-gateway
+
+set -e
+
+INSTALL_DIR="/opt/echosmart/gateway"
+CONFIG_FILE="/etc/echosmart/gateway.env"
+SERVICE_NAME="echosmart-gateway.service"
+
+# Create echosmart system user if it does not exist
+if ! id -u echosmart >/dev/null 2>&1; then
+    adduser --system --group --home /opt/echosmart --no-create-home \
+        --shell /usr/sbin/nologin echosmart
+fi
+
+# Set ownership
+chown -R echosmart:echosmart "$INSTALL_DIR"
+chown -R echosmart:echosmart /etc/echosmart
+
+# Install Python dependencies into a virtualenv
+if [ ! -d "${INSTALL_DIR}/venv" ]; then
+    python3 -m venv "${INSTALL_DIR}/venv"
+fi
+"${INSTALL_DIR}/venv/bin/pip" install --quiet --upgrade pip
+"${INSTALL_DIR}/venv/bin/pip" install --quiet -r "${INSTALL_DIR}/requirements.txt"
+
+# Reload systemd, enable and start the service
+systemctl daemon-reload
+systemctl enable "$SERVICE_NAME" || true
+
+echo ""
+echo "╔══════════════════════════════════════════════════╗"
+echo "║  EchoSmart Gateway installed successfully!       ║"
+echo "║                                                  ║"
+echo "║  Run 'echosmart-gateway-setup' to configure.     ║"
+echo "║  Then: systemctl start echosmart-gateway          ║"
+echo "╚══════════════════════════════════════════════════╝"
+echo ""
+
+#DEBHELPER#

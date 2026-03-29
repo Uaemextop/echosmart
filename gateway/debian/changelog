@@ -1,0 +1,11 @@
+echosmart-gateway (1.0.0-1) bookworm; urgency=medium
+
+  * Initial .deb release of EchoSmart Gateway
+  * Five sensor drivers: DS18B20, DHT22, BH1750, SoilMoisture, MH-Z19C
+  * Local SQLite caching and alert engine
+  * MQTT publishing and cloud synchronisation
+  * CLI: echosmart-gateway run|status|test-sensors
+  * Setup wizard: echosmart-gateway-setup
+  * Systemd service for headless operation
+
+ -- EchoSmart Team <support@echosmart.io>  Sat, 29 Mar 2026 07:00:00 +0000

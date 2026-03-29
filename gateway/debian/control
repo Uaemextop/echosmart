@@ -1,0 +1,25 @@
+Source: echosmart-gateway
+Section: science
+Priority: optional
+Maintainer: EchoSmart Team <support@echosmart.io>
+Build-Depends: debhelper-compat (= 13), python3, dh-python
+Standards-Version: 4.6.2
+Homepage: https://github.com/Uaemextop/echosmart
+
+Package: echosmart-gateway
+Architecture: all
+Depends: python3 (>= 3.9),
+         python3-requests,
+         python3-dotenv,
+         python3-paho-mqtt,
+         ${misc:Depends}
+Recommends: mosquitto-clients, sqlite3
+Suggests: python3-rpi.gpio, python3-smbus
+Description: EchoSmart IoT Gateway for precision agriculture
+ Sensor hub that runs on Raspberry Pi to collect environmental
+ data (temperature, humidity, light, soil moisture, CO₂) and
+ relay it to the EchoSmart cloud platform via MQTT.
+ .
+ Includes five sensor drivers (DS18B20, DHT22, BH1750,
+ SoilMoisture+ADS1115, MH-Z19C), local SQLite caching, alert
+ engine, and automatic cloud synchronisation.
