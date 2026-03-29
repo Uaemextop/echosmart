@@ -3677,6 +3677,95 @@ desktop/
 
 ---
 
+## Fase 12: Producción y Comercialización
+
+> Preparar el proyecto para producción en masa y venta del kit
+> EchoSmart (Raspberry Pi + sensores).
+
+### 12.1 Empaquetado Debian (.deb) para Raspberry Pi OS
+
+- [x] Crear `gateway/debian/control` con metadatos del paquete
+- [x] Crear `gateway/debian/rules` con reglas de compilación
+- [x] Crear `gateway/debian/postinst` — instala virtualenv y habilita servicio
+- [x] Crear `gateway/debian/prerm` — detiene servicio y limpia virtualenv
+- [x] Crear `gateway/debian/changelog` con historial de versiones
+- [x] Crear `gateway/debian/compat` (nivel 13)
+- [x] Crear `gateway/debian/echosmart-gateway.service` — unidad systemd de producción
+- [ ] Validar build de `.deb` en Raspberry Pi OS (arm64) con `dpkg-buildpackage`
+- [ ] Probar instalación completa: `sudo dpkg -i echosmart-gateway_*.deb`
+- [ ] Probar desinstalación: `sudo dpkg -r echosmart-gateway`
+
+### 12.2 CLI y Binarios del Gateway
+
+- [x] Crear `gateway/src/cli.py` con sub-comandos: run, status, test-sensors, version
+- [x] Crear `gateway/bin/echosmart-gateway` — wrapper bash que delega al CLI Python
+- [x] Crear `gateway/bin/echosmart-gateway-setup` — wizard interactivo de configuración
+- [x] Tests unitarios en `gateway/tests/test_cli.py` (9 tests)
+- [ ] Agregar `echosmart-gateway config show` para mostrar configuración actual
+- [ ] Agregar `echosmart-gateway logs` para ver logs del servicio
+
+### 12.3 Servicio systemd de Producción
+
+- [x] Actualizar `gateway/echosmart-gateway.service` para usar rutas de producción
+- [x] Usar `EnvironmentFile=/etc/echosmart/gateway.env` para configuración
+- [x] Usar `ExecStart=/usr/bin/echosmart-gateway run` (binario instalado por .deb)
+- [ ] Configurar watchdog de systemd para auto-reinicio
+- [ ] Agregar límites de memoria y CPU al servicio
+
+### 12.4 CI/CD para .deb
+
+- [x] Crear `.github/workflows/build-deb.yml` — compila .deb en tags `v*`
+- [x] Subir `.deb` como artifact de GitHub Actions
+- [x] Adjuntar `.deb` a releases de GitHub automáticamente
+- [ ] Agregar test de instalación en un contenedor ARM
+- [ ] Configurar repositorio APT privado para actualizaciones OTA
+
+### 12.5 Makefile de Proyecto
+
+- [x] Crear `Makefile` con targets: help, install, lint, test, build, deb, docker, clean
+- [ ] Agregar target `make iso` para generar imagen de RPi con pi-gen
+- [ ] Agregar target `make release` para crear tag y trigger de CI
+
+### 12.6 Documentación de Producción
+
+- [x] Crear `docs/production-kit.md` — BOM, precios, variantes de kit, ensamblaje, QC
+- [x] Crear `docs/deb-packaging.md` — guía completa de compilación e instalación del .deb
+- [x] Actualizar `docs/README.md` con enlaces a los nuevos documentos
+- [ ] Crear guía rápida de inicio imprimible (formato A5) para incluir en el kit
+- [ ] Documentar proceso de pre-flashing masivo de MicroSD
+
+### 12.7 Pre-flashing y ISO del Gateway
+
+- [ ] Script de pi-gen para crear imagen personalizada con gateway pre-instalado
+- [ ] Auto-configuración WiFi/Ethernet en primer arranque
+- [ ] Auto-registro del gateway en la plataforma cloud al primer boot
+- [ ] Validar imagen ISO en Raspberry Pi 4B y Pi 5
+
+### 12.8 Actualizaciones OTA (Over The Air)
+
+- [ ] Mecanismo de actualización automática del paquete `.deb` desde repositorio APT
+- [ ] Notificación al usuario cuando hay actualizaciones disponibles
+- [ ] Rollback automático si la actualización falla
+- [ ] Dashboard de gestión de flota (versiones instaladas por gateway)
+
+### 12.9 Branding y Materiales de Venta
+
+- [ ] Diseño de caja de empaque con logo EchoSmart
+- [ ] Tarjeta de guía rápida de inicio (QR a docs online)
+- [ ] Pegatinas con número de serie y códigos QR
+- [ ] Landing page comercial con precios y botón de compra
+- [ ] Fotografías profesionales del kit ensamblado
+
+### 12.10 Cumplimiento y Legal
+
+- [ ] Verificar licencia MIT para distribución comercial
+- [ ] Declaración de conformidad CE (Raspberry Pi ya certificada)
+- [ ] Términos y condiciones de venta
+- [ ] Política de garantía (12 meses sugerido)
+- [ ] Política de privacidad para datos recolectados por el gateway
+
+---
+
 ## Resumen de Plataformas
 
 | Plataforma | Tecnología | Directorio | Estado |
@@ -3712,7 +3801,8 @@ desktop/
 | 9 | **ISO Raspberry Pi Gateway** | 26–28 | ~100 | 🟠 Pendiente |
 | 10 | Features Avanzadas | 29+ | ~80 | 🟠 Pendiente |
 | 11 | Testing con Hardware Real | Final | ~40 | 🟠 Pendiente |
-| | **TOTAL** | | **~1640+** | |
+| 12 | **Producción y Comercialización** | — | ~55 | 🟡 En progreso |
+| | **TOTAL** | | **~1700+** | |
 
 ## Resumen de Assets Generados
 

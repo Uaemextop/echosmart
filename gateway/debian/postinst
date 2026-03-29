@@ -1,0 +1,29 @@
+#!/bin/bash
+# postinst — runs after the .deb is installed
+set -e
+
+INSTALL_DIR="/opt/echosmart/gateway"
+VENV_DIR="${INSTALL_DIR}/venv"
+
+echo ">>> Creating Python virtual environment …"
+python3 -m venv "${VENV_DIR}"
+"${VENV_DIR}/bin/pip" install --upgrade pip
+"${VENV_DIR}/bin/pip" install -r "${INSTALL_DIR}/requirements.txt"
+
+echo ">>> Enabling echosmart-gateway.service …"
+systemctl daemon-reload
+systemctl enable echosmart-gateway.service || true
+
+echo ""
+echo "╔══════════════════════════════════════════╗"
+echo "║  EchoSmart Gateway installed!            ║"
+echo "║                                          ║"
+echo "║  Run the setup wizard:                   ║"
+echo "║    sudo echosmart-gateway-setup          ║"
+echo "║                                          ║"
+echo "║  Then start the service:                 ║"
+echo "║    sudo systemctl start echosmart-gateway║"
+echo "╚══════════════════════════════════════════╝"
+echo ""
+
+#DEBHELPER#

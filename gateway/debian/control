@@ -1,0 +1,18 @@
+Source: echosmart-gateway
+Section: misc
+Priority: optional
+Maintainer: EchoSmart Team <soporte@echosmart.io>
+Build-Depends: debhelper-compat (= 13), python3, python3-venv, python3-pip
+Standards-Version: 4.6.0
+Homepage: https://github.com/Uaemextop/echosmart
+
+Package: echosmart-gateway
+Architecture: all
+Depends: python3 (>= 3.9), python3-venv, ${misc:Depends}
+Description: EchoSmart IoT Gateway for greenhouse monitoring
+ The EchoSmart Gateway reads environmental sensors (temperature,
+ humidity, CO₂, light, soil moisture) on a Raspberry Pi and sends
+ data to the EchoSmart cloud platform via MQTT / HTTP.
+ .
+ Includes a CLI (echosmart-gateway), a systemd service, and a
+ first-boot setup wizard (echosmart-gateway-setup).

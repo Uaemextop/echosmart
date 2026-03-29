@@ -69,6 +69,15 @@ Bienvenido a la documentación técnica de **EchoSmart**, la plataforma IoT de a
 
 ---
 
+## Producción y Comercialización
+
+| Documento | Descripción |
+|-----------|-------------|
+| [Kit de Producción](production-kit.md) | BOM, precios, ensamblaje, control de calidad y empaque para venta comercial |
+| [Paquete Debian (.deb)](deb-packaging.md) | Compilar, instalar y mantener el paquete `.deb` del gateway en Raspberry Pi OS |
+
+---
+
 ## Comunidad
 
 | Documento | Descripción |
@@ -121,7 +130,7 @@ Bienvenido a la documentación técnica de **EchoSmart**, la plataforma IoT de a
 
 | Métrica | Valor |
 |---------|-------|
-| Total de documentos | 24 |
+| Total de documentos | 26 |
 | Endpoints API documentados | 30+ |
 | Sensores documentados | 5 tipos (+8 futuros) |
 | Protocolos documentados | 7 (MQTT, 1-Wire, I2C, UART, GPIO, HTTP, WebSocket) |
