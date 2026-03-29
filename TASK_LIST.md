@@ -1093,14 +1093,10 @@ gateway/
 - [ ] Actualizar `gateway/debian/prerm` con stop y disable de servicio
 
 #### 1.9.2 Contenido del .deb
-- [ ] `/usr/bin/echosmart` — binario unificado del gateway
-- [ ] 
-- [ ] `/usr/bin/echosmart sysinfo` — diagnósticos del sistema (C++)
-- [ ] `/usr/bin/echosmart read` — lectura de sensores (C++)
-- [ ] `/usr/bin/echosmart setup` — wizard de configuración (bash)
+- [ ] `/usr/bin/echosmart` — binario unificado (todos los comandos: read, sysinfo, run, setup, status, calibrate, list, test, version, help)
 - [ ] `/etc/echosmart/gateway.env` — configuración por defecto (conffile)
 - [ ] `/etc/echosmart/sensors.json` — definición de sensores (conffile)
-- [ ] `/lib/systemd/system/echosmart-gateway.service` — unidad systemd
+- [ ] `/lib/systemd/system/echosmart-gateway.service` — unidad systemd (`ExecStart=/usr/bin/echosmart run`)
 
 #### 1.9.3 Verificación del .deb
 - [ ] Build nativo: `dpkg-buildpackage -b -us -uc` → exit 0
@@ -3792,14 +3788,10 @@ desktop/
 
 - [ ] **Raspberry Pi OS Lite** con actualizaciones de seguridad
 - [ ] **Paquete .deb `echosmart-gateway`** pre-instalado con:
-  - [ ] `/usr/bin/echosmart` — binario unificado del gateway
-  - [ ] `/usr/bin/echosmart (binario)` — binario C++ del daemon
-  - [ ] `/usr/bin/echosmart sysinfo` — diagnósticos del sistema (C++)
-  - [ ] `/usr/bin/echosmart read` — lectura de sensores (C++)
-  - [ ] `/usr/bin/echosmart setup` — wizard de configuración
+  - [ ] `/usr/bin/echosmart` — binario unificado (read, sysinfo, run, setup, status, etc.)
   - [ ] `/etc/echosmart/gateway.env` — configuración por defecto
   - [ ] `/etc/echosmart/sensors.json` — definición de sensores
-  - [ ] `/lib/systemd/system/echosmart-gateway.service` — unidad systemd
+  - [ ] `/lib/systemd/system/echosmart-gateway.service` — unidad systemd (`ExecStart=/usr/bin/echosmart run`)
 - [ ] **SQLite3** para almacenamiento local
 - [ ] **Mosquitto client** para MQTT
 - [ ] **Interfaces habilitadas**: I2C, 1-Wire, UART, SPI
