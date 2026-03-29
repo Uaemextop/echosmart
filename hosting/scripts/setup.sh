@@ -3,15 +3,17 @@
 # EchoSmart — Initial cPanel Hosting Setup
 # ============================================================
 # Run this ONCE to configure the cPanel hosting environment.
-# Sets up directory structure, SSL, cron jobs, and PHP settings.
+# Uses the existing Extendable block theme with EchoSmart
+# dark theme customization via mu-plugin and global styles.
 #
 # Usage:  ./setup.sh
 # ============================================================
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT_DIR="$(dirname "$SCRIPT_DIR")"
 
-ENV_FILE="${SCRIPT_DIR}/../.env"
+ENV_FILE="${ROOT_DIR}/.env"
 if [[ ! -f "$ENV_FILE" ]]; then
     echo "❌ Error: .env not found. Copy .env.example to .env first."
     exit 1
@@ -20,8 +22,8 @@ fi
 source "$ENV_FILE"
 
 SSH_OPTS="-p ${SSH_PORT} -o StrictHostKeyChecking=accept-new"
-if [[ -n "${SSH_KEY_FILE:-}" && -f "${SCRIPT_DIR}/../${SSH_KEY_FILE}" ]]; then
-    SSH_OPTS="${SSH_OPTS} -i ${SCRIPT_DIR}/../${SSH_KEY_FILE}"
+if [[ -n "${SSH_KEY_FILE:-}" && -f "${ROOT_DIR}/${SSH_KEY_FILE}" ]]; then
+    SSH_OPTS="${SSH_OPTS} -i ${ROOT_DIR}/${SSH_KEY_FILE}"
 fi
 
 SSH_TARGET="${CPANEL_USER}@${SERVER_IP}"
@@ -36,17 +38,10 @@ log "📁 Creating directory structure on server..."
 ssh ${SSH_OPTS} "${SSH_TARGET}" bash <<'REMOTE_SETUP'
 set -euo pipefail
 
-# WordPress content directories
-mkdir -p ~/public_html/wp-content/themes/echosmart
-mkdir -p ~/public_html/wp-content/plugins/echosmart-api
-mkdir -p ~/public_html/wp-content/uploads
+# WordPress uploads directories
+mkdir -p ~/public_html/wp-content/uploads/echosmart
 mkdir -p ~/public_html/wp-content/cache
-
-# EchoSmart app assets directory
-mkdir -p ~/public_html/wp-content/themes/echosmart/app
-mkdir -p ~/public_html/wp-content/themes/echosmart/assets/img
-mkdir -p ~/public_html/wp-content/themes/echosmart/assets/css
-mkdir -p ~/public_html/wp-content/themes/echosmart/assets/js
+mkdir -p ~/public_html/wp-content/mu-plugins
 
 # Logs and backups (outside public_html)
 mkdir -p ~/logs
@@ -58,7 +53,6 @@ REMOTE_SETUP
 # ---- 2. Set PHP version and settings ----
 log "⚙️  Configuring PHP settings..."
 ssh ${SSH_OPTS} "${SSH_TARGET}" bash <<'REMOTE_PHP'
-# Create/update .htaccess with PHP settings
 cat > ~/public_html/.user.ini <<'EOF'
 ; EchoSmart PHP Configuration
 upload_max_filesize = 64M
@@ -86,23 +80,24 @@ chmod 755 ~/public_html/wp-content/cache
 echo "✅ Permissions set."
 REMOTE_PERMS
 
-# ---- 4. Set up WP-CLI if available ----
-log "🔧 Checking WP-CLI availability..."
+# ---- 4. Configure WordPress via WP-CLI ----
+log "🔧 Configuring WordPress via WP-CLI..."
 ssh ${SSH_OPTS} "${SSH_TARGET}" bash <<REMOTE_WPCLI
 if command -v wp &>/dev/null; then
     echo "✅ WP-CLI is available."
 
     cd ~/public_html
 
-    # Enable EchoSmart theme
-    wp theme activate echosmart 2>/dev/null || echo "⚠️  Theme not yet deployed."
-
-    # Enable EchoSmart API plugin
-    wp plugin activate echosmart-api 2>/dev/null || echo "⚠️  Plugin not yet deployed."
+    # Ensure Extendable theme is active
+    wp theme activate extendable 2>/dev/null || echo "⚠️  Extendable theme not found."
 
     # Set site title and description
     wp option update blogname "EchoSmart"
     wp option update blogdescription "Monitoreo Ambiental Inteligente para Invernaderos"
+
+    # Set locale and timezone
+    wp option update WPLANG "es_MX"
+    wp option update timezone_string "America/Mexico_City"
 
     # Set permalink structure for clean URLs
     wp rewrite structure '/%postname%/'
@@ -110,9 +105,10 @@ if command -v wp &>/dev/null; then
 
     # Disable comments globally
     wp option update default_comment_status closed
+    wp option update default_ping_status closed
 
-    # Set timezone
-    wp option update timezone_string "America/Mexico_City"
+    # Flush cache
+    wp cache flush
 
     echo "✅ WordPress configured via WP-CLI."
 else
@@ -123,7 +119,6 @@ REMOTE_WPCLI
 # ---- 5. Create cron job for WordPress ----
 log "⏰ Setting up WordPress cron..."
 ssh ${SSH_OPTS} "${SSH_TARGET}" bash <<REMOTE_CRON
-# Disable WP built-in cron (use system cron instead for reliability)
 CRON_CMD="*/5 * * * * /usr/local/bin/php ~/public_html/wp-cron.php > /dev/null 2>&1"
 (crontab -l 2>/dev/null | grep -v "wp-cron" ; echo "\${CRON_CMD}") | crontab -
 echo "✅ WordPress cron configured (every 5 minutes)."
@@ -132,6 +127,6 @@ REMOTE_CRON
 echo ""
 log "🎉 Initial hosting setup complete!"
 log "   Next steps:"
-log "   1. Run deploy.sh to deploy theme and plugin"
+log "   1. Run deploy.sh to deploy configuration and assets"
 log "   2. Visit https://${DOMAIN}/wp-admin/ to verify"
-log "   3. Activate EchoSmart theme and plugin if WP-CLI was not available"
+log "   3. Dark theme is applied via mu-plugin + global styles"

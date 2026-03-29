@@ -2,7 +2,7 @@
 # ============================================================
 # EchoSmart — Deploy to cPanel Shared Hosting
 # ============================================================
-# Deploys WordPress theme, plugin, and configuration to the
+# Deploys WordPress configuration and assets to the
 # Namecheap cPanel hosting via SSH/rsync.
 #
 # Usage:
@@ -10,10 +10,9 @@
 #
 # Components:
 #   all       Deploy everything (default)
-#   theme     Deploy WordPress theme only
-#   plugin    Deploy EchoSmart API plugin only
-#   config    Deploy configuration files only
-#   frontend  Build and deploy frontend as WP assets
+#   config    Deploy configuration files (.htaccess, wp-config-extra)
+#   assets    Upload brand assets (logos, icons) to uploads
+#   css       Deploy custom dark theme CSS
 # ============================================================
 set -euo pipefail
 
@@ -21,7 +20,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(dirname "$SCRIPT_DIR")"
 
 # Load environment
-ENV_FILE="${SCRIPT_DIR}/.env"
+ENV_FILE="${ROOT_DIR}/.env"
 if [[ ! -f "$ENV_FILE" ]]; then
     echo "❌ Error: ${ENV_FILE} not found."
     echo "   Copy .env.example to .env and fill in your credentials."
@@ -39,62 +38,67 @@ for var in CPANEL_USER SERVER_IP SSH_PORT REMOTE_PUBLIC_HTML REMOTE_WP_CONTENT; 
 done
 
 SSH_OPTS="-p ${SSH_PORT} -o StrictHostKeyChecking=accept-new"
-if [[ -n "${SSH_KEY_FILE:-}" && -f "${SCRIPT_DIR}/${SSH_KEY_FILE}" ]]; then
-    SSH_OPTS="${SSH_OPTS} -i ${SCRIPT_DIR}/${SSH_KEY_FILE}"
+if [[ -n "${SSH_KEY_FILE:-}" && -f "${ROOT_DIR}/${SSH_KEY_FILE}" ]]; then
+    SSH_OPTS="${SSH_OPTS} -i ${ROOT_DIR}/${SSH_KEY_FILE}"
 fi
 
 SSH_TARGET="${CPANEL_USER}@${SERVER_IP}"
-RSYNC_OPTS="-avz --delete -e \"ssh ${SSH_OPTS}\""
+RSYNC_OPTS="-avz -e \"ssh ${SSH_OPTS}\""
 
 log() { echo "$(date '+%H:%M:%S') ▸ $*"; }
 
 # ---- Deploy functions ----
-
-deploy_theme() {
-    log "🎨 Deploying EchoSmart WordPress theme..."
-    eval rsync ${RSYNC_OPTS} \
-        "${SCRIPT_DIR}/wordpress/theme/echosmart/" \
-        "${SSH_TARGET}:${REMOTE_WP_CONTENT}/themes/echosmart/"
-    log "✅ Theme deployed."
-}
-
-deploy_plugin() {
-    log "🔌 Deploying EchoSmart API plugin..."
-    eval rsync ${RSYNC_OPTS} \
-        "${SCRIPT_DIR}/wordpress/plugins/echosmart-api/" \
-        "${SSH_TARGET}:${REMOTE_WP_CONTENT}/plugins/echosmart-api/"
-    log "✅ Plugin deployed."
-}
 
 deploy_config() {
     log "⚙️  Deploying hosting configuration..."
 
     # Upload .htaccess
     eval rsync ${RSYNC_OPTS} \
-        "${SCRIPT_DIR}/wordpress/.htaccess" \
+        "${ROOT_DIR}/wordpress/.htaccess" \
         "${SSH_TARGET}:${REMOTE_PUBLIC_HTML}/.htaccess"
 
-    # Upload wp-config additions (to be included by wp-config.php)
+    # Upload wp-config additions
     eval rsync ${RSYNC_OPTS} \
-        "${SCRIPT_DIR}/wordpress/wp-config-extra.php" \
+        "${ROOT_DIR}/wordpress/wp-config-extra.php" \
         "${SSH_TARGET}:${REMOTE_PUBLIC_HTML}/wp-config-extra.php"
 
     log "✅ Configuration deployed."
 }
 
-deploy_frontend() {
-    log "🏗️  Building frontend..."
-    cd "${ROOT_DIR}/frontend"
-    npm ci --silent
-    VITE_API_URL="https://${DOMAIN}/api" npm run build
+deploy_assets() {
+    log "🖼️  Deploying brand assets..."
+    ASSETS_DIR="$(dirname "$ROOT_DIR")/assets"
 
-    log "📦 Deploying frontend assets..."
+    if [[ ! -d "$ASSETS_DIR" ]]; then
+        log "⚠️  Assets directory not found at ${ASSETS_DIR}"
+        return 1
+    fi
+
+    # Ensure remote directory exists
+    ssh ${SSH_OPTS} "${SSH_TARGET}" "mkdir -p ${REMOTE_WP_CONTENT}/uploads/echosmart"
+
+    # Upload logos
     eval rsync ${RSYNC_OPTS} \
-        "${ROOT_DIR}/frontend/dist/" \
-        "${SSH_TARGET}:${REMOTE_WP_CONTENT}/themes/echosmart/app/"
+        "${ASSETS_DIR}/logo/png/" \
+        "${SSH_TARGET}:${REMOTE_WP_CONTENT}/uploads/echosmart/logos/"
 
-    cd "${SCRIPT_DIR}"
-    log "✅ Frontend assets deployed."
+    # Upload sensor icons
+    eval rsync ${RSYNC_OPTS} \
+        "${ASSETS_DIR}/icons/jpg/512/" \
+        "${SSH_TARGET}:${REMOTE_WP_CONTENT}/uploads/echosmart/icons/"
+
+    log "✅ Brand assets deployed."
+}
+
+deploy_css() {
+    log "🎨 Deploying dark theme CSS..."
+    ssh ${SSH_OPTS} "${SSH_TARGET}" "mkdir -p ${REMOTE_WP_CONTENT}/uploads/echosmart"
+
+    # The CSS is managed on the server via mu-plugin.
+    # This function can be extended to deploy updated CSS from the repo.
+    log "ℹ️  CSS is managed via mu-plugin on the server."
+    log "   Edit wp-content/uploads/echosmart/custom.css on the server."
+    log "✅ CSS check complete."
 }
 
 # ---- Main ----
@@ -105,14 +109,13 @@ log "🚀 EchoSmart Deploy → ${DOMAIN} (${COMPONENT})"
 echo ""
 
 case "$COMPONENT" in
-    theme)    deploy_theme ;;
-    plugin)   deploy_plugin ;;
     config)   deploy_config ;;
-    frontend) deploy_frontend ;;
+    assets)   deploy_assets ;;
+    css)      deploy_css ;;
     all)
-        deploy_theme
-        deploy_plugin
         deploy_config
+        deploy_assets
+        deploy_css
         echo ""
         log "🎉 Full deployment complete!"
         log "   🌐 Site: https://${DOMAIN}"
@@ -120,7 +123,7 @@ case "$COMPONENT" in
         ;;
     *)
         echo "Unknown component: ${COMPONENT}"
-        echo "Usage: ./deploy.sh [all|theme|plugin|config|frontend]"
+        echo "Usage: ./deploy.sh [all|config|assets|css]"
         exit 1
         ;;
 esac
