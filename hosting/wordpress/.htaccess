@@ -1,0 +1,130 @@
+# ============================================================
+# EchoSmart — Apache .htaccess Configuration
+# ============================================================
+# For Namecheap cPanel shared hosting with WordPress
+# ============================================================
+
+# ---- Security Headers ----
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-Frame-Options "SAMEORIGIN"
+    Header always set X-XSS-Protection "1; mode=block"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    Header always set Permissions-Policy "camera=(), microphone=(), geolocation=()"
+    Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+</IfModule>
+
+# ---- Force HTTPS ----
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{HTTPS} !=on
+    RewriteRule ^(.*)$ https://%{HTTP_HOST}/$1 [R=301,L]
+</IfModule>
+
+# ---- Redirect www to non-www ----
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
+    RewriteRule ^(.*)$ https://%1/$1 [R=301,L]
+</IfModule>
+
+# ---- Gzip Compression ----
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/plain text/css
+    AddOutputFilterByType DEFLATE application/javascript application/json
+    AddOutputFilterByType DEFLATE application/xml text/xml
+    AddOutputFilterByType DEFLATE image/svg+xml
+    AddOutputFilterByType DEFLATE application/font-woff application/font-woff2
+</IfModule>
+
+# ---- Browser Caching ----
+<IfModule mod_expires.c>
+    ExpiresActive On
+
+    # Images
+    ExpiresByType image/jpeg "access plus 1 year"
+    ExpiresByType image/png "access plus 1 year"
+    ExpiresByType image/gif "access plus 1 year"
+    ExpiresByType image/svg+xml "access plus 1 year"
+    ExpiresByType image/webp "access plus 1 year"
+    ExpiresByType image/x-icon "access plus 1 year"
+
+    # CSS & JavaScript
+    ExpiresByType text/css "access plus 1 month"
+    ExpiresByType application/javascript "access plus 1 month"
+
+    # Fonts
+    ExpiresByType font/woff2 "access plus 1 year"
+    ExpiresByType application/font-woff "access plus 1 year"
+
+    # Default
+    ExpiresDefault "access plus 1 week"
+</IfModule>
+
+# ---- EchoSmart API Proxy (for backend integration) ----
+# If the EchoSmart backend API runs on a separate server,
+# proxy requests from /api/ to the backend.
+# NOTE: mod_proxy may not be available on shared hosting.
+# In that case, use the WordPress REST API plugin instead.
+#
+# <IfModule mod_proxy.c>
+#     ProxyPreserveHost On
+#     ProxyPass /api/ http://api.echosmart.me/
+#     ProxyPassReverse /api/ http://api.echosmart.me/
+# </IfModule>
+
+# ---- Protect sensitive files ----
+<FilesMatch "\.(env|txt|md|yml|yaml|json|sh|sql|bak|log)$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order Allow,Deny
+        Deny from all
+    </IfModule>
+</FilesMatch>
+
+# Protect wp-config.php
+<Files wp-config.php>
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+</Files>
+
+# Protect .htaccess
+<Files .htaccess>
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+</Files>
+
+# ---- Disable directory browsing ----
+Options -Indexes
+
+# ---- WordPress Permalinks ----
+# BEGIN WordPress
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+    RewriteBase /
+    RewriteRule ^index\.php$ - [L]
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule . /index.php [L]
+</IfModule>
+# END WordPress
+
+# ---- Block bad bots ----
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{HTTP_USER_AGENT} (MJ12bot|AhrefsBot|SemrushBot|DotBot) [NC]
+    RewriteRule .* - [F,L]
+</IfModule>
+
+# ---- Limit file upload size ----
+<IfModule mod_php.c>
+    php_value upload_max_filesize 64M
+    php_value post_max_size 64M
+    php_value max_execution_time 300
+    php_value max_input_time 300
+</IfModule>

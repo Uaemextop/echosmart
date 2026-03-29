@@ -1,0 +1,403 @@
+/*
+Theme Name: EchoSmart
+Theme URI: https://echosmart.me
+Author: EchoSmart Team
+Author URI: https://echosmart.me
+Description: Tema oficial de EchoSmart — Plataforma IoT de Monitoreo Ambiental Inteligente para Invernaderos. Integra el panel de control del usuario con WordPress.
+Version: 1.0.0
+License: Proprietary
+License URI: https://echosmart.me/license
+Text Domain: echosmart
+Domain Path: /languages
+Requires at least: 6.0
+Requires PHP: 8.0
+Tags: iot, agriculture, smart-greenhouse, monitoring
+
+EchoSmart — Monitoreo Ambiental Inteligente
+Software propietario — Todos los derechos reservados.
+*/
+
+/* ============================================================
+   EchoSmart Theme Styles
+   ============================================================ */
+
+:root {
+    /* Brand Colors */
+    --es-primary: #2E7D32;
+    --es-primary-light: #4CAF50;
+    --es-primary-dark: #1B5E20;
+    --es-secondary: #00BCD4;
+    --es-secondary-light: #26C6DA;
+    --es-accent: #FF9800;
+    --es-background: #F5F7FA;
+    --es-surface: #FFFFFF;
+    --es-text: #263238;
+    --es-text-light: #607D8B;
+    --es-error: #F44336;
+    --es-success: #4CAF50;
+    --es-warning: #FF9800;
+
+    /* Typography */
+    --es-font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --es-font-heading: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+    /* Spacing */
+    --es-spacing-xs: 0.25rem;
+    --es-spacing-sm: 0.5rem;
+    --es-spacing-md: 1rem;
+    --es-spacing-lg: 1.5rem;
+    --es-spacing-xl: 2rem;
+    --es-spacing-2xl: 3rem;
+    --es-spacing-3xl: 4rem;
+
+    /* Border Radius */
+    --es-radius-sm: 4px;
+    --es-radius-md: 8px;
+    --es-radius-lg: 12px;
+    --es-radius-xl: 16px;
+    --es-radius-full: 9999px;
+
+    /* Shadows */
+    --es-shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+    --es-shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+    --es-shadow-lg: 0 8px 24px rgba(0,0,0,0.12);
+}
+
+/* ---- Reset & Base ---- */
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+    font-family: var(--es-font-primary);
+    color: var(--es-text);
+    background: var(--es-background);
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--es-font-heading);
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--es-text);
+}
+
+a {
+    color: var(--es-primary);
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+a:hover { color: var(--es-primary-dark); }
+
+img { max-width: 100%; height: auto; }
+
+/* ---- Layout ---- */
+.es-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 var(--es-spacing-lg);
+}
+
+/* ---- Header ---- */
+.es-header {
+    background: var(--es-surface);
+    box-shadow: var(--es-shadow-sm);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    padding: var(--es-spacing-md) 0;
+}
+
+.es-header__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.es-header__logo {
+    display: flex;
+    align-items: center;
+    gap: var(--es-spacing-sm);
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--es-primary);
+}
+
+.es-header__logo svg,
+.es-header__logo img {
+    width: 40px;
+    height: 40px;
+}
+
+.es-nav { display: flex; gap: var(--es-spacing-lg); align-items: center; }
+
+.es-nav a {
+    color: var(--es-text);
+    font-weight: 500;
+    padding: var(--es-spacing-xs) var(--es-spacing-sm);
+    border-radius: var(--es-radius-sm);
+    transition: all 0.2s ease;
+}
+.es-nav a:hover {
+    color: var(--es-primary);
+    background: rgba(46, 125, 50, 0.06);
+}
+
+/* ---- Buttons ---- */
+.es-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--es-spacing-sm);
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: var(--es-radius-md);
+    font-family: var(--es-font-primary);
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+}
+
+.es-btn--primary {
+    background: var(--es-primary);
+    color: #fff;
+}
+.es-btn--primary:hover {
+    background: var(--es-primary-dark);
+    color: #fff;
+    box-shadow: var(--es-shadow-md);
+    transform: translateY(-1px);
+}
+
+.es-btn--secondary {
+    background: transparent;
+    color: var(--es-primary);
+    border: 2px solid var(--es-primary);
+}
+.es-btn--secondary:hover {
+    background: var(--es-primary);
+    color: #fff;
+}
+
+.es-btn--accent {
+    background: var(--es-accent);
+    color: #fff;
+}
+.es-btn--accent:hover {
+    background: #E68900;
+    color: #fff;
+}
+
+/* ---- Hero Section ---- */
+.es-hero {
+    background: linear-gradient(135deg, var(--es-primary-dark) 0%, var(--es-primary) 50%, var(--es-secondary) 100%);
+    color: #fff;
+    padding: var(--es-spacing-3xl) 0;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.es-hero::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="2" fill="rgba(255,255,255,0.08)"/><circle cx="80" cy="40" r="3" fill="rgba(255,255,255,0.06)"/><circle cx="50" cy="70" r="1.5" fill="rgba(255,255,255,0.1)"/></svg>') repeat;
+}
+
+.es-hero__content {
+    position: relative;
+    z-index: 1;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.es-hero h1 {
+    font-size: 3rem;
+    margin-bottom: var(--es-spacing-lg);
+    color: #fff;
+}
+
+.es-hero p {
+    font-size: 1.25rem;
+    opacity: 0.9;
+    margin-bottom: var(--es-spacing-xl);
+}
+
+.es-hero__actions {
+    display: flex;
+    gap: var(--es-spacing-md);
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+/* ---- Features Grid ---- */
+.es-features {
+    padding: var(--es-spacing-3xl) 0;
+}
+
+.es-features__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--es-spacing-xl);
+}
+
+.es-feature-card {
+    background: var(--es-surface);
+    border-radius: var(--es-radius-lg);
+    padding: var(--es-spacing-xl);
+    box-shadow: var(--es-shadow-sm);
+    transition: all 0.3s ease;
+    text-align: center;
+}
+
+.es-feature-card:hover {
+    box-shadow: var(--es-shadow-lg);
+    transform: translateY(-4px);
+}
+
+.es-feature-card__icon {
+    width: 64px;
+    height: 64px;
+    background: rgba(46, 125, 50, 0.1);
+    border-radius: var(--es-radius-full);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto var(--es-spacing-lg);
+    font-size: 1.75rem;
+}
+
+.es-feature-card h3 {
+    margin-bottom: var(--es-spacing-sm);
+}
+
+.es-feature-card p {
+    color: var(--es-text-light);
+    margin: 0;
+}
+
+/* ---- Stats Section ---- */
+.es-stats {
+    background: var(--es-primary-dark);
+    color: #fff;
+    padding: var(--es-spacing-2xl) 0;
+}
+
+.es-stats__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: var(--es-spacing-xl);
+    text-align: center;
+}
+
+.es-stat__number {
+    font-size: 2.5rem;
+    font-weight: 800;
+    display: block;
+}
+
+.es-stat__label {
+    font-size: 0.9rem;
+    opacity: 0.8;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* ---- CTA Section ---- */
+.es-cta {
+    text-align: center;
+    padding: var(--es-spacing-3xl) 0;
+    background: var(--es-surface);
+}
+
+.es-cta h2 {
+    font-size: 2rem;
+    margin-bottom: var(--es-spacing-md);
+}
+
+.es-cta p {
+    color: var(--es-text-light);
+    max-width: 600px;
+    margin: 0 auto var(--es-spacing-xl);
+    font-size: 1.1rem;
+}
+
+/* ---- Footer ---- */
+.es-footer {
+    background: var(--es-text);
+    color: rgba(255, 255, 255, 0.7);
+    padding: var(--es-spacing-2xl) 0 var(--es-spacing-lg);
+}
+
+.es-footer__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--es-spacing-xl);
+    margin-bottom: var(--es-spacing-xl);
+}
+
+.es-footer h4 {
+    color: #fff;
+    margin-bottom: var(--es-spacing-md);
+}
+
+.es-footer a {
+    color: rgba(255, 255, 255, 0.7);
+    display: block;
+    padding: var(--es-spacing-xs) 0;
+}
+.es-footer a:hover { color: var(--es-primary-light); }
+
+.es-footer__bottom {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: var(--es-spacing-lg);
+    text-align: center;
+    font-size: 0.85rem;
+}
+
+/* ---- Dashboard Embed ---- */
+.es-dashboard-frame {
+    width: 100%;
+    min-height: 80vh;
+    border: none;
+    border-radius: var(--es-radius-lg);
+}
+
+/* ---- App Container (React SPA) ---- */
+.es-app-container {
+    min-height: 100vh;
+}
+
+#echosmart-app {
+    min-height: 100vh;
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 768px) {
+    .es-hero h1 { font-size: 2rem; }
+    .es-hero p { font-size: 1rem; }
+
+    .es-header__inner { flex-wrap: wrap; gap: var(--es-spacing-md); }
+    .es-nav { gap: var(--es-spacing-md); }
+
+    .es-features__grid { grid-template-columns: 1fr; }
+    .es-stats__grid { grid-template-columns: repeat(2, 1fr); }
+    .es-footer__grid { grid-template-columns: 1fr; }
+}
+
+/* ---- WordPress Specific ---- */
+.wp-block-post-content { max-width: 100%; }
+
+/* Hide admin bar spacing adjustment */
+body.admin-bar .es-header {
+    top: 32px;
+}
+@media (max-width: 782px) {
+    body.admin-bar .es-header {
+        top: 46px;
+    }
+}
