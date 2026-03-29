@@ -84,3 +84,7 @@ reports/
 # Temporary files
 tmp/
 .tmp/
+
+# EchoSmart PHP site credentials (never commit)
+hosting/site/includes/config.php
+hosting/site/logs/*.log
