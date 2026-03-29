@@ -1,0 +1,28 @@
+Source: echosmart-gateway
+Section: net
+Priority: optional
+Maintainer: EchoSmart Team <dev@echosmart.io>
+Build-Depends: debhelper-compat (= 13), python3, gcc
+Standards-Version: 4.6.2
+Homepage: https://github.com/Uaemextop/echosmart
+Rules-Requires-Root: no
+
+Package: echosmart-gateway
+Architecture: arm64
+Depends: ${misc:Depends},
+         python3 (>= 3.9),
+         python3-pip,
+         python3-venv,
+         mosquitto,
+         sqlite3,
+         adduser
+Recommends: raspi-config
+Suggests: echosmart-server
+Description: EchoSmart Gateway — Software de edge computing para Raspberry Pi
+ Software de monitoreo ambiental de precisión para invernaderos. Se ejecuta
+ en Raspberry Pi 4B, lee sensores DS18B20, DHT22, BH1750, MH-Z19C y
+ humedad de suelo (ADS1115), almacena lecturas en SQLite, publica por MQTT
+ y sincroniza con el backend cloud EchoSmart.
+ .
+ Incluye: daemon systemd, CLI echosmart-gateway, asistente de configuración
+ echosmart-gateway-setup y la utilidad nativa echosmart-sysinfo.
