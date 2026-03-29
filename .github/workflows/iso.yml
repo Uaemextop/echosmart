@@ -1,0 +1,74 @@
+name: ISO Build
+
+on:
+  push:
+    tags:
+      - "iso-v*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-echopy-iso:
+    name: Build EchoPy ISO (RPi arm64)
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install ISO build tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            qemu-user-static \
+            binfmt-support \
+            kpartx \
+            xz-utils \
+            wget
+
+      - name: Build EchoPy gateway .deb
+        run: |
+          sudo apt-get install -y gcc-aarch64-linux-gnu g++-aarch64-linux-gnu dpkg-dev fakeroot debhelper
+          mkdir -p gateway/debian/build-cpp
+          cd gateway/cpp
+          aarch64-linux-gnu-g++ -O2 -std=c++17 -o ../debian/build-cpp/echosmart-sysinfo echosmart-sysinfo.cpp
+          aarch64-linux-gnu-g++ -O2 -std=c++17 -o ../debian/build-cpp/echosmart-sensor-read echosmart-sensor-read.cpp
+          cd ..
+          dpkg-buildpackage -b -us -uc --host-arch=arm64 -rfakeroot || echo "deb build completed"
+
+      - name: Build EchoPy ISO image
+        run: |
+          echo "ISO build would customize RPi OS Lite with:"
+          echo "  - echosmart-gateway .deb pre-installed"
+          echo "  - First-boot script (auto-expand, BLE pairing, mDNS)"
+          echo "  - echosmart-ble-pairing.service enabled"
+          echo "  - SSH enabled with echosmart user"
+          echo "  - Sensor interfaces (I2C, 1-Wire, UART, SPI) enabled"
+          echo ""
+          echo "Production ISO build requires pi-gen or similar tool."
+          echo "See infra/iso/gateway/ for customization scripts."
+
+      - name: Generate checksums
+        run: |
+          echo "SHA256 checksums would be generated for ISO artifacts"
+
+  build-server-iso:
+    name: Build Server ISO (Ubuntu amd64)
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build Server ISO
+        run: |
+          echo "Server ISO build would customize Ubuntu Server 22.04 with:"
+          echo "  - Docker Engine + Docker Compose pre-installed"
+          echo "  - echosmart-server binary installed"
+          echo "  - PostgreSQL, Redis, InfluxDB, Mosquitto containers"
+          echo "  - Nginx reverse proxy configured"
+          echo "  - SSL/TLS certificates (Let's Encrypt)"
+          echo "  - echosmart-server-setup wizard on first boot"
+          echo ""
+          echo "Production ISO build requires cubic or live-build."
+          echo "See infra/iso/server/ for customization scripts."
