@@ -11,8 +11,9 @@
  * - Authenticated SMTP = proper DKIM signing by Exim
  * - No Sender header mismatch (mail() adds Sender: cpaneluser@hostname)
  * - Clean readable plain-text alternative
- * - No Precedence:bulk (that marks as marketing = spam)
- * - List-Unsubscribe for Gmail compliance
+ * - No Precedence:bulk (marks as marketing = spam)
+ * - Transactional emails marked with Auto-Submitted: auto-generated
+ * - EHLO uses server hostname (matches rDNS for SPF alignment)
  *
  * @package EchoSmart
  */
@@ -181,8 +182,9 @@ class Mailer
         $msg .= "Date: " . gmdate('r') . "\r\n";
         $msg .= "Message-ID: <{$msgId}@echosmart.me>\r\n";
         $msg .= "Content-Type: multipart/alternative; boundary=\"{$boundary}\"\r\n";
-        $msg .= "List-Unsubscribe: <mailto:" . ADMIN_EMAIL . "?subject=unsubscribe>\r\n";
-        $msg .= "List-Unsubscribe-Post: List-Unsubscribe=One-Click\r\n";
+        // Mark as automated transactional email (RFC 3834)
+        $msg .= "Auto-Submitted: auto-generated\r\n";
+        $msg .= "X-Auto-Response-Suppress: All\r\n";
         $msg .= "\r\n";
 
         // Plain text part
@@ -220,8 +222,10 @@ class Mailer
 
             stream_set_timeout($socket, 30);
 
+            // Use server hostname in EHLO to match rDNS (critical for SPF)
+            $serverHost = gethostname() ?: 'localhost';
             self::smtpRead($socket);
-            self::smtpCommand($socket, "EHLO echosmart.me", 250);
+            self::smtpCommand($socket, "EHLO {$serverHost}", 250);
             self::smtpCommand($socket, "AUTH LOGIN", 334);
             self::smtpCommand($socket, base64_encode($user), 334);
             self::smtpCommand($socket, base64_encode($pass), 235);
@@ -258,8 +262,9 @@ class Mailer
         $headers .= "Date: " . gmdate('r') . "\r\n";
         $headers .= "Message-ID: <{$msgId}@echosmart.me>\r\n";
         $headers .= "Content-Type: multipart/alternative; boundary=\"{$boundary}\"\r\n";
-        $headers .= "List-Unsubscribe: <mailto:" . ADMIN_EMAIL . "?subject=unsubscribe>\r\n";
-        $headers .= "List-Unsubscribe-Post: List-Unsubscribe=One-Click\r\n";
+        // Mark as automated transactional email (RFC 3834)
+        $headers .= "Auto-Submitted: auto-generated\r\n";
+        $headers .= "X-Auto-Response-Suppress: All\r\n";
 
         $body  = "--{$boundary}\r\n";
         $body .= "Content-Type: text/plain; charset=UTF-8\r\n";

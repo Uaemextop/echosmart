@@ -192,11 +192,13 @@ Transactional emails sent via **authenticated SMTP** on `127.0.0.1:465` (IPv4):
 - **Reply-To:** `admin@echosmart.me`
 - **Emails:** Welcome, password reset, contact notification
 - **Email routing:** `local` (set via `uapi Email set_always_accept mxcheck=local`)
-- **Anti-spam headers:** `List-Unsubscribe` (RFC 8058), `List-Unsubscribe-Post`
+- **EHLO:** Uses server hostname (matches rDNS for SPF alignment)
+- **Anti-spam headers:** `Auto-Submitted: auto-generated` (RFC 3834), `X-Auto-Response-Suppress: All`
 - **Transfer encoding:** `quoted-printable`
 
-> **Spam fix (2026-03-29):**
-> Emails were landing in Gmail/Outlook spam due to multiple issues:
+> **Spam fix history:**
+>
+> **Round 1 (2026-03-29):**
 > 1. **Sender header mismatch** — `mail()` caused Exim to add
 >    `Sender: eduardoc3677@business191.web-hosting.com` which mismatches From.
 >    Fixed by switching to authenticated SMTP as primary sender.
@@ -206,6 +208,18 @@ Transactional emails sent via **authenticated SMTP** on `127.0.0.1:465` (IPv4):
 > 4. **DMARC quarantine** — `p=quarantine` changed to `p=none` for reputation building.
 > 5. **Precedence:bulk** header was marking emails as marketing/bulk.
 > 6. **Unreadable plain text** — was stripped HTML garbage; now human-written text.
+>
+> **Round 2 (2026-03-29):**
+> 7. **List-Unsubscribe on transactional emails** — `List-Unsubscribe` and
+>    `List-Unsubscribe-Post` headers are for marketing/bulk emails. Having them
+>    on transactional emails (welcome, password reset) signals to spam filters
+>    that the email is marketing. Removed in favor of `Auto-Submitted: auto-generated`.
+> 8. **EHLO mismatch** — EHLO was `echosmart.me` but rDNS for the IP is
+>    `business191-3.web-hosting.com`. Changed to `gethostname()` (server hostname)
+>    so EHLO matches rDNS for better SPF alignment.
+> 9. **Missing transactional markers** — Added `Auto-Submitted: auto-generated`
+>    (RFC 3834) and `X-Auto-Response-Suppress: All` to mark emails as automated
+>    transactional rather than bulk/marketing.
 > All fixes applied via SSH + cPanel UAPI.
 
 ### Security
@@ -301,3 +315,24 @@ If webmail (Roundcube/Horde via cPanel) cannot send to external addresses:
 | SMTP Port   | 465 (SSL/TLS)        |
 | Username    | full email address   |
 | Password    | account password     |
+
+### Port 123 (NTP) — Cannot Be Opened
+
+Port 123 (NTP, UDP) **cannot be opened** on this shared hosting plan:
+
+| Check                     | Result                                      |
+|---------------------------|---------------------------------------------|
+| Bind to port 123          | ❌ `Permission denied` (ports < 1024 need root) |
+| Root / sudo access        | ❌ Not available on shared hosting           |
+| Firewall (iptables)       | ❌ Not accessible to cPanel users            |
+| Custom services           | ❌ Only HTTP/HTTPS/email ports allowed       |
+
+**Why?** Shared hosting (Namecheap cPanel) runs multiple customers on the same
+server. Only the hosting provider (root) can open system ports. Port 123 is a
+privileged port (< 1024) requiring root access.
+
+**Alternatives:**
+- The server already gets time from the host's NTP service (system clock is accurate)
+- Applications can use PHP's `date()` / `time()` functions normally
+- For IoT gateways that need NTP, use a public NTP pool directly from the device
+- If a custom NTP server is needed, upgrade to a **VPS or dedicated server**
