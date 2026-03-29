@@ -84,3 +84,4 @@ reports/
 # Temporary files
 tmp/
 .tmp/
+.cache/
