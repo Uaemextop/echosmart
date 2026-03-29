@@ -83,7 +83,7 @@
 | MX     | echosmart.me       | mx1-hosting.jellyfish.systems (pri 5)                                          |
 | MX     | echosmart.me       | mx2-hosting.jellyfish.systems (pri 10)                                         |
 | MX     | echosmart.me       | mx3-hosting.jellyfish.systems (pri 20)                                         |
-| TXT    | echosmart.me (SPF) | `v=spf1 +a +mx +ip4:63.250.38.86 +ip4:68.65.123.176 include:spf.web-hosting.com ~all` |
+| TXT    | echosmart.me (SPF) | `v=spf1 +a +mx +ip4:68.65.123.247 +ip4:63.250.38.86 +ip4:68.65.123.176 include:spf.web-hosting.com ~all` |
 | TXT    | _dmarc (DMARC)     | `v=DMARC1; p=quarantine; rua=mailto:admin@echosmart.me; ruf=mailto:admin@echosmart.me; pct=100;` |
 | TXT    | default._domainkey | DKIM RSA 2048-bit public key                                                  |
 | NS     | echosmart.me       | dns1.namecheaphosting.com                                                      |
@@ -190,13 +190,14 @@ Transactional emails sent via the **local Exim MTA** using PHP `mail()`:
 - **Envelope sender:** `-f noreply@echosmart.me` (SPF/DKIM aligned)
 - **Fallback:** Authenticated SMTP via `127.0.0.1:465` (IPv4 forced)
 - **Emails:** Welcome, password reset, contact notification
+- **Email routing:** `local` (set via `uapi Email set_always_accept mxcheck=local`)
 
-> **Why mail() instead of SMTP sockets?**
-> On cPanel shared hosting, connecting to `mail.echosmart.me:465` from PHP
-> resolves to `::1` (IPv6 loopback). Exim's ACL rejects this with:
-> `"Your IP: ::1 : Your domain echosmart.me is not allowed in header From"`.
-> Using `mail()` submits through the local sendmail pipe, which Exim trusts
-> for locally hosted domains. The SMTP fallback forces IPv4 (`127.0.0.1`).
+> **SMTP Error 550 fix:**
+> cPanel's Exim rejected emails with `"Your IP: ::1 : Your domain echosmart.me
+> is not allowed in header From"` because: (1) the email routing was auto-detected
+> as "remote" (MX records point to jellyfish.systems, not localhost), and
+> (2) the PHP mailer connected via localhost IPv6. Both were fixed:
+> routing forced to `local`, and mailer switched to `mail()` + IPv4 fallback.
 
 ### Security
 
@@ -225,16 +226,26 @@ ssh -i hosting/id_rsa -p 21098 eduardoc3677@68.65.123.247
 
 ### SMTP Error 550: "Your IP: ::1 : Your domain echosmart.me is not allowed in header From"
 
-**Cause:** PHP connects to `mail.echosmart.me:465` which resolves to the same
-server via IPv6 loopback `::1`. cPanel's Exim rejects the `From` header from
-that IP because `::1` isn't in the trusted hosts ACL for `echosmart.me`.
+**Root cause (two issues):**
+1. Email routing was auto-detected as `remote` because MX records point to
+   `mx*-hosting.jellyfish.systems` (which Exim sees as external servers)
+2. PHP connected via `mail.echosmart.me` which resolved to IPv6 `::1`
 
-**Fix (applied):** The `Mailer.php` now uses PHP's native `mail()` function
-which submits mail through the local Exim pipe (sendmail), bypassing TCP
-entirely. The cPanel user `eduardoc3677` owns `echosmart.me`, so Exim trusts
-local mail submission. If `mail()` fails, a fallback connects via
-`127.0.0.1:465` (IPv4 forced) with SSL peer verification disabled for the
-loopback connection.
+**Fix applied:**
+1. Set email routing to `local` via cPanel API:
+   ```bash
+   uapi Email set_always_accept domain=echosmart.me mxcheck=local
+   ```
+2. Changed `Mailer.php` to use PHP `mail()` (local Exim pipe) instead of
+   raw SMTP sockets. Fallback uses `127.0.0.1` (IPv4) if `mail()` fails.
+3. Removed duplicate DMARC record (`p=none`, kept `p=quarantine`):
+   ```bash
+   uapi DNS mass_edit_zone zone=echosmart.me serial=XXXXXXXXXX remove=LINE_INDEX
+   ```
+4. Updated SPF to include server IP `68.65.123.247`:
+   ```bash
+   uapi DNS mass_edit_zone zone=echosmart.me serial=XXXXXXXXXX edit='{"line_index":13,...}'
+   ```
 
 ### Webmail: Cannot send to external addresses (Gmail, Outlook, etc.)
 
