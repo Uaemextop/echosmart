@@ -4,7 +4,6 @@ description: >
   Agente de arquitectura profesional para este repositorio, centrado en diseño limpio,
   modular y mantenible. Evita código spaghetti aplicando principios SOLID, separación
   clara de responsabilidades y buenas prácticas de ingeniería de software.
-target: github-copilot
 tools: ["*"]
 
 disable-model-invocation: false
@@ -12,20 +11,18 @@ user-invocable: true
 
 mcp-servers:
   everything:
-    type: local
+    type: stdio
     command: npx
     args:
       - -y
       - "@modelcontextprotocol/server-everything"
-    tools: ["*"]
 
   sequential-thinking:
-    type: local
+    type: stdio
     command: npx
     args:
       - -y
       - "@modelcontextprotocol/server-sequential-thinking"
-    tools: ["*"]
 
   memory:
     type: stdio
@@ -33,7 +30,6 @@ mcp-servers:
     args:
       - -y
       - "@modelcontextprotocol/server-memory"
-    tools: ["*"]
 
   filesystem:
     type: stdio
@@ -42,82 +38,59 @@ mcp-servers:
       - -y
       - "@modelcontextprotocol/server-filesystem"
       - "."
-    tools: ["*"]
 
   git:
-    type: local
+    type: stdio
     command: uvx
     args:
       - "mcp-server-git"
-    tools: ["*"]
-
-  mcp-language-server:
-    type: local
-    command: mcp-language-server
-    args:
-      - --workspace
-      - "."
-      - --lsp
-      - "typescript-language-server"
-      - --
-      - --local
-    tools: ["*"]
 
   fetch:
-    type: local
+    type: stdio
     command: uvx
     args:
       - "mcp-server-fetch"
-    tools: ["*"]
 
   time:
-    type: local
+    type: stdio
     command: uvx
     args:
-      - "mcp-server-time"
-    tools: ["*"]
+      - "baiyx-mcp-server-time"
 
   read-website-fast:
-    type: local
+    type: stdio
     command: npx
     args:
       - -y
       - "@just-every/mcp-read-website-fast"
-    tools: ["*"]
 
   playwright:
-    type: local
+    type: stdio
     command: npx
     args:
       - -y
-      - "@playwright/mcp@latest"
-    tools: ["*"]
+      - "@playwright/mcp"
 
   chrome-devtools:
-    type: local
+    type: stdio
     command: npx
     args:
       - -y
-      - "chrome-devtools-mcp@latest"
-      - --autoConnect
-      - --channel=beta
-    tools: ["*"]
+      - "chrome-devtools-mcp"
 
   next-devtools:
-    type: local
+    type: stdio
     command: npx
     args:
       - -y
-      - "next-devtools-mcp@latest"
-    tools: ["*"]
+      - "next-devtools-mcp"
 
   mcp-echarts:
-    type: local
+    type: stdio
     command: npx
     args:
       - -y
       - "mcp-echarts"
-    tools: ["*"]
 
   mcp-mermaid:
     type: stdio
@@ -125,7 +98,6 @@ mcp-servers:
     args:
       - -y
       - "mcp-mermaid"
-    tools: ["*"]
 
   flyonui:
     type: stdio
@@ -133,7 +105,6 @@ mcp-servers:
     args:
       - -y
       - "flyonui-mcp"
-    tools: ["*"]
 
   gluestack-ui:
     type: stdio
@@ -141,11 +112,6 @@ mcp-servers:
     args:
       - -y
       - "gluestack-ui-mcp-server"
-    tools: ["*"]
-
-metadata:
-  owner: "architecture"
-  intent: "clean-architecture-and-professional-design"
 ---
 
 Eres un arquitecto de software senior responsable de mantener una arquitectura
@@ -176,7 +142,7 @@ Lineamientos de estilo y calidad:
 
 Uso de herramientas MCP:
 
-- Usa `filesystem`, `git` y `mcp-language-server` para:
+- Usa `filesystem` y `git` para:
   - Explorar el código real del repositorio.
   - Identificar malos olores de arquitectura (ciclos, módulos dios, etc.).
   - Proponer refactors seguros y bien justificados.
