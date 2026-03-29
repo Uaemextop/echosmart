@@ -45,8 +45,8 @@ El proyecto sigue **Clean Architecture** de Robert C. Martin. Las capas son:
 | Principio | Aplicación en EchoSmart |
 |-----------|------------------------|
 | **S** — Single Responsibility | Cada archivo/clase tiene UNA sola razón para cambiar. `sensor_service.py` NO debe manejar alertas. |
-| **O** — Open/Closed | Nuevos sensores se agregan creando un nuevo sub-comando en `echosmart-sensor-read`, SIN modificar el daemon `echosmart-gateway`. |
-| **L** — Liskov Substitution | Todos los sensores se leen con la misma interfaz del binario `echosmart-sensor-read <sensor> --simulate`. Son intercambiables. |
+| **O** — Open/Closed | Nuevos sensores se agregan creando un nuevo sub-comando `echosmart read <nuevo>`, SIN modificar otros comandos. |
+| **L** — Liskov Substitution | Todos los sensores se leen con la misma interfaz del binario `echosmart read <sensor> --simulate=true`. Son intercambiables. |
 | **I** — Interface Segregation | No forzar a un componente a depender de métodos que no usa. Interfaces pequeñas y específicas. |
 | **D** — Dependency Inversion | Los servicios dependen de abstracciones (interfaces/protocolos), no de implementaciones concretas. |
 
@@ -129,7 +129,7 @@ backend/src/
 |--------|-------------|---------|
 | **Repository** | Backend — acceso a datos | `SensorRepository` encapsula queries SQL |
 | **Service Layer** | Backend — lógica de negocio | `AlertService` orquesta detección y notificación |
-| **Factory** | Gateway — creación de lecturas | `echosmart-sensor-read <tipo>` selecciona el sub-comando correcto |
+| **Factory** | Gateway — creación de lecturas | `echosmart read <tipo>` selecciona el sub-comando correcto |
 | **Observer** | Gateway/Frontend — eventos | Sensor Manager emite eventos, Alert Engine escucha |
 | **Strategy** | Gateway — protocolos de comunicación | Diferentes estrategias para I2C, UART, GPIO |
 | **Adapter** | Frontend — API calls | Adaptar respuesta HTTP a estado Redux |
@@ -426,8 +426,8 @@ A continuación se definen los **5 sensores** seleccionados para el proyecto. Ca
 | **Alimentación** | 3.0V – 5.5V (compatible con RPi 3.3V) |
 | **Rango óptimo invernadero** | 18°C – 28°C |
 | **¿Por qué este sensor?** | Estándar de facto en proyectos IoT agrícolas. Resistente al agua (versión encapsulada), permite múltiples sensores en el mismo bus 1-Wire con direcciones únicas. Precio bajo (~$2 USD). Compatible nativo con Raspberry Pi. |
-| **Driver** | `gateway/cpp/echosmart-sensor-read.cpp` (sub-comando `ds18b20`) |
-| **Simulación** | `echosmart-sensor-read ds18b20 --simulate` → valores entre 15.0°C y 35.0°C |
+| **Driver** | `gateway/cpp/echosmart read.cpp` (sub-comando `ds18b20`) |
+| **Simulación** | `echosmart read ds18b20 --simulate=true` → valores entre 15.0°C y 35.0°C |
 
 #### 💧 Sensor 2: DHT22 (AM2302) — Temperatura + Humedad Relativa
 | Especificación | Valor |
@@ -441,8 +441,8 @@ A continuación se definen los **5 sensores** seleccionados para el proyecto. Ca
 | **Alimentación** | 3.3V – 6V |
 | **Rango óptimo invernadero** | Temp: 18–28°C, Humedad: 60–80% RH |
 | **¿Por qué este sensor?** | Combina temperatura y humedad en un solo módulo. Mejor precisión que el DHT11. Muy utilizado en agricultura de precisión. Bajo costo (~$3 USD). Lectura vía GPIO con libgpiod en el binario C++. |
-| **Driver** | `gateway/cpp/echosmart-sensor-read.cpp` (sub-comando `dht22`) |
-| **Simulación** | `echosmart-sensor-read dht22 --simulate` → Temp: 15.0–35.0°C, Humedad: 40.0–90.0% |
+| **Driver** | `gateway/cpp/echosmart read.cpp` (sub-comando `dht22`) |
+| **Simulación** | `echosmart read dht22 --simulate=true` → Temp: 15.0–35.0°C, Humedad: 40.0–90.0% |
 
 #### ☀️ Sensor 3: BH1750 — Luminosidad (Lux)
 | Especificación | Valor |
@@ -456,8 +456,8 @@ A continuación se definen los **5 sensores** seleccionados para el proyecto. Ca
 | **Alimentación** | 2.4V – 3.6V (compatible con RPi 3.3V) |
 | **Rango óptimo invernadero** | 10,000 – 30,000 lux |
 | **¿Por qué este sensor?** | Sensor digital de luz con salida directa en lux (no requiere conversión). Protocolo I2C estándar. Ideal para determinar si el invernadero necesita iluminación suplementaria o protección contra exceso de luz. Precio muy bajo (~$1.5 USD). |
-| **Driver** | `gateway/cpp/echosmart-sensor-read.cpp` (sub-comando `bh1750`) |
-| **Simulación** | `echosmart-sensor-read bh1750 --simulate` → valores entre 500 y 50,000 lux |
+| **Driver** | `gateway/cpp/echosmart read.cpp` (sub-comando `bh1750`) |
+| **Simulación** | `echosmart read bh1750 --simulate=true` → valores entre 500 y 50,000 lux |
 
 #### 🌱 Sensor 4: Sensor de Humedad de Suelo + ADS1115 (ADC)
 | Especificación | Valor |
@@ -470,8 +470,8 @@ A continuación se definen los **5 sensores** seleccionados para el proyecto. Ca
 | **Alimentación** | 3.3V – 5V |
 | **Rango óptimo invernadero** | 50% – 80% de humedad de suelo |
 | **¿Por qué este sensor?** | El sensor capacitivo (v1.2) es superior al resistivo: no se corroe, vida útil más larga. El ADS1115 proporciona conversión analógico-digital de alta resolución via I2C. Permite conectar hasta 4 sensores de suelo en un solo módulo. Precio combinado ~$4 USD. |
-| **Driver** | `gateway/cpp/echosmart-sensor-read.cpp` (sub-comando `soil`) |
-| **Simulación** | `echosmart-sensor-read soil --simulate` → valores entre 20.0% y 90.0% |
+| **Driver** | `gateway/cpp/echosmart read.cpp` (sub-comando `soil`) |
+| **Simulación** | `echosmart read soil --simulate=true` → valores entre 20.0% y 90.0% |
 
 #### 🏭 Sensor 5: MH-Z19C — Concentración de CO₂
 | Especificación | Valor |
@@ -487,8 +487,8 @@ A continuación se definen los **5 sensores** seleccionados para el proyecto. Ca
 | **Alimentación** | 4.9V – 5.1V (requiere nivel de voltaje estable) |
 | **Rango óptimo invernadero** | 400 – 1,000 ppm |
 | **¿Por qué este sensor?** | Tecnología NDIR (infrarrojo no dispersivo) ofrece mediciones precisas y estables a largo plazo. Autocalibración incorporada (ABC logic). El CO₂ es crítico para la fotosíntesis; niveles altos indican ventilación insuficiente. Compatible con UART del RPi. Precio ~$18 USD. |
-| **Driver** | `gateway/cpp/echosmart-sensor-read.cpp` (sub-comando `mhz19c`) |
-| **Simulación** | `echosmart-sensor-read mhz19c --simulate` → valores entre 350 y 2,000 ppm |
+| **Driver** | `gateway/cpp/echosmart read.cpp` (sub-comando `mhz19c`) |
+| **Simulación** | `echosmart read mhz19c --simulate=true` → valores entre 350 y 2,000 ppm |
 
 #### Resumen de Sensores
 
@@ -504,137 +504,211 @@ A continuación se definen los **5 sensores** seleccionados para el proyecto. Ca
 **Raspberry Pi recomendado**: Raspberry Pi 4 Model B (2GB+ RAM) — $35–55 USD
 **Costo total estimado del hardware**: ~$65–85 USD (RPi + 5 sensores + cables/protoboard)
 
-### 1.2 Arquitectura del Gateway (Binarios Qt/C++ + .deb)
+### 1.2 Arquitectura del Gateway (Binario Unificado Qt/C++ + .deb)
 
-> 🏛️ El gateway se compone de binarios C++/Qt compilados con CMake y empaquetados en .deb.
-> Cada binario tiene su propio directorio con archivos `.cpp`, `.h`, `.qml`, `.qrc` y `.ui`.
+> 🏛️ Todo el gateway se compila en **un solo binario `echosmart`** que expone
+> múltiples comandos con la sintaxis: `echosmart <command> <input> --<arg>=<value>`.
+> Los archivos fuente usan `.cpp`, `.h`, `.qml`, `.qrc` y `.ui`.
+
+#### Tabla de comandos del binario `echosmart`
+
+| Comando | Input | Argumentos | Descripción |
+|---------|-------|------------|-------------|
+| `echosmart read` | `<sensor>` | `--simulate=true`, `--format=json` | Leer un sensor |
+| `echosmart sysinfo` | — | `--format=json\|text` | Diagnósticos del sistema |
+| `echosmart run` | — | `--config=<path>`, `--sensors=<path>`, `--simulate=true`, `--once=true`, `--interval=<sec>` | Ejecutar daemon de polling |
+| `echosmart setup` | — | `--config=<path>` | Wizard de primer arranque |
+| `echosmart status` | — | `--format=json\|text` | Estado del gateway y sensores |
+| `echosmart calibrate` | `<sensor>` | `--dry=<val>`, `--wet=<val>`, `--ref=<val>` | Calibrar sensor |
+| `echosmart list` | — | — | Listar sensores configurados |
+| `echosmart test` | `<sensor>\|all` | `--simulate=true` | Probar sensores |
+| `echosmart version` | — | — | Mostrar versión |
+| `echosmart help` | `[command]` | — | Mostrar ayuda |
+
+#### Ejemplos de uso
+
+```bash
+echosmart read ds18b20 --simulate=true          # Lectura simulada de temperatura
+echosmart read dht22                             # Lectura real de temp+humedad
+echosmart read bh1750 --format=json              # Lectura de luz en JSON
+echosmart sysinfo                                # Diagnósticos del sistema
+echosmart sysinfo --format=text                  # Diagnósticos en texto plano
+echosmart run --simulate=true --once=true         # Un ciclo de polling simulado
+echosmart run --interval=30                       # Daemon con polling cada 30s
+echosmart run --config=/etc/echosmart/gateway.env # Daemon con config custom
+echosmart setup                                   # Wizard interactivo
+echosmart status                                  # Estado actual
+echosmart calibrate soil --dry=3200 --wet=1400    # Calibrar sensor de suelo
+echosmart list                                    # Listar sensores
+echosmart test all --simulate=true                # Probar todos los sensores
+echosmart version                                 # Mostrar versión
+echosmart help read                               # Ayuda del comando read
+```
+
+#### Estructura de archivos fuente
 
 ```
 gateway/
 ├── cpp/                                          # Código fuente C++ / Qt
 │   ├── CMakeLists.txt                            # Build system raíz (C++17, Qt6, -O2)
 │   │
-│   ├── shared/                                   # Biblioteca compartida entre binarios
-│   │   ├── CMakeLists.txt                        # Target: libechosmart-shared
-│   │   ├── version.h                             # Macros ES_VERSION, ES_VERSION_STRING
-│   │   ├── sensordata.h                          # Struct SensorData (tipo, valor, unidad, ts)
-│   │   ├── sensordata.cpp                        # Serialización JSON de SensorData
-│   │   ├── alertrule.h                           # Struct AlertRule (sensor, condición, umbral)
-│   │   ├── alertrule.cpp                         # Evaluación de AlertRule
-│   │   ├── jsonformatter.h                       # Funciones de formateo JSON
-│   │   ├── jsonformatter.cpp                     # Implementación sin deps externas
-│   │   ├── configloader.h                        # Carga de gateway.env y sensors.json
-│   │   ├── configloader.cpp                      # Parser key=value y JSON minimal
-│   │   ├── logger.h                              # Log a stdout/journal (ISO 8601)
-│   │   ├── logger.cpp                            # Implementación de log_info/warn/error
-│   │   ├── fileutils.h                           # read_file, trim, file_exists
-│   │   ├── fileutils.cpp                         # Helpers de filesystem
-│   │   └── resources.qrc                         # Recursos compartidos (iconos, JSON schemas)
+│   ├── main.cpp                                  # Entry point — dispatch de comandos
+│   ├── cli.h                                     # Parseo de `echosmart <cmd> <input> --<arg>=<val>`
+│   ├── cli.cpp                                   # Implementación del parser CLI
 │   │
-│   ├── echosmart-sensor-read/                    # Binario de lectura de sensores
-│   │   ├── CMakeLists.txt                        # Target: echosmart-sensor-read
-│   │   ├── main.cpp                              # Entry point, parseo de args, dispatch
-│   │   ├── sensorreader.h                        # Clase SensorReader (interfaz base)
-│   │   ├── sensorreader.cpp                      # Lógica común de lectura
-│   │   ├── drivers/                              # Un .h + .cpp por tipo de sensor
-│   │   │   ├── ds18b20driver.h                   # Clase DS18B20Driver : SensorReader
-│   │   │   ├── ds18b20driver.cpp                 # Lectura 1-Wire + simulación
-│   │   │   ├── dht22driver.h                     # Clase DHT22Driver : SensorReader
-│   │   │   ├── dht22driver.cpp                   # Lectura GPIO + simulación
-│   │   │   ├── bh1750driver.h                    # Clase BH1750Driver : SensorReader
-│   │   │   ├── bh1750driver.cpp                  # Lectura I2C + simulación
-│   │   │   ├── soildriver.h                      # Clase SoilDriver : SensorReader
-│   │   │   ├── soildriver.cpp                    # Lectura ADS1115 ADC + simulación
-│   │   │   ├── mhz19cdriver.h                    # Clase MHZ19CDriver : SensorReader
-│   │   │   └── mhz19cdriver.cpp                  # Lectura UART + simulación
-│   │   └── resources.qrc                         # Recursos del binario sensor-read
+│   ├── commands/                                 # Un .h + .cpp por comando
+│   │   ├── cmd_read.h                            # Comando `echosmart read <sensor>`
+│   │   ├── cmd_read.cpp                          # Dispatch a driver + salida JSON
+│   │   ├── cmd_sysinfo.h                         # Comando `echosmart sysinfo`
+│   │   ├── cmd_sysinfo.cpp                       # Recopila CPU, RAM, disco, uptime
+│   │   ├── cmd_run.h                             # Comando `echosmart run` (daemon)
+│   │   ├── cmd_run.cpp                           # Loop de polling + alertas + sync
+│   │   ├── cmd_setup.h                           # Comando `echosmart setup`
+│   │   ├── cmd_setup.cpp                         # Wizard interactivo de config
+│   │   ├── cmd_status.h                          # Comando `echosmart status`
+│   │   ├── cmd_status.cpp                        # Lee sysinfo + última lectura
+│   │   ├── cmd_calibrate.h                       # Comando `echosmart calibrate <sensor>`
+│   │   ├── cmd_calibrate.cpp                     # Calibración de sensor
+│   │   ├── cmd_list.h                            # Comando `echosmart list`
+│   │   ├── cmd_list.cpp                          # Lista sensores de sensors.json
+│   │   ├── cmd_test.h                            # Comando `echosmart test <sensor|all>`
+│   │   ├── cmd_test.cpp                          # Ejecuta lectura de prueba
+│   │   ├── cmd_version.h                         # Comando `echosmart version`
+│   │   ├── cmd_version.cpp                       # Imprime versión
+│   │   ├── cmd_help.h                            # Comando `echosmart help [cmd]`
+│   │   └── cmd_help.cpp                          # Imprime ayuda general o por comando
 │   │
-│   ├── echosmart-sysinfo/                        # Binario de diagnósticos
-│   │   ├── CMakeLists.txt                        # Target: echosmart-sysinfo
-│   │   ├── main.cpp                              # Entry point
-│   │   ├── sysinfo.h                             # Clase SysInfo
-│   │   ├── sysinfo.cpp                           # Lectura CPU, RAM, disco, uptime
-│   │   ├── sysinfo.ui                            # (Reservado) Formulario Qt Designer
-│   │   └── resources.qrc                         # Recursos del binario sysinfo
+│   ├── drivers/                                  # Un .h + .cpp por tipo de sensor
+│   │   ├── sensor_driver.h                       # Clase base abstracta SensorDriver
+│   │   ├── sensor_driver.cpp                     # Lógica común (simulación, validación)
+│   │   ├── ds18b20_driver.h                      # DS18B20Driver : SensorDriver
+│   │   ├── ds18b20_driver.cpp                    # 1-Wire + simulación
+│   │   ├── dht22_driver.h                        # DHT22Driver : SensorDriver
+│   │   ├── dht22_driver.cpp                      # GPIO + simulación
+│   │   ├── bh1750_driver.h                       # BH1750Driver : SensorDriver
+│   │   ├── bh1750_driver.cpp                     # I2C + simulación
+│   │   ├── soil_driver.h                         # SoilDriver : SensorDriver
+│   │   ├── soil_driver.cpp                       # ADS1115 ADC + simulación
+│   │   ├── mhz19c_driver.h                       # MHZ19CDriver : SensorDriver
+│   │   ├── mhz19c_driver.cpp                     # UART + simulación
+│   │   ├── driver_factory.h                      # DriverFactory — crea driver por tipo
+│   │   └── driver_factory.cpp                    # Registro y dispatch
 │   │
-│   ├── echosmart-gateway/                        # Daemon principal
-│   │   ├── CMakeLists.txt                        # Target: echosmart-gateway-bin
-│   │   ├── main.cpp                              # Entry point, señales, loop principal
-│   │   ├── gateway.h                             # Clase Gateway (orquestador)
-│   │   ├── gateway.cpp                           # Implementación del ciclo de polling
-│   │   ├── sensorpoller.h                        # Clase SensorPoller (invoca sensor-read)
-│   │   ├── sensorpoller.cpp                      # Lógica de polling con QProcess/fork
-│   │   ├── alertengine.h                         # Clase AlertEngine (evaluación de reglas)
-│   │   ├── alertengine.cpp                       # Implementación de reglas y cooldown
-│   │   ├── datastore.h                           # Clase DataStore (persistencia local)
-│   │   ├── datastore.cpp                         # Escritura JSON/SQLite offline
-│   │   ├── cloudsyncer.h                         # Clase CloudSyncer (HTTP POST al backend)
-│   │   ├── cloudsyncer.cpp                       # Sync con retry y backoff
-│   │   ├── mqttpublisher.h                       # Clase MqttPublisher
-│   │   ├── mqttpublisher.cpp                     # Publicación MQTT con reconexión
-│   │   ├── gateway.ui                            # (Reservado) Formulario Qt Designer
-│   │   ├── resources.qrc                         # Recursos del daemon
-│   │   └── qml/                                  # Interfaz QML (pantalla local opcional)
-│   │       ├── main.qml                          # Ventana raíz
-│   │       ├── Dashboard.qml                     # Panel resumen de sensores
-│   │       ├── SensorCard.qml                    # Tarjeta individual de sensor
-│   │       ├── AlertBanner.qml                   # Banner de alertas activas
-│   │       ├── StatusBar.qml                     # Barra de estado (WiFi, cloud, uptime)
-│   │       └── qmldir                            # Registro de módulos QML
+│   ├── core/                                     # Lógica central del daemon
+│   │   ├── gateway.h                             # Clase Gateway (orquestador del daemon)
+│   │   ├── gateway.cpp                           # Ciclo de polling + señales
+│   │   ├── sensor_poller.h                       # Clase SensorPoller
+│   │   ├── sensor_poller.cpp                     # Polling de sensores
+│   │   ├── alert_engine.h                        # Clase AlertEngine
+│   │   ├── alert_engine.cpp                      # Evaluación de reglas + cooldown
+│   │   ├── data_store.h                          # Clase DataStore (persistencia)
+│   │   ├── data_store.cpp                        # JSONL rotativo + cleanup
+│   │   ├── cloud_syncer.h                        # Clase CloudSyncer (HTTP sync)
+│   │   ├── cloud_syncer.cpp                      # POST batch + retry + backoff
+│   │   ├── mqtt_publisher.h                      # Clase MqttPublisher
+│   │   └── mqtt_publisher.cpp                    # Publicación MQTT + LWT
+│   │
+│   ├── shared/                                   # Tipos y utilidades compartidas
+│   │   ├── version.h                             # ES_VERSION_MAJOR/MINOR/PATCH/STRING
+│   │   ├── sensor_data.h                         # Struct SensorData
+│   │   ├── sensor_data.cpp                       # Serialización JSON
+│   │   ├── alert_rule.h                          # Struct AlertRule
+│   │   ├── alert_rule.cpp                        # Evaluación
+│   │   ├── config_loader.h                       # GatewayConfig + SensorEntry
+│   │   ├── config_loader.cpp                     # Parser .env y .json
+│   │   ├── json_formatter.h                      # Funciones JSON sin deps
+│   │   ├── json_formatter.cpp                    # Implementación
+│   │   ├── logger.h                              # log_info/warn/error (ISO 8601)
+│   │   ├── logger.cpp                            # Implementación
+│   │   ├── file_utils.h                          # read_file, trim, etc.
+│   │   ├── file_utils.cpp                        # Implementación
+│   │   └── resources.qrc                         # Recursos embebidos (schemas, defaults)
+│   │
+│   ├── ui/                                       # Interfaz gráfica Qt (opcional)
+│   │   ├── main_window.h                         # Ventana principal Qt Widgets
+│   │   ├── main_window.cpp                       # Implementación
+│   │   ├── main_window.ui                        # Qt Designer — layout principal
+│   │   ├── sensor_panel.ui                       # Qt Designer — panel de sensores
+│   │   ├── alert_dialog.ui                       # Qt Designer — diálogo de alertas
+│   │   ├── config_dialog.ui                      # Qt Designer — configuración
+│   │   └── resources.qrc                         # Recursos de UI (iconos, estilos)
+│   │
+│   ├── qml/                                      # Interfaz QML (pantalla táctil RPi)
+│   │   ├── main.qml                              # Ventana raíz
+│   │   ├── Dashboard.qml                         # Panel resumen de sensores
+│   │   ├── SensorCard.qml                        # Tarjeta individual de sensor
+│   │   ├── AlertBanner.qml                       # Banner de alertas activas
+│   │   ├── StatusBar.qml                         # WiFi, cloud, uptime, CPU temp
+│   │   ├── ConfigScreen.qml                      # Pantalla de configuración
+│   │   ├── CalibrationScreen.qml                 # Pantalla de calibración
+│   │   └── qmldir                                # Registro de módulos QML
 │   │
 │   └── tests/                                    # Tests unitarios y de integración
-│       ├── CMakeLists.txt                        # Targets de test (CTest)
-│       ├── test_sensordata.cpp                   # Tests de SensorData serialización
-│       ├── test_alertrule.cpp                    # Tests de AlertRule evaluación
-│       ├── test_configloader.cpp                 # Tests de carga de config
-│       ├── test_jsonformatter.cpp                # Tests de formateo JSON
-│       ├── test_ds18b20driver.cpp                # Tests DS18B20 simulación
-│       ├── test_dht22driver.cpp                  # Tests DHT22 simulación
-│       ├── test_bh1750driver.cpp                 # Tests BH1750 simulación
-│       ├── test_soildriver.cpp                   # Tests soil simulación
-│       ├── test_mhz19cdriver.cpp                 # Tests MHZ19C simulación
+│       ├── CMakeLists.txt                        # Targets CTest
+│       ├── test_cli.cpp                          # Tests del parser CLI
+│       ├── test_sensor_data.cpp                  # Tests de SensorData
+│       ├── test_alert_rule.cpp                   # Tests de AlertRule
+│       ├── test_config_loader.cpp                # Tests de ConfigLoader
+│       ├── test_json_formatter.cpp               # Tests de JSON
+│       ├── test_ds18b20.cpp                      # Tests DS18B20
+│       ├── test_dht22.cpp                        # Tests DHT22
+│       ├── test_bh1750.cpp                       # Tests BH1750
+│       ├── test_soil.cpp                         # Tests Soil
+│       ├── test_mhz19c.cpp                       # Tests MHZ19C
+│       ├── test_driver_factory.cpp               # Tests DriverFactory
 │       ├── test_sysinfo.cpp                      # Tests sysinfo
-│       ├── test_gateway_cycle.cpp                # Tests ciclo completo del daemon
-│       └── test_datastore.cpp                    # Tests persistencia local
+│       ├── test_gateway_cycle.cpp                # Tests ciclo daemon
+│       ├── test_data_store.cpp                   # Tests persistencia
+│       └── test_alert_engine.cpp                 # Tests motor de alertas
 │
 ├── bin/                                          # Scripts wrapper
-│   ├── echosmart-gateway                         # Wrapper bash del daemon
-│   └── echosmart-gateway-setup                   # Wizard interactivo
+│   └── echosmart-gateway-setup                   # Wrapper legacy (llama `echosmart setup`)
 ├── debian/                                       # Empaquetado .deb (debhelper 13)
-│   ├── control                                   # Metadatos del paquete + deps Qt
+│   ├── control                                   # Metadatos del paquete
 │   ├── rules                                     # cmake build + install
 │   ├── changelog                                 # Historial de versiones
 │   ├── compat                                    # Nivel 13
 │   ├── postinst                                  # Post-instalación (usuario, systemd)
 │   ├── prerm                                     # Pre-remoción (stop servicio)
-│   └── echosmart-gateway.service                 # Unidad systemd hardened
+│   └── echosmart-gateway.service                 # Unidad systemd: ExecStart=/usr/bin/echosmart run
 ├── sensors.json                                  # Config sensores por defecto
 ├── .env.example                                  # Variables de entorno por defecto
 └── README.md                                     # Instrucciones build + instalación
 ```
 
-#### 1.2.1 Build System — CMakeLists.txt raíz
-- [ ] Crear `gateway/cpp/CMakeLists.txt` — proyecto raíz `echosmart`
+#### 1.2.1 Build System — CMakeLists.txt
+- [ ] Crear `gateway/cpp/CMakeLists.txt` — proyecto raíz
   - [ ] `cmake_minimum_required(VERSION 3.16)`
   - [ ] `project(echosmart VERSION 1.0.0 LANGUAGES CXX)`
   - [ ] `set(CMAKE_CXX_STANDARD 17)` + `CMAKE_CXX_STANDARD_REQUIRED ON`
   - [ ] `find_package(Qt6 COMPONENTS Core Quick Widgets QUIET)` (opcional)
-  - [ ] `add_subdirectory(shared)`
-  - [ ] `add_subdirectory(echosmart-sensor-read)`
-  - [ ] `add_subdirectory(echosmart-sysinfo)`
-  - [ ] `add_subdirectory(echosmart-gateway)`
-  - [ ] `add_subdirectory(tests)`
-  - [ ] Opciones: `-DBUILD_QML=ON/OFF`, `-DBUILD_TESTS=ON/OFF`
+  - [ ] Compilar todas las fuentes en un solo target `echosmart`
+  - [ ] `target_sources(echosmart PRIVATE main.cpp cli.cpp commands/*.cpp drivers/*.cpp core/*.cpp shared/*.cpp)`
+  - [ ] Si Qt6 encontrado: agregar `ui/*.cpp ui/*.ui qml/*.qml` y `resources.qrc`
+  - [ ] `install(TARGETS echosmart RUNTIME DESTINATION bin)`
+  - [ ] Opciones: `-DBUILD_QML=ON/OFF`, `-DBUILD_UI=ON/OFF`, `-DBUILD_TESTS=ON/OFF`
   - [ ] Cross-compilación: `CMAKE_TOOLCHAIN_FILE` para arm64
+  - [ ] Flags: `-Wall -Wextra -Wpedantic -O2`
 
-#### 1.2.2 Build System — CMakeLists.txt por sub-directorio
-- [ ] Crear `gateway/cpp/shared/CMakeLists.txt` — target `echosmart-shared` (STATIC)
-- [ ] Crear `gateway/cpp/echosmart-sensor-read/CMakeLists.txt` — target `echosmart-sensor-read`
-- [ ] Crear `gateway/cpp/echosmart-sysinfo/CMakeLists.txt` — target `echosmart-sysinfo`
-- [ ] Crear `gateway/cpp/echosmart-gateway/CMakeLists.txt` — target `echosmart-gateway-bin`
-- [ ] Crear `gateway/cpp/tests/CMakeLists.txt` — targets de test con CTest
-- [ ] Cada target linkea contra `echosmart-shared`
-- [ ] Flags de compilación: `-Wall -Wextra -Wpedantic -O2`
+#### 1.2.2 Entry Point — `main.cpp` + `cli.h` / `cli.cpp`
+- [ ] Crear `gateway/cpp/main.cpp`
+  - [ ] `int main(int argc, char* argv[])` — parsear args, dispatch a comando
+  - [ ] Si `argc < 2` → imprimir ayuda y salir con código 1
+  - [ ] Mapa de comandos: `{"read", "sysinfo", "run", "setup", "status", "calibrate", "list", "test", "version", "help"}`
+  - [ ] Dispatch: `cmd_map[argv[1]](argc, argv)` → código de salida
+  - [ ] Comando desconocido → `"error: unknown command '<cmd>'. Run 'echosmart help'.\n"` + exit 1
+- [ ] Crear `gateway/cpp/cli.h`
+  - [ ] `struct CliArgs` con: `std::string command`, `std::string input`, `std::map<std::string, std::string> args`
+  - [ ] `CliArgs parse(int argc, char* argv[])` — parser de `echosmart <cmd> <input> --<arg>=<val>`
+  - [ ] `std::string getArg(const std::string& name, const std::string& default_val = "")` — obtener arg
+  - [ ] `bool hasArg(const std::string& name)` — verificar arg existe
+  - [ ] `bool getBool(const std::string& name, bool default_val = false)` — arg como bool
+  - [ ] `int getInt(const std::string& name, int default_val = 0)` — arg como entero
+- [ ] Crear `gateway/cpp/cli.cpp`
+  - [ ] Parser: `argv[1]` = command, `argv[2]` = input (si no empieza con `--`), resto = args `--key=value`
+  - [ ] Soportar: `--simulate=true`, `--simulate` (sin valor = true), `--interval=30`
+  - [ ] Soportar: `--config=/path/to/file`, `--format=json`
+  - [ ] Validar: keys sólo contienen `[a-z0-9-]`, values no vacíos
 
 ### 1.3 Biblioteca Compartida (`shared/`)
 
@@ -728,277 +802,169 @@ gateway/
   - [ ] Embeber `default-alerts.json` (reglas de alerta por defecto)
   - [ ] Embeber `version.txt` (versión del build para runtime)
 
-### 1.4 Binario `echosmart-sensor-read` (lectura de sensores)
+### 1.4 Comando `echosmart read <sensor>` — Lectura de Sensores
 
-#### 1.4.1 `main.cpp` — Entry point
-- [ ] Crear `gateway/cpp/echosmart-sensor-read/main.cpp`
-  - [ ] Parsear argumentos: `<sensor_type> [--simulate] [--json] [--version] [--help]`
-  - [ ] Dispatch a la clase driver correcta según `sensor_type`
-  - [ ] `printUsage()` — lista de sensores y flags
-  - [ ] `printVersion()` — versión desde `version.h`
-  - [ ] Return 0 éxito, 1 error, 2 sensor no encontrado
+#### 1.4.1 `commands/cmd_read.h` / `cmd_read.cpp`
+- [ ] Crear `gateway/cpp/commands/cmd_read.h`
+  - [ ] `int cmd_read(const CliArgs& args)` — entry point del comando `read`
+  - [ ] Validar `args.input` ∈ {ds18b20, dht22, bh1750, soil, mhz19c}
+  - [ ] Obtener `--simulate=true|false` (default: false)
+  - [ ] Obtener `--format=json|text` (default: json)
+- [ ] Crear `gateway/cpp/commands/cmd_read.cpp`
+  - [ ] Instanciar driver vía `DriverFactory::create(args.input)`
+  - [ ] Llamar `driver->read(simulate)` → `SensorData`
+  - [ ] Imprimir resultado según `--format`
+  - [ ] Return 0 éxito, 1 sensor desconocido, 2 error de lectura
 
-#### 1.4.2 `sensorreader.h` / `sensorreader.cpp` — Interfaz base
-- [ ] Crear `gateway/cpp/echosmart-sensor-read/sensorreader.h`
-  - [ ] `class SensorReader` (base abstracta)
-  - [ ] `virtual SensorData read(bool simulate) = 0` — lectura (simulada o real)
-  - [ ] `virtual std::string sensorType() const = 0` — tipo ("ds18b20", etc.)
-  - [ ] `virtual std::string protocol() const = 0` — protocolo ("1-wire", etc.)
-  - [ ] `virtual bool isAvailable() const` — verifica hardware disponible
-  - [ ] `virtual ~SensorReader() = default`
-- [ ] Crear `gateway/cpp/echosmart-sensor-read/sensorreader.cpp`
-  - [ ] Implementar `isAvailable()` por defecto (return true en simulación)
-  - [ ] Helper `simulateValue(double lo, double hi)` — random uniforme
+#### 1.4.2 `drivers/sensor_driver.h` / `sensor_driver.cpp` — Clase base
+- [ ] Crear `gateway/cpp/drivers/sensor_driver.h`
+  - [ ] `class SensorDriver` (base abstracta)
+  - [ ] `virtual SensorData read(bool simulate) = 0`
+  - [ ] `virtual std::string sensorType() const = 0`
+  - [ ] `virtual std::string protocol() const = 0`
+  - [ ] `virtual bool isAvailable() const`
+  - [ ] `virtual ~SensorDriver() = default`
+- [ ] Crear `gateway/cpp/drivers/sensor_driver.cpp`
+  - [ ] `isAvailable()` default: true en simulación
+  - [ ] Helper `simulateValue(double lo, double hi)` — random con `<random>`
 
-#### 1.4.3 `ds18b20driver.h` / `ds18b20driver.cpp`
-- [ ] Crear `gateway/cpp/echosmart-sensor-read/drivers/ds18b20driver.h`
-  - [ ] `class DS18B20Driver : public SensorReader`
-  - [ ] Constructor: `DS18B20Driver(const std::string& device_id = "")`
+#### 1.4.3 `drivers/driver_factory.h` / `driver_factory.cpp`
+- [ ] Crear `gateway/cpp/drivers/driver_factory.h`
+  - [ ] `static std::unique_ptr<SensorDriver> create(const std::string& type)`
+  - [ ] `static std::vector<std::string> listTypes()`
+- [ ] Crear `gateway/cpp/drivers/driver_factory.cpp`
+  - [ ] Mapa: ds18b20, dht22, bh1750, soil, mhz19c → driver class
+
+#### 1.4.4 `drivers/ds18b20_driver.h` / `ds18b20_driver.cpp`
+- [ ] Crear `gateway/cpp/drivers/ds18b20_driver.h`
+  - [ ] `class DS18B20Driver : public SensorDriver`
   - [ ] `SensorData read(bool simulate) override`
-  - [ ] `std::string sensorType() const override` → `"ds18b20"`
-  - [ ] `std::string protocol() const override` → `"1-wire"`
-  - [ ] `bool isAvailable() const override` — verifica `/sys/bus/w1/devices/28-*`
-  - [ ] `std::vector<std::string> listDevices()` — enumerar sensores en bus
-- [ ] Crear `gateway/cpp/echosmart-sensor-read/drivers/ds18b20driver.cpp`
-  - [ ] `read(simulate=true)`: random entre 15.0 y 35.0 °C
-  - [ ] `read(simulate=false)`: abrir `/sys/bus/w1/devices/{id}/w1_slave`, parsear `t=XXXXX`
-  - [ ] Validación: rechazar si temp < -55 o > 125
-  - [ ] `listDevices()`: listar directorios `28-*` en `/sys/bus/w1/devices/`
+  - [ ] `std::string sensorType()` → `"ds18b20"`, `protocol()` → `"1-wire"`
+  - [ ] `std::vector<std::string> listDevices()` — enumerar bus 1-Wire
+- [ ] Crear `gateway/cpp/drivers/ds18b20_driver.cpp`
+  - [ ] Simulación: random 15.0–35.0 °C
+  - [ ] Real: parsear `/sys/bus/w1/devices/{id}/w1_slave`, campo `t=XXXXX`
+  - [ ] Validación: rechazar < -55 o > 125
 
-#### 1.4.4 `dht22driver.h` / `dht22driver.cpp`
-- [ ] Crear `gateway/cpp/echosmart-sensor-read/drivers/dht22driver.h`
-  - [ ] `class DHT22Driver : public SensorReader`
-  - [ ] Constructor: `DHT22Driver(int gpio_pin = 17)`
-  - [ ] `SensorData read(bool simulate) override` — retorna temp (humidity en campo extra)
-  - [ ] `double lastHumidity() const` — último valor de humedad leído
-  - [ ] `std::string sensorType() const override` → `"dht22"`
-  - [ ] `std::string protocol() const override` → `"gpio"`
-- [ ] Crear `gateway/cpp/echosmart-sensor-read/drivers/dht22driver.cpp`
-  - [ ] `read(simulate=true)`: random temp 15-35, humidity 40-90
-  - [ ] `read(simulate=false)`: lectura GPIO con libgpiod o bit-banging
-  - [ ] CRC8 checksum validation
-  - [ ] Rate limiting: ≥2 segundos entre lecturas
-
-#### 1.4.5 `bh1750driver.h` / `bh1750driver.cpp`
-- [ ] Crear `gateway/cpp/echosmart-sensor-read/drivers/bh1750driver.h`
-  - [ ] `class BH1750Driver : public SensorReader`
-  - [ ] Constructor: `BH1750Driver(int i2c_bus = 1, uint8_t address = 0x23)`
+#### 1.4.5 `drivers/dht22_driver.h` / `dht22_driver.cpp`
+- [ ] Crear `gateway/cpp/drivers/dht22_driver.h`
+  - [ ] `class DHT22Driver : public SensorDriver`
   - [ ] `SensorData read(bool simulate) override`
-  - [ ] `std::string sensorType() const override` → `"bh1750"`
-  - [ ] `std::string protocol() const override` → `"i2c"`
-  - [ ] `bool isAvailable() const override` — verifica `/dev/i2c-{bus}`
-- [ ] Crear `gateway/cpp/echosmart-sensor-read/drivers/bh1750driver.cpp`
-  - [ ] `read(simulate=true)`: random entre 100 y 50000 lux
-  - [ ] `read(simulate=false)`: `open("/dev/i2c-1")`, `ioctl(fd, I2C_SLAVE, addr)`, write cmd 0x10, read 2 bytes, convertir a lux
-  - [ ] Validación: descartar > 65535 lux
+  - [ ] `double lastHumidity() const`
+- [ ] Crear `gateway/cpp/drivers/dht22_driver.cpp`
+  - [ ] Simulación: temp 15–35, humidity 40–90
+  - [ ] Real: GPIO con libgpiod, CRC8 checksum, rate limit ≥2s
 
-#### 1.4.6 `soildriver.h` / `soildriver.cpp`
-- [ ] Crear `gateway/cpp/echosmart-sensor-read/drivers/soildriver.h`
-  - [ ] `class SoilDriver : public SensorReader`
-  - [ ] Constructor: `SoilDriver(int i2c_bus = 1, uint8_t ads_address = 0x48, int channel = 0)`
-  - [ ] `SensorData read(bool simulate) override`
-  - [ ] `std::string sensorType() const override` → `"soil_moisture"`
-  - [ ] `std::string protocol() const override` → `"i2c"`
-  - [ ] `void calibrate(int dry_raw, int wet_raw)` — establecer curva de calibración
-  - [ ] `double rawToPercent(int raw_value) const` — conversión
-- [ ] Crear `gateway/cpp/echosmart-sensor-read/drivers/soildriver.cpp`
-  - [ ] `read(simulate=true)`: random entre 10% y 95%
-  - [ ] `read(simulate=false)`: configurar ADS1115 canal via I2C, leer 16-bit ADC, convertir a %
-  - [ ] Calibración lineal: `pct = (raw - dry) / (wet - dry) * 100`
-  - [ ] Validación: clamp a 0-100%
+#### 1.4.6 `drivers/bh1750_driver.h` / `bh1750_driver.cpp`
+- [ ] Crear `gateway/cpp/drivers/bh1750_driver.h`
+  - [ ] `class BH1750Driver : public SensorDriver`
+  - [ ] Constructor con `i2c_bus=1, address=0x23`
+- [ ] Crear `gateway/cpp/drivers/bh1750_driver.cpp`
+  - [ ] Simulación: random 100–50000 lux
+  - [ ] Real: `ioctl(I2C_SLAVE, 0x23)`, write 0x10, read 2 bytes
 
-#### 1.4.7 `mhz19cdriver.h` / `mhz19cdriver.cpp`
-- [ ] Crear `gateway/cpp/echosmart-sensor-read/drivers/mhz19cdriver.h`
-  - [ ] `class MHZ19CDriver : public SensorReader`
-  - [ ] Constructor: `MHZ19CDriver(const std::string& uart_port = "/dev/serial0", int baudrate = 9600)`
-  - [ ] `SensorData read(bool simulate) override`
-  - [ ] `std::string sensorType() const override` → `"mhz19c"`
-  - [ ] `std::string protocol() const override` → `"uart"`
-  - [ ] `bool isAvailable() const override` — verifica puerto serial existe
-  - [ ] `bool sendCalibration()` — enviar comando de calibración ABC
-  - [ ] `bool isWarmedUp() const` — ≥3 minutos desde inicio
-- [ ] Crear `gateway/cpp/echosmart-sensor-read/drivers/mhz19cdriver.cpp`
-  - [ ] `read(simulate=true)`: random entre 400 y 2000 ppm
-  - [ ] `read(simulate=false)`: abrir serial con `termios`, enviar `{0xFF,0x01,0x86,0x00,...}`, leer 9 bytes, parsear ppm = byte[2]*256 + byte[3], verificar checksum
-  - [ ] Checksum: `0xFF - (sum bytes 1..7)` + 1
-  - [ ] Timeout: 5 segundos, retornar error si no hay respuesta
+#### 1.4.7 `drivers/soil_driver.h` / `soil_driver.cpp`
+- [ ] Crear `gateway/cpp/drivers/soil_driver.h`
+  - [ ] `class SoilDriver : public SensorDriver`
+  - [ ] `void calibrate(int dry_raw, int wet_raw)`
+  - [ ] `double rawToPercent(int raw) const`
+- [ ] Crear `gateway/cpp/drivers/soil_driver.cpp`
+  - [ ] Simulación: random 10–95%
+  - [ ] Real: ADS1115 via I2C, lineal `(raw-dry)/(wet-dry)*100`, clamp 0–100
 
-#### 1.4.8 `resources.qrc` (sensor-read)
-- [ ] Crear `gateway/cpp/echosmart-sensor-read/resources.qrc`
-  - [ ] Embeber texto de ayuda (`usage.txt`)
-  - [ ] Embeber schemas JSON de validación de salida
+#### 1.4.8 `drivers/mhz19c_driver.h` / `mhz19c_driver.cpp`
+- [ ] Crear `gateway/cpp/drivers/mhz19c_driver.h`
+  - [ ] `class MHZ19CDriver : public SensorDriver`
+  - [ ] `bool sendCalibration()`, `bool isWarmedUp() const`
+- [ ] Crear `gateway/cpp/drivers/mhz19c_driver.cpp`
+  - [ ] Simulación: random 400–2000 ppm
+  - [ ] Real: UART termios, cmd `{0xFF,0x01,0x86,...}`, checksum, timeout 5s
 
-### 1.5 Binario `echosmart-sysinfo` (diagnósticos del sistema)
+### 1.5 Comando `echosmart sysinfo` — Diagnósticos del Sistema
 
-#### 1.5.1 `main.cpp`
-- [ ] Crear `gateway/cpp/echosmart-sysinfo/main.cpp`
-  - [ ] Parsear argumentos: `[--version] [--help] [--format json|text]`
-  - [ ] Instanciar `SysInfo`, llamar `collect()`, imprimir resultado
-  - [ ] Return 0 siempre (diagnósticos no fallan)
+#### 1.5.1 `commands/cmd_sysinfo.h` / `cmd_sysinfo.cpp`
+- [ ] Crear `gateway/cpp/commands/cmd_sysinfo.h`
+  - [ ] `int cmd_sysinfo(const CliArgs& args)`
+  - [ ] `--format=json|text` (default: json)
+- [ ] Crear `gateway/cpp/commands/cmd_sysinfo.cpp`
+  - [ ] Instanciar `SysInfo`, `collect()`, imprimir según formato
 
-#### 1.5.2 `sysinfo.h` / `sysinfo.cpp`
-- [ ] Crear `gateway/cpp/echosmart-sysinfo/sysinfo.h`
-  - [ ] `struct SystemInfo` con: `hostname`, `model`, `cpu_temp_c`, `uptime_s`, `load_avg[3]`, `mem_total_kb`, `mem_available_kb`, `disk_total_bytes`, `disk_free_bytes`, `version`
-  - [ ] `class SysInfo`
-  - [ ] `SystemInfo collect()` — recopilar todos los datos
-  - [ ] `std::string toJson(const SystemInfo& info)` — serializar a JSON
-  - [ ] `std::string toText(const SystemInfo& info)` — serializar a texto legible
-- [ ] Crear `gateway/cpp/echosmart-sysinfo/sysinfo.cpp`
-  - [ ] `getHostname()` — leer `/etc/hostname`
-  - [ ] `getModel()` — leer `/proc/device-tree/model`
-  - [ ] `getCpuTemp()` — leer `/sys/class/thermal/thermal_zone0/temp`, dividir /1000
-  - [ ] `getUptime()` — leer `/proc/uptime`, primer campo
-  - [ ] `getLoadAvg()` — leer `/proc/loadavg`, primeros 3 campos
-  - [ ] `getMemory()` — leer `/proc/meminfo`, parsear MemTotal y MemAvailable
-  - [ ] `getDisk()` — ejecutar `df -B1 /`, parsear total y available
+#### 1.5.2 `commands/sysinfo.h` / `sysinfo.cpp`
+- [ ] Crear `gateway/cpp/commands/sysinfo.h`
+  - [ ] `struct SystemInfo` — hostname, model, cpu_temp, uptime, load, mem, disk, version
+  - [ ] `class SysInfo` — `collect()`, `toJson()`, `toText()`
+- [ ] Crear `gateway/cpp/commands/sysinfo.cpp`
+  - [ ] Leer `/etc/hostname`, `/proc/device-tree/model`, `/sys/class/thermal/thermal_zone0/temp`
+  - [ ] Leer `/proc/uptime`, `/proc/loadavg`, `/proc/meminfo`
+  - [ ] Usar `statvfs("/")` para disco
 
-#### 1.5.3 `sysinfo.ui`
-- [ ] Crear `gateway/cpp/echosmart-sysinfo/sysinfo.ui` (reservado para futuro GUI diagnóstico)
-  - [ ] Formulario Qt Designer con labels para CPU, RAM, disco, uptime
-  - [ ] Layout vertical con QGroupBox por categoría
+### 1.6 Comando `echosmart run` — Daemon Principal
 
-#### 1.5.4 `resources.qrc` (sysinfo)
-- [ ] Crear `gateway/cpp/echosmart-sysinfo/resources.qrc`
-  - [ ] Embeber plantilla de salida texto
+#### 1.6.1 `commands/cmd_run.h` / `cmd_run.cpp`
+- [ ] Crear `gateway/cpp/commands/cmd_run.h`
+  - [ ] `int cmd_run(const CliArgs& args)`
+  - [ ] Args: `--config=`, `--sensors=`, `--simulate=`, `--once=`, `--interval=`
+- [ ] Crear `gateway/cpp/commands/cmd_run.cpp`
+  - [ ] Signal handlers: SIGINT/SIGTERM → `g_running = false`
+  - [ ] Cargar config + sensors, instanciar Gateway, `run()` o `runOnce()`
 
-### 1.6 Binario `echosmart-gateway` (daemon principal)
+#### 1.6.2 Comandos adicionales
+- [ ] `commands/cmd_setup.h/.cpp` — wizard interactivo, escribe `/etc/echosmart/gateway.env`
+- [ ] `commands/cmd_status.h/.cpp` — sysinfo + última lectura de cada sensor
+- [ ] `commands/cmd_calibrate.h/.cpp` — `echosmart calibrate soil --dry=3200 --wet=1400`
+- [ ] `commands/cmd_list.h/.cpp` — listar sensores de `sensors.json`
+- [ ] `commands/cmd_test.h/.cpp` — probar sensores, imprimir PASS/FAIL
+- [ ] `commands/cmd_version.h/.cpp` — `"echosmart v{ES_VERSION_STRING}\n"`
+- [ ] `commands/cmd_help.h/.cpp` — ayuda general o por comando
 
-#### 1.6.1 `main.cpp` — Entry point del daemon
-- [ ] Crear `gateway/cpp/echosmart-gateway/main.cpp`
-  - [ ] Parsear argumentos: `[--config path] [--sensors path] [--simulate] [--once] [--interval N] [--version] [--help]`
-  - [ ] Instalar signal handlers: SIGINT, SIGTERM → `g_running = false`
-  - [ ] Instanciar `Gateway` con config y sensor list
-  - [ ] Llamar `gateway.run()` (loop principal)
-  - [ ] Return 0 en apagado limpio, 1 en error
+#### 1.6.3 `core/gateway.h` / `core/gateway.cpp`
+- [ ] Crear `gateway/cpp/core/gateway.h`
+  - [ ] `class Gateway` — `run()`, `runOnce()`, `shutdown()`, `pollCount()`, `isRunning()`
+- [ ] Crear `gateway/cpp/core/gateway.cpp`
+  - [ ] `runOnce()`: pollAll → evaluate → save → sync
 
-#### 1.6.2 `gateway.h` / `gateway.cpp` — Orquestador
-- [ ] Crear `gateway/cpp/echosmart-gateway/gateway.h`
-  - [ ] `class Gateway`
-  - [ ] Constructor: `Gateway(const GatewayConfig& cfg, const std::vector<SensorEntry>& sensors)`
-  - [ ] `void run()` — loop principal (while g_running)
-  - [ ] `void runOnce()` — un solo ciclo de polling
-  - [ ] `void shutdown()` — apagado limpio
-  - [ ] `int pollCount() const` — número de ciclos ejecutados
-  - [ ] `bool isRunning() const`
-- [ ] Crear `gateway/cpp/echosmart-gateway/gateway.cpp`
-  - [ ] `run()`: log inicio, loop { `runOnce()`, sleep interval }, log fin
-  - [ ] `runOnce()`: para cada sensor → `poller.poll()` → `alertEngine.evaluate()` → `dataStore.save()` → `cloudSyncer.sync()`
-  - [ ] Sleep en incrementos de 1s para reaccionar a SIGTERM rápido
+#### 1.6.4 `core/sensor_poller.h` / `core/sensor_poller.cpp`
+- [ ] Crear `gateway/cpp/core/sensor_poller.h` / `.cpp`
+  - [ ] `poll(SensorEntry)` — instanciar driver, leer, retornar SensorData
+  - [ ] `pollAll(vector<SensorEntry>)` — iterar, log errores
+  - [ ] Timeout 10s por sensor
 
-#### 1.6.3 `sensorpoller.h` / `sensorpoller.cpp`
-- [ ] Crear `gateway/cpp/echosmart-gateway/sensorpoller.h`
-  - [ ] `class SensorPoller`
-  - [ ] Constructor: `SensorPoller(bool simulate)`
-  - [ ] `SensorData poll(const SensorEntry& sensor)` — invoca binario sensor-read
-  - [ ] `std::vector<SensorData> pollAll(const std::vector<SensorEntry>& sensors)`
-  - [ ] Private: `std::string execBinary(const std::string& cmd)` — fork+exec
-- [ ] Crear `gateway/cpp/echosmart-gateway/sensorpoller.cpp`
-  - [ ] `poll()`: construir comando `echosmart-sensor-read <type> [--simulate]`, ejecutar con `popen()`, parsear JSON de stdout
-  - [ ] `pollAll()`: iterar sensores, recopilar `SensorData`, log errores
-  - [ ] Timeout de 10s por sensor (kill proceso si no responde)
+#### 1.6.5 `core/alert_engine.h` / `core/alert_engine.cpp`
+- [ ] Crear `gateway/cpp/core/alert_engine.h` / `.cpp`
+  - [ ] `evaluate(SensorData)` — evaluar reglas, cooldown, retornar alertas
 
-#### 1.6.4 `alertengine.h` / `alertengine.cpp`
-- [ ] Crear `gateway/cpp/echosmart-gateway/alertengine.h`
-  - [ ] `class AlertEngine`
-  - [ ] Constructor: `AlertEngine(const std::vector<AlertRule>& rules)`
-  - [ ] `std::vector<std::string> evaluate(const SensorData& reading)` — evaluar y retornar alertas
-  - [ ] `void addRule(const AlertRule& rule)`
-  - [ ] `void clearRules()`
-  - [ ] `int alertCount() const` — total de alertas generadas
-  - [ ] Private: `std::map<std::string, int64_t> cooldowns_` — última alerta por regla
-- [ ] Crear `gateway/cpp/echosmart-gateway/alertengine.cpp`
-  - [ ] `evaluate()`: iterar reglas, evaluar cada una, verificar cooldown, log alertas
-  - [ ] Cooldown: no repetir misma alerta dentro de `rule.cooldown_seconds`
-  - [ ] Formato de alerta: `"ALERT [CRITICAL] Temperatura above 40°C (value=42.5)"`
+#### 1.6.6 `core/data_store.h` / `core/data_store.cpp`
+- [ ] Crear `gateway/cpp/core/data_store.h` / `.cpp`
+  - [ ] `save()`, `saveAlert()`, `getUnsynced()`, `cleanup()`, `pendingCount()`
+  - [ ] Ficheros JSONL rotativos: `readings-YYYYMMDD.jsonl`
 
-#### 1.6.5 `datastore.h` / `datastore.cpp`
-- [ ] Crear `gateway/cpp/echosmart-gateway/datastore.h`
-  - [ ] `class DataStore`
-  - [ ] Constructor: `DataStore(const std::string& data_dir = "/var/lib/echosmart/")`
-  - [ ] `void save(const SensorData& reading)` — persistir a disco
-  - [ ] `void saveAlert(const std::string& alert_msg)` — persistir alerta
-  - [ ] `std::vector<SensorData> getUnsynced(int limit = 100)` — lecturas no sincronizadas
-  - [ ] `void markSynced(const std::vector<int64_t>& timestamps)` — marcar como sincronizadas
-  - [ ] `void cleanup(int max_age_days = 7)` — eliminar datos antiguos
-  - [ ] `int pendingCount() const`
-- [ ] Crear `gateway/cpp/echosmart-gateway/datastore.cpp`
-  - [ ] `save()`: append a fichero JSONL rotativo (`readings-YYYYMMDD.jsonl`)
-  - [ ] `saveAlert()`: append a `alerts-YYYYMMDD.jsonl`
-  - [ ] `getUnsynced()`: leer ficheros recientes, filtrar no sincronizados
-  - [ ] `cleanup()`: eliminar ficheros más antiguos que max_age_days
-  - [ ] Crear directorio si no existe
+#### 1.6.7 `core/cloud_syncer.h` / `core/cloud_syncer.cpp`
+- [ ] Crear `gateway/cpp/core/cloud_syncer.h` / `.cpp`
+  - [ ] `sync(vector<SensorData>)` — HTTP POST batch, retry backoff
 
-#### 1.6.6 `cloudsyncer.h` / `cloudsyncer.cpp`
-- [ ] Crear `gateway/cpp/echosmart-gateway/cloudsyncer.h`
-  - [ ] `class CloudSyncer`
-  - [ ] Constructor: `CloudSyncer(const std::string& api_url, const std::string& api_key, const std::string& gateway_id)`
-  - [ ] `bool sync(const std::vector<SensorData>& readings)` — HTTP POST batch
-  - [ ] `bool isOnline() const` — último sync exitoso < 5 min
-  - [ ] `int failedAttempts() const`
-  - [ ] Private: `int backoff_seconds_` — backoff actual
-- [ ] Crear `gateway/cpp/echosmart-gateway/cloudsyncer.cpp`
-  - [ ] `sync()`: construir JSON array, HTTP POST a `{api_url}/api/v1/readings`, verificar 200/201
-  - [ ] HTTP con `libcurl` o `popen("curl ...")` como fallback
-  - [ ] Retry con backoff exponencial: 1s, 2s, 4s, 8s... max 5 min
-  - [ ] Log: lecturas enviadas, respuesta del servidor, errores
+#### 1.6.8 `core/mqtt_publisher.h` / `core/mqtt_publisher.cpp`
+- [ ] Crear `gateway/cpp/core/mqtt_publisher.h` / `.cpp`
+  - [ ] `connect()`, `publish(SensorData)`, `disconnect()`, LWT
 
-#### 1.6.7 `mqttpublisher.h` / `mqttpublisher.cpp`
-- [ ] Crear `gateway/cpp/echosmart-gateway/mqttpublisher.h`
-  - [ ] `class MqttPublisher`
-  - [ ] Constructor: `MqttPublisher(const std::string& broker, int port, const std::string& gateway_id)`
-  - [ ] `bool connect()` — conectar al broker MQTT
-  - [ ] `bool publish(const SensorData& reading)` — publicar lectura
-  - [ ] `bool publishAlert(const std::string& alert_msg)` — publicar alerta
-  - [ ] `void disconnect()`
-  - [ ] `bool isConnected() const`
-  - [ ] Topic format: `echosmart/{gateway_id}/sensors/{sensor_type}/reading`
-- [ ] Crear `gateway/cpp/echosmart-gateway/mqttpublisher.cpp`
-  - [ ] Implementar con `mosquitto_pub` via `popen()` (sin dependencia de libmosquitto)
-  - [ ] Fallback si mosquitto_pub no está: log warning y continuar
-  - [ ] LWT (Last Will): `echosmart/{gateway_id}/status` → `"offline"`
+### 1.6b Interfaz Gráfica Qt (opcional, BUILD_UI=ON / BUILD_QML=ON)
 
-#### 1.6.8 `gateway.ui` (reservado)
-- [ ] Crear `gateway/cpp/echosmart-gateway/gateway.ui`
-  - [ ] Formulario Qt Designer para futuro GUI de configuración local
-  - [ ] Tabs: "Sensores", "Alertas", "Configuración", "Sistema"
-  - [ ] Tabla de lecturas en tiempo real
+#### 1.6b.1 Formularios `.ui` (Qt Designer)
+- [ ] Crear `gateway/cpp/ui/main_window.ui` — layout con tabs
+- [ ] Crear `gateway/cpp/ui/sensor_panel.ui` — tabla de sensores live
+- [ ] Crear `gateway/cpp/ui/alert_dialog.ui` — alertas activas
+- [ ] Crear `gateway/cpp/ui/config_dialog.ui` — configuración
+- [ ] Crear `gateway/cpp/ui/main_window.h` / `main_window.cpp`
+- [ ] Crear `gateway/cpp/ui/resources.qrc` — iconos y estilos
 
-#### 1.6.9 `resources.qrc` (gateway)
-- [ ] Crear `gateway/cpp/echosmart-gateway/resources.qrc`
-  - [ ] Embeber `default-gateway.env` (configuración por defecto)
-  - [ ] Embeber `default-sensors.json` (sensores por defecto)
-  - [ ] Embeber `default-alerts.json` (reglas de alerta por defecto)
-  - [ ] Embeber QML files si `BUILD_QML=ON`
-
-#### 1.6.10 Interfaz QML — UI local (pantalla conectada al RPi)
-- [ ] Crear `gateway/cpp/echosmart-gateway/qml/main.qml`
-  - [ ] `ApplicationWindow` con título "EchoSmart Gateway"
-  - [ ] `StackView` para navegación entre paneles
-  - [ ] Barra lateral con iconos: Dashboard, Sensores, Alertas, Config
-  - [ ] Conexión a backend C++ via `Q_PROPERTY` / `Q_INVOKABLE`
-- [ ] Crear `gateway/cpp/echosmart-gateway/qml/Dashboard.qml`
-  - [ ] Grid de `SensorCard` para cada sensor registrado
-  - [ ] `StatusBar` en la parte superior
-  - [ ] `AlertBanner` si hay alertas activas
-  - [ ] Refresh automático cada polling interval
-- [ ] Crear `gateway/cpp/echosmart-gateway/qml/SensorCard.qml`
-  - [ ] Nombre del sensor (title)
-  - [ ] Valor actual + unidad (text grande)
-  - [ ] Indicador de estado: verde (OK), amarillo (warning), rojo (critical)
-  - [ ] Timestamp de última lectura
-  - [ ] Mini gráfica de últimas 10 lecturas (sparkline)
-- [ ] Crear `gateway/cpp/echosmart-gateway/qml/AlertBanner.qml`
-  - [ ] Lista de alertas activas con severidad y mensaje
-  - [ ] Color de fondo según severidad (amarillo/rojo)
-  - [ ] Botón "Dismiss" para limpiar alertas reconocidas
-- [ ] Crear `gateway/cpp/echosmart-gateway/qml/StatusBar.qml`
-  - [ ] Indicador de conexión WiFi (verde/rojo)
-  - [ ] Indicador de conexión cloud (verde/amarillo/rojo)
-  - [ ] Uptime del gateway
-  - [ ] Versión del software
-  - [ ] Temperatura CPU
-- [ ] Crear `gateway/cpp/echosmart-gateway/qml/qmldir`
-  - [ ] Registrar módulos: Dashboard, SensorCard, AlertBanner, StatusBar
+#### 1.6b.2 Interfaz QML (pantalla táctil)
+- [ ] Crear `gateway/cpp/qml/main.qml` — ApplicationWindow + StackView
+- [ ] Crear `gateway/cpp/qml/Dashboard.qml` — grid de SensorCard
+- [ ] Crear `gateway/cpp/qml/SensorCard.qml` — valor, unidad, estado, sparkline
+- [ ] Crear `gateway/cpp/qml/AlertBanner.qml` — alertas con severidad
+- [ ] Crear `gateway/cpp/qml/StatusBar.qml` — WiFi, cloud, uptime, CPU
+- [ ] Crear `gateway/cpp/qml/ConfigScreen.qml` — configuración
+- [ ] Crear `gateway/cpp/qml/CalibrationScreen.qml` — calibración
+- [ ] Crear `gateway/cpp/qml/qmldir` — registro de módulos
 
 ### 1.7 Tests Unitarios y de Integración (CTest)
 
@@ -1082,15 +1048,15 @@ gateway/
 
 #### 1.7.4 Tests de integración (binarios compilados)
 - [ ] Test de integración: compilar todos los binarios → verificar exit code 0
-- [ ] Test de integración: `echosmart-sysinfo --version` → contiene "1.0.0"
-- [ ] Test de integración: `echosmart-sensor-read ds18b20 --simulate` → JSON con "sensor":"ds18b20"
-- [ ] Test de integración: `echosmart-sensor-read dht22 --simulate` → JSON con "temperature" y "humidity"
-- [ ] Test de integración: `echosmart-sensor-read bh1750 --simulate` → JSON con "sensor":"bh1750"
-- [ ] Test de integración: `echosmart-sensor-read soil --simulate` → JSON con "sensor":"soil_moisture"
-- [ ] Test de integración: `echosmart-sensor-read mhz19c --simulate` → JSON con "sensor":"mhz19c"
-- [ ] Test de integración: `echosmart-sensor-read invalid_sensor` → exit code ≠ 0
-- [ ] Test de integración: `echosmart-gateway --simulate --once` → log "polling cycle start" y "polling cycle end"
-- [ ] Test de integración: `echosmart-gateway --version` → contiene "1.0.0"
+- [ ] Test de integración: `echosmart sysinfo --version=true` → contiene "1.0.0"
+- [ ] Test de integración: `echosmart read ds18b20 --simulate=true` → JSON con "sensor":"ds18b20"
+- [ ] Test de integración: `echosmart read dht22 --simulate=true` → JSON con "temperature" y "humidity"
+- [ ] Test de integración: `echosmart read bh1750 --simulate=true` → JSON con "sensor":"bh1750"
+- [ ] Test de integración: `echosmart read soil --simulate=true` → JSON con "sensor":"soil_moisture"
+- [ ] Test de integración: `echosmart read mhz19c --simulate=true` → JSON con "sensor":"mhz19c"
+- [ ] Test de integración: `echosmart read invalid_sensor` → exit code ≠ 0
+- [ ] Test de integración: `echosmart run --simulate=true --once=true` → log "polling cycle start" y "polling cycle end"
+- [ ] Test de integración: `echosmart version` → contiene "1.0.0"
 - [ ] Test de integración: verificar .deb se construye sin errores
 
 ### 1.8 Comunicaciones (MQTT + HTTP Sync)
@@ -1127,11 +1093,11 @@ gateway/
 - [ ] Actualizar `gateway/debian/prerm` con stop y disable de servicio
 
 #### 1.9.2 Contenido del .deb
-- [ ] `/usr/bin/echosmart-gateway` — wrapper shell del daemon
-- [ ] `/usr/bin/echosmart-gateway-bin` — binario C++ compilado
-- [ ] `/usr/bin/echosmart-sysinfo` — diagnósticos del sistema (C++)
-- [ ] `/usr/bin/echosmart-sensor-read` — lectura de sensores (C++)
-- [ ] `/usr/bin/echosmart-gateway-setup` — wizard de configuración (bash)
+- [ ] `/usr/bin/echosmart` — binario unificado del gateway
+- [ ] 
+- [ ] `/usr/bin/echosmart sysinfo` — diagnósticos del sistema (C++)
+- [ ] `/usr/bin/echosmart read` — lectura de sensores (C++)
+- [ ] `/usr/bin/echosmart setup` — wizard de configuración (bash)
 - [ ] `/etc/echosmart/gateway.env` — configuración por defecto (conffile)
 - [ ] `/etc/echosmart/sensors.json` — definición de sensores (conffile)
 - [ ] `/lib/systemd/system/echosmart-gateway.service` — unidad systemd
@@ -1149,11 +1115,11 @@ gateway/
 
 - [ ] Implementar mDNS/Zeroconf para descubrimiento en red local
 - [ ] Implementar API REST local ligera en el gateway (puerto 8080)
-  - [ ] `GET /api/status` — invoca `echosmart-sysinfo`, retorna JSON
+  - [ ] `GET /api/status` — invoca `echosmart sysinfo`, retorna JSON
   - [ ] `GET /api/readings` — últimas lecturas de cada sensor
   - [ ] `GET /api/config` — lee `/etc/echosmart/gateway.env`
   - [ ] `POST /api/config` — actualiza configuración y reinicia servicio
-  - [ ] `POST /api/restart` — `systemctl restart echosmart-gateway`
+  - [ ] `POST /api/restart` — `systemctl restart echosmart-gateway` (servicio systemd)
 - [ ] Identificación del gateway: hostname, MAC, serial, versión
 - [ ] Tests: descubrimiento, API local, actualización de config
 
@@ -3453,7 +3419,7 @@ desktop/
 - [ ] **Gateway Dockerfile** (`infra/docker/gateway.Dockerfile`):
   - [ ] Para testing en contenedor (sin GPIO real)
   - [ ] Modo simulación por defecto
-  - [ ] Health check: `echosmart-sysinfo --version`
+  - [ ] Health check: `echosmart sysinfo --version=true`
 - [ ] `docker-compose.prod.yml`:
   - [ ] Backend: gunicorn con 4 workers + uvicorn
   - [ ] Frontend: nginx optimizado
@@ -3826,11 +3792,11 @@ desktop/
 
 - [ ] **Raspberry Pi OS Lite** con actualizaciones de seguridad
 - [ ] **Paquete .deb `echosmart-gateway`** pre-instalado con:
-  - [ ] `/usr/bin/echosmart-gateway` — wrapper del daemon
-  - [ ] `/usr/bin/echosmart-gateway-bin` — binario C++ del daemon
-  - [ ] `/usr/bin/echosmart-sysinfo` — diagnósticos del sistema (C++)
-  - [ ] `/usr/bin/echosmart-sensor-read` — lectura de sensores (C++)
-  - [ ] `/usr/bin/echosmart-gateway-setup` — wizard de configuración
+  - [ ] `/usr/bin/echosmart` — binario unificado del gateway
+  - [ ] `/usr/bin/echosmart (binario)` — binario C++ del daemon
+  - [ ] `/usr/bin/echosmart sysinfo` — diagnósticos del sistema (C++)
+  - [ ] `/usr/bin/echosmart read` — lectura de sensores (C++)
+  - [ ] `/usr/bin/echosmart setup` — wizard de configuración
   - [ ] `/etc/echosmart/gateway.env` — configuración por defecto
   - [ ] `/etc/echosmart/sensors.json` — definición de sensores
   - [ ] `/lib/systemd/system/echosmart-gateway.service` — unidad systemd
@@ -3849,7 +3815,7 @@ desktop/
   - [ ] `echosmart-watchdog.service` — Monitor de salud
   - [ ] `echosmart-updater.timer` — Actualización automática diaria
 
-### 9.3 Script de Configuración del Gateway — `echosmart-gateway-setup`
+### 9.3 Script de Configuración del Gateway — `echosmart setup`
 
 - [ ] Crear script de configuración de primer boot:
   - [ ] **Paso 1: Nombre del gateway** — Identificador único (ej: `invernadero-norte-01`)
@@ -4053,7 +4019,7 @@ desktop/
 - [ ] Flashear con Balena Etcher o RPi Imager
 - [ ] Insertar microSD en Raspberry Pi
 - [ ] Conectar alimentación y red
-- [ ] Ejecutar wizard de configuración (`echosmart-gateway-setup`)
+- [ ] Ejecutar wizard de configuración (`echosmart setup`)
 - [ ] Verificar que el gateway aparece en el dashboard del servidor
 
 ### 11.3 Conexión Física de Sensores
@@ -4148,11 +4114,11 @@ desktop/
 
 - [ ] Crear procedimiento de QA por unidad antes de empaquetar:
   - [ ] Encender Raspberry Pi → boot completo < 60 s
-  - [ ] Ejecutar `echosmart-sysinfo` → JSON válido con modelo y versión
-  - [ ] Ejecutar `echosmart-sensor-read ds18b20 --simulate` → JSON válido
-  - [ ] Ejecutar `echosmart-gateway --simulate --once` → ciclo completo OK
+  - [ ] Ejecutar `echosmart sysinfo` → JSON válido con modelo y versión
+  - [ ] Ejecutar `echosmart read ds18b20 --simulate=true` → JSON válido
+  - [ ] Ejecutar `echosmart run --simulate=true --once=true` → ciclo completo OK
   - [ ] Verificar `systemctl status echosmart-gateway` → loaded
-  - [ ] Verificar wizard `echosmart-gateway-setup` → escribe config
+  - [ ] Verificar wizard `echosmart setup` → escribe config
 - [ ] Criterios de PASS/FAIL documentados
 - [ ] Registro de resultados QA por número de serie
 - [ ] Tasa de rechazo objetivo: < 2%
