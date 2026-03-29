@@ -1,8 +1,11 @@
 # EchoSmart — Lista de Tareas de Desarrollo Multiplataforma
 
 > Kit IoT de agricultura de precisión para monitoreo ambiental inteligente en invernaderos.
+> **Software propietario** — todo el stack es propiedad exclusiva del proyecto EchoSmart.
+> El dispositivo Raspberry Pi del kit se llama **EchoPy** y ejecuta el binario `echosmart`.
+> El servidor ejecuta un binario independiente **`echosmart-server`** con comandos propios.
 > Gateway implementado en **C++17 nativo** con empaquetado **.deb** para Raspberry Pi OS (arm64).
-> Producto comercializado como **kit llave en mano** (Raspberry Pi + sensores + microSD pre-grabada).
+> Producto comercializado como **kit llave en mano** (EchoPy + sensores + microSD pre-grabada + número de serie único).
 
 ---
 
@@ -509,22 +512,23 @@ A continuación se definen los **5 sensores** seleccionados para el proyecto. Ca
 > 🏛️ Todo el gateway se compila en **un solo binario `echosmart`** que expone
 > múltiples comandos con la sintaxis: `echosmart <command> <input> --<arg>=<value>`.
 > Los archivos fuente usan `.cpp`, `.h`, `.qml`, `.qrc` y `.ui`.
+> El dispositivo Raspberry Pi del kit se llama **EchoPy** — es el nombre comercial del gateway.
 
-#### Tabla de comandos del binario `echosmart`
+#### Tabla de comandos del binario `echosmart` (EchoPy / Gateway)
 
 | Comando | Input | Argumentos | Descripción |
 |---------|-------|------------|-------------|
 | `echosmart read` | `<sensor>` | `--simulate=true`, `--format=json` | Leer un sensor |
 | `echosmart sysinfo` | — | `--format=json\|text` | Diagnósticos del sistema |
 | `echosmart run` | — | `--config=<path>`, `--sensors=<path>`, `--simulate=true`, `--once=true`, `--interval=<sec>` | Ejecutar daemon de polling |
-| `echosmart setup` | — | `--config=<path>` | Wizard de primer arranque |
+| `echosmart setup` | — | `--config=<path>` | Wizard de primer arranque (vincula serial del kit) |
 | `echosmart status` | — | `--format=json\|text` | Estado del gateway y sensores |
 | `echosmart config` | `<scope>` | `--get=<key>`, `--set=<key>`, `--value=<value>`, `--file=<path>`, `--format=json\|text` | Leer, validar, exportar o actualizar configuración |
 | `echosmart discover` | `<scope>` | `--network=<cidr>`, `--timeout=<sec>`, `--format=json\|text` | Descubrir sensores, gateway, servidor o servicios locales |
 | `echosmart api` | `<resource>` | `--method=GET\|POST\|PUT\|DELETE`, `--path=<route>`, `--body=<json>`, `--token=<jwt>`, `--output=<file>` | Consumir la API backend y automatizar provisioning |
 | `echosmart web` | `<action>` | `--host=<host>`, `--port=<port>`, `--open=true`, `--profile=dev\|prod` | Servir o abrir consola web/local UI del gateway |
 | `echosmart server` | `<action>` | `--url=<server>`, `--api-key=<key>`, `--gateway-id=<id>`, `--format=json\|text` | Registrar, provisionar, diagnosticar o actualizar vínculo con servidor |
-| `echosmart cosmuodate` | `<component>` | `--check=true`, `--download=true`, `--apply=true`, `--channel=stable|beta`, `--version=<semver>` | Descargar, verificar y aplicar actualizaciones del ISO/sistema/app/sensores |
+| `echosmart cosmuodate` | `<component>` | `--check=true`, `--download=true`, `--apply=true`, `--channel=stable\|beta`, `--version=<semver>` | Descargar, verificar y aplicar actualizaciones del ISO/sistema/app/sensores |
 | `echosmart app` | `<target>` | `--platform=web\|mobile\|desktop`, `--pair=true`, `--bundle=true`, `--qr=true` | Integrar gateway con apps cliente |
 | `echosmart infra` | `<action>` | `--profile=dev\|staging\|prod`, `--compose=<file>`, `--check=true` | Orquestar infraestructura local/remota |
 | `echosmart calibrate` | `<sensor>` | `--dry=<val>`, `--wet=<val>`, `--ref=<val>` | Calibrar sensor |
@@ -532,6 +536,29 @@ A continuación se definen los **5 sensores** seleccionados para el proyecto. Ca
 | `echosmart test` | `<sensor>\|all` | `--simulate=true` | Probar sensores |
 | `echosmart version` | — | — | Mostrar versión |
 | `echosmart help` | `[command]` | — | Mostrar ayuda |
+
+#### Tabla de comandos del binario `echosmart-server` (Servidor)
+
+> 🖥️ Binario independiente para el servidor. Gestiona la infraestructura, usuarios, EchoPys, actualizaciones y ventas.
+
+| Comando | Input | Argumentos | Descripción |
+|---------|-------|------------|-------------|
+| `echosmart-server start` | — | `--port=<port>`, `--config=<path>`, `--workers=<n>` | Iniciar servidor (API + WebSocket + MQTT broker) |
+| `echosmart-server stop` | — | `--graceful=true` | Detener servidor limpiamente |
+| `echosmart-server status` | — | `--format=json\|text` | Estado de todos los servicios |
+| `echosmart-server setup` | — | `--domain=<domain>`, `--admin-email=<email>` | Wizard de configuración inicial del servidor |
+| `echosmart-server users` | `<action>` | `--email=<email>`, `--role=admin\|user`, `--suspend=true\|false` | Gestión de usuarios (crear, listar, suspender, eliminar) |
+| `echosmart-server serials` | `<action>` | `--batch=<n>`, `--prefix=<prefix>`, `--format=json\|csv`, `--export=<file>` | Generar, listar y gestionar números de serie para kits |
+| `echosmart-server echopy` | `<action>` | `--id=<echopy_id>`, `--serial=<serial>`, `--format=json\|text` | Gestión de EchoPys registrados (listar, ver, desvincular, suspender) |
+| `echosmart-server echopy-remote` | `<echopy_id>` | `--ssh=true`, `--user=<user>`, `--sudo=true`, `--command=<cmd>` | Conexión remota a un EchoPy (SSH con sudo, ejecutar comandos) |
+| `echosmart-server updates` | `<action>` | `--component=<comp>`, `--version=<semver>`, `--channel=stable\|beta`, `--publish=true` | Gestionar y publicar actualizaciones (Cosmuodate) |
+| `echosmart-server sales` | `<action>` | `--format=json\|csv`, `--from=<date>`, `--to=<date>` | Sistema de ventas: pedidos, inventario, reportes |
+| `echosmart-server backup` | `<action>` | `--output=<path>`, `--restore=<file>` | Backup y restauración de base de datos |
+| `echosmart-server logs` | `[service]` | `--tail=<n>`, `--follow=true`, `--level=<level>` | Ver logs del servidor y servicios |
+| `echosmart-server health` | — | `--format=json\|text` | Health check completo de todos los servicios |
+| `echosmart-server config` | `<scope>` | `--get=<key>`, `--set=<key>`, `--value=<value>` | Leer o actualizar configuración del servidor |
+| `echosmart-server version` | — | — | Mostrar versión del servidor |
+| `echosmart-server help` | `[command]` | — | Mostrar ayuda |
 
 #### Ejemplos de uso
 
@@ -1540,8 +1567,9 @@ gateway/
 
 - [x] Routers básicos implementados
 - [ ] **Auth Router** (`/api/v1/auth`):
-  - [ ] `POST /register` — Registro de usuario
-  - [ ] `POST /login` — Login con email/password
+  - [ ] `POST /register` — Registro de usuario (requiere serial válido del kit)
+  - [ ] `POST /login` — Login con email/password (usuario final)
+  - [ ] `POST /admin/login` — Login exclusivo para administradores (requiere rol admin + 2FA)
   - [ ] `POST /refresh` — Renovar access token
   - [ ] `POST /logout` — Invalidar tokens
   - [ ] `POST /forgot-password` — Solicitar reset
@@ -1549,6 +1577,26 @@ gateway/
   - [ ] `GET /me` — Perfil del usuario autenticado
   - [ ] `PUT /me` — Actualizar perfil propio
   - [ ] `PUT /me/password` — Cambiar contraseña
+- [ ] **Serials Router** (`/api/v1/serials`) — Gestión de números de serie:
+  - [ ] `POST /validate` — Validar que un serial existe, es válido y no está usado (público, usado durante registro)
+  - [ ] `GET /` — Listar todos los seriales (admin only, con filtros: estado, fecha, usuario)
+  - [ ] `POST /generate` — Generar batch de seriales nuevos (admin only, input: cantidad, prefijo)
+  - [ ] `GET /{serial}` — Detalle de un serial (admin only: estado, usuario, EchoPy vinculado)
+  - [ ] `POST /{serial}/revoke` — Revocar un serial (admin only)
+  - [ ] `GET /stats` — Estadísticas: generados, usados, disponibles, revocados (admin only)
+  - [ ] `GET /export` — Exportar seriales a CSV (admin only, para imprimir etiquetas)
+- [ ] **EchoPy Router** (`/api/v1/echopy`) — Gestión de dispositivos EchoPy:
+  - [ ] `POST /bind` — Vincular EchoPy a serial y usuario (usado durante registro/pairing desde app)
+  - [ ] `GET /` — Listar EchoPys del usuario autenticado (user) o todos (admin)
+  - [ ] `GET /{id}` — Detalle de EchoPy (info, sensores, estado, debug)
+  - [ ] `PUT /{id}` — Actualizar configuración del EchoPy
+  - [ ] `POST /{id}/unbind` — Desvincular EchoPy del usuario (admin only, libera serial)
+  - [ ] `POST /{id}/suspend` — Suspender servicio del EchoPy temporalmente (admin only)
+  - [ ] `POST /{id}/reactivate` — Reactivar servicio suspendido (admin only)
+  - [ ] `POST /{id}/reboot` — Reiniciar EchoPy remotamente (admin only)
+  - [ ] `POST /{id}/remote-command` — Ejecutar comando remoto en el EchoPy (admin only, SSH con sudo)
+  - [ ] `GET /{id}/diagnostics` — Info de depuración: CPU, RAM, disco, red, logs
+  - [ ] `GET /{id}/logs` — Últimas N líneas de logs del EchoPy
 - [ ] **Sensors Router** (`/api/v1/sensors`):
   - [ ] `GET /` — Listar sensores (con filtros, paginación, búsqueda)
   - [ ] `POST /` — Crear sensor
@@ -2082,10 +2130,13 @@ frontend/src/
 - [ ] Tests: navegación entre rutas, guards, redirects, 404
 - [ ] Agregar sección "CLI snippets" en la UI para copiar comandos `echosmart api`, `echosmart server`, `echosmart cosmuodate`, `echosmart app`
 
-### 3.6 Feature: Autenticación
+### 3.6 Feature: Autenticación (Login de Usuario y Admin separados)
+
+> 🔐 **Dos sistemas de login separados**: uno para el usuario final (`/login`) y otro para el administrador (`/admin/login`).
+> El registro de usuario requiere un **número de serie válido** del kit EchoPy.
 
 - [x] Implementar Login básico
-- [ ] **LoginPage** (debe verse como `mockup-web-login.png`):
+- [ ] **LoginPage** — Login del usuario final (debe verse como `mockup-web-login.png`):
   - [ ] Logo EchoSmart centrado arriba
   - [ ] Card con fondo `#111111` centrada en pantalla
   - [ ] Título: "Welcome Back" o "Iniciar Sesión"
@@ -2094,12 +2145,31 @@ frontend/src/
   - [ ] Checkbox "Remember me"
   - [ ] Botón "Iniciar Sesión" en verde `#00E676` con texto negro
   - [ ] Link "Forgot password?" debajo
-  - [ ] Link "Don't have an account? Sign up" abajo
+  - [ ] Link "¿No tienes cuenta? Regístrate" → `/register`
   - [ ] Validación en tiempo real (formato email, longitud password ≥ 8)
   - [ ] Loading state en botón durante request
-  - [ ] Mensajes de error: credenciales inválidas, cuenta desactivada, red
+  - [ ] Mensajes de error: credenciales inválidas, cuenta desactivada/suspendida, red
   - [ ] Redirect a dashboard después de login exitoso
   - [ ] Guardar tokens en localStorage con encriptación básica
+- [ ] **AdminLoginPage** — Login exclusivo del administrador (`/admin/login`):
+  - [ ] Mismo diseño que LoginPage pero con título "Administración EchoSmart"
+  - [ ] Solo acepta usuarios con rol `admin` o `superadmin`
+  - [ ] Redirect a `/admin/dashboard` después de login exitoso
+  - [ ] 2FA obligatorio para acceso admin
+- [ ] **RegisterPage** — Registro de usuario con número de serie:
+  - [ ] **Paso 1**: Input para número de serie del kit (formato `ES-YYYYMM-XXXX`)
+    - [ ] Texto: "Ingresa el número de serie de la etiqueta dentro de tu kit"
+    - [ ] Validación en tiempo real contra `POST /api/v1/serials/validate`
+    - [ ] Error si el serial ya fue registrado, no existe, o fue revocado
+  - [ ] **Paso 2**: Formulario de datos del usuario
+    - [ ] Nombre completo, email, password (con indicador de fortaleza), confirmar password
+    - [ ] Teléfono (opcional)
+    - [ ] Checkbox "Acepto términos y condiciones"
+  - [ ] **Paso 3**: Buscar EchoPy — instrucciones para vincular desde la app móvil
+    - [ ] Texto: "Descarga la app EchoSmart para vincular tu EchoPy"
+    - [ ] QR code para descargar la app
+    - [ ] O: botón "Ya vinculé mi EchoPy" → finalizar registro
+  - [ ] Progress steps indicator (3 pasos)
 - [ ] **ForgotPasswordPage**:
   - [ ] Input email + botón "Send Reset Link"
   - [ ] Confirmación: "Si el email existe, recibirás un enlace"
@@ -2111,18 +2181,23 @@ frontend/src/
 - [ ] **ProtectedRoute** (wrapper):
   - [ ] Verificar token válido antes de renderizar
   - [ ] Redirect a `/login` si no autenticado
-  - [ ] Verificar rol para rutas de admin
+  - [ ] Verificar rol para rutas de admin (`/admin/*` requiere rol admin)
+  - [ ] Verificar rol para rutas de usuario (`/dashboard/*` requiere rol user)
   - [ ] Refresh automático de token 5 min antes de expirar
 - [ ] **useAuth hook**:
   - [ ] `login(email, password): Promise<User>` — Login y guardar tokens
+  - [ ] `register(serial, userData): Promise<User>` — Registro con serial
   - [ ] `logout(): void` — Limpiar tokens, redirect a login
   - [ ] `isAuthenticated: boolean` — Reactivo
+  - [ ] `isAdmin: boolean` — Verificar si es admin
   - [ ] `user: User | null` — Datos del usuario actual
   - [ ] `hasRole(role: string): boolean` — Verificar permisos
   - [ ] `refreshToken(): Promise<void>` — Refresh automático
-- [ ] Tests: login flow, token refresh, protected routes, role check, error states
+- [ ] Tests: login flow, admin login, registration with serial, token refresh, protected routes, role check, error states
 
-### 3.7 Feature: Dashboard (como `mockup-web-dashboard.png`)
+### 3.7 Feature: Dashboard del Usuario (como `mockup-web-dashboard.png`)
+
+> 👤 **El usuario final solo tiene acceso a la información de SU EchoPy y su invernadero.** No puede ver otros usuarios, otros EchoPys ni configuraciones del servidor.
 
 - [x] Dashboard básico con gráficas
 - [ ] **DashboardPage** — Layout idéntico al mockup:
@@ -2293,22 +2368,78 @@ frontend/src/
 ### 3.13 Feature: Panel de Administración (como `mockup-web-users.png`)
 
 - [x] Admin panel básico
+- [ ] **Login separado para administrador** — ruta `/admin/login` con validación de rol admin
 - [ ] **UsersPage** (admin only, como `mockup-web-users.png`):
-  - [ ] Contadores en cards: Total Users, Active, Admins, Pending
-  - [ ] Tabla de usuarios: nombre, email, rol (badge), estado (dot), último login, acciones
-  - [ ] Filtros: rol, estado
-  - [ ] Búsqueda por nombre/email
-  - [ ] Acciones por usuario: editar rol, desactivar, eliminar, reset password
+  - [ ] Contadores en cards: Total Users, Active, Admins, Pending, Suspended
+  - [ ] Tabla de usuarios: nombre, email, rol (badge), estado (dot), último login, EchoPy vinculado, acciones
+  - [ ] Filtros: rol, estado, fecha de registro
+  - [ ] Búsqueda por nombre/email/serial
+  - [ ] Acciones por usuario: editar rol, suspender servicio temporalmente, reactivar, eliminar, reset password
   - [ ] Modal de invitación: enviar email de invitación con rol asignado
+  - [ ] Vista de actividad del usuario: último login, lecturas, alertas
+
+- [ ] **SerialCodesPage** (admin only) — Generación y gestión de números de serie:
+  - [ ] Generador de seriales: input para cantidad (batch), prefijo, formato `ES-YYYYMM-XXXX`
+  - [ ] Botón "Generar" → `POST /api/v1/admin/serials/generate` con cantidad
+  - [ ] Tabla de seriales: código, estado (disponible/registrado/revocado), usuario asignado, EchoPy vinculado, fecha
+  - [ ] Exportar a CSV/PDF para imprimir etiquetas
+  - [ ] Acciones: revocar serial, ver historial de uso
+  - [ ] Estadísticas: seriales generados, usados, disponibles, revocados
+
+- [ ] **EchoPyManagementPage** (admin only) — Gestión de todos los EchoPys:
+  - [ ] Tabla de EchoPys: nombre, serial, usuario, estado (online/offline), última conexión, versión firmware, sensores
+  - [ ] Filtros: estado, versión, usuario
+  - [ ] **Detalle de EchoPy**: toda la información del dispositivo:
+    - [ ] Info general: hostname, serial, MAC, IP, versión firmware, uptime
+    - [ ] Sensores conectados: tipo, última lectura, estado, calibración
+    - [ ] Información de depuración: CPU, RAM, disco, temperatura del CPU, red
+    - [ ] Logs del dispositivo (últimas 100 líneas)
+    - [ ] Historial de actualizaciones aplicadas
+  - [ ] **Acciones remotas** sobre cada EchoPy:
+    - [ ] Reiniciar servicio del gateway
+    - [ ] Reiniciar el EchoPy completo (reboot)
+    - [ ] Actualizar firmware (enviar update vía Cosmuodate)
+    - [ ] Cambiar configuración remota (intervalo de polling, sensores activos, logging)
+    - [ ] **Conexión remota SSH** con usuario y contraseña con permisos sudo
+    - [ ] Terminal web embebido para ejecutar comandos remotos en el EchoPy
+    - [ ] Suspender servicio al usuario temporalmente (bloquea transmisión de datos)
+    - [ ] Reactivar servicio suspendido
+    - [ ] Desvincular EchoPy del usuario (libera el serial)
+  - [ ] Mapa con ubicación de todos los EchoPys (si tienen GPS/ubicación configurada)
+
+- [ ] **UpdateManagementPage** (admin only) — Sistema de actualizaciones Cosmuodate:
+  - [ ] Panel de actualizaciones disponibles por componente (gateway, system, app, sensor)
+  - [ ] Subir nuevo paquete de actualización (artefacto + changelog + checksum)
+  - [ ] Definir canal: `stable`, `beta`, `hotfix`
+  - [ ] Programar despliegue: inmediato, fecha específica, rollout gradual (% de EchoPys)
+  - [ ] Monitorear progreso de despliegue: EchoPys actualizados vs pendientes vs fallidos
+  - [ ] Rollback: revertir a versión anterior si hay fallos
+  - [ ] Historial de actualizaciones publicadas
+
+- [ ] **SalesPage** (admin only) — Sistema de ventas y pedidos:
+  - [ ] Dashboard de ventas: ingresos, pedidos, kits vendidos (gráficas)
+  - [ ] Tabla de pedidos: número, cliente, kit, estado, fecha, tracking
+  - [ ] Gestión de inventario: stock de kits, componentes, alertas de stock bajo
+  - [ ] Generación de facturas y recibos
+  - [ ] Integración con Stripe para pagos
+  - [ ] Reportes de ventas exportables (CSV, PDF)
+
+- [ ] **ServerConfigPage** (admin only) — Configuración del servidor:
+  - [ ] Estado de servicios: API, base de datos, MQTT, Redis, Nginx
+  - [ ] Configuración de dominio, SSL, SMTP
+  - [ ] Métricas: CPU, RAM, disco, conexiones activas
+  - [ ] Logs del servidor (filtro por servicio y nivel)
+  - [ ] Backup manual / programar backups automáticos
+
 - [ ] **GatewaysAdminPage** (admin only):
-  - [ ] Tabla de TODOS los gateways del tenant
+  - [ ] Tabla de TODOS los gateways/EchoPys del sistema (todos los tenants)
   - [ ] Detalle con logs, métricas, configuración
-  - [ ] Acciones: reiniciar, actualizar, eliminar
+  - [ ] Acciones: reiniciar, actualizar, eliminar, suspender
 - [ ] **TenantSettingsPage** (admin only):
   - [ ] Configuración del tenant: nombre, logo personalizado, plan, límites
   - [ ] Estadísticas de uso: gateways, sensores, lecturas, almacenamiento
   - [ ] Billing info (si aplica)
-- [ ] Tests: tablas, acciones, permisos (verificar que viewer no accede a admin)
+- [ ] Tests: tablas, acciones, permisos (verificar que viewer no accede a admin), serial generation, remote management
 
 ### 3.14 Feature: Configuración (como `mockup-web-settings.png`)
 
@@ -2661,6 +2792,12 @@ mobile/src/
 - [ ] Configurar React Navigation v6:
   - [ ] **AuthStack** (Stack Navigator):
     - [ ] `LoginScreen` — Formulario de login
+    - [ ] `RegisterScreen` — Registro con número de serie del kit
+    - [ ] `SerialEntryScreen` — Ingreso del código de serie único de la etiqueta del kit
+    - [ ] `UserInfoScreen` — Formulario de datos del usuario (nombre, email, password)
+    - [ ] `SearchEchoPyScreen` — Buscar EchoPy vía Bluetooth/WiFi
+    - [ ] `PairEchoPyScreen` — Seleccionar y vincular EchoPy encontrado
+    - [ ] `SetupEchoPyScreen` — Pasos de configuración del EchoPy (WiFi, nombre, ubicación)
     - [ ] `ForgotPasswordScreen` — Recuperar contraseña
     - [ ] `ResetPasswordScreen` — Nueva contraseña
   - [ ] **MainTabs** (Bottom Tab Navigator):
@@ -2701,10 +2838,56 @@ mobile/src/
   - [ ] Checkbox "Remember me"
   - [ ] Botón "Iniciar Sesión" en verde `#00E676`
   - [ ] Link "Forgot password?"
+  - [ ] Link "¿No tienes cuenta? Regístrate" → `RegisterScreen`
   - [ ] Biometric login button (Face ID / Fingerprint) si está habilitado
   - [ ] KeyboardAvoidingView para que el teclado no tape inputs
   - [ ] Loading state durante request
   - [ ] Error messages: shake animation + texto rojo
+
+- [ ] **RegisterScreen** — Flujo de registro con número de serie:
+  - [ ] Logo EchoSmart centrado
+  - [ ] Texto: "Registra tu kit EchoPy"
+  - [ ] **Paso 1: Número de Serie**
+    - [ ] Input grande centrado para el código de serie (formato `ES-YYYYMM-XXXX`)
+    - [ ] Texto: "Ingresa el número de serie que se encuentra en la etiqueta dentro de tu kit"
+    - [ ] Imagen ilustrativa mostrando dónde encontrar la etiqueta en el kit
+    - [ ] Validación en tiempo real: formato correcto + consulta al servidor si el serial es válido y no está usado
+    - [ ] Botón "Verificar" → valida contra `POST /api/v1/serials/validate`
+    - [ ] Mensaje de error si el serial ya fue registrado o no existe
+  - [ ] **Paso 2: Información del Usuario**
+    - [ ] Input nombre completo
+    - [ ] Input email (validación de formato)
+    - [ ] Input password (indicador de fortaleza: débil/media/fuerte)
+    - [ ] Input confirmar password
+    - [ ] Input teléfono (opcional)
+    - [ ] Checkbox "Acepto términos y condiciones"
+    - [ ] Botón "Crear Cuenta" → `POST /api/v1/auth/register` con serial + datos
+  - [ ] **Paso 3: Buscar EchoPy**
+    - [ ] Pantalla con animación de búsqueda (ondas/radar)
+    - [ ] Botón grande "Buscar mi EchoPy" en verde
+    - [ ] Buscar vía Bluetooth Low Energy (BLE) — el EchoPy expone servicio BLE con UUID conocido
+    - [ ] Buscar vía WiFi — el EchoPy expone mDNS `_echopy._tcp.local`
+    - [ ] Lista de EchoPys encontrados: nombre (hostname), señal, distancia aproximada
+    - [ ] Texto: "Enciende tu EchoPy y asegúrate de estar cerca"
+    - [ ] Timeout de 30 segundos con opción de reintentar
+    - [ ] Si no encuentra: instrucciones de troubleshooting
+  - [ ] **Paso 4: Vincular EchoPy**
+    - [ ] El usuario selecciona su EchoPy de la lista
+    - [ ] Confirmación: "¿Vincular EchoPy [nombre]?"
+    - [ ] El sistema asigna permanentemente el número de serie al EchoPy
+    - [ ] `POST /api/v1/echopy/bind` con `{serial, echopy_mac, user_id}`
+    - [ ] El EchoPy recibe su serial vía BLE/WiFi y lo almacena en `/etc/echosmart/serial`
+    - [ ] Confirmación visual: "¡Tu EchoPy ha sido vinculado exitosamente!"
+  - [ ] **Paso 5: Configurar EchoPy**
+    - [ ] Configurar WiFi del EchoPy (SSID + password) — enviado vía BLE/WiFi directo
+    - [ ] Nombre del invernadero (ej: "Invernadero Norte")
+    - [ ] Ubicación (ciudad o coordenadas GPS del teléfono)
+    - [ ] El EchoPy se conecta al WiFi configurado y al servidor automáticamente
+    - [ ] Verificación: "EchoPy conectado al servidor ✓"
+    - [ ] Botón "Finalizar" → navegar al `DashboardScreen`
+  - [ ] Progress indicator (5 pasos) visible en toda la pantalla
+  - [ ] Posibilidad de retroceder a pasos anteriores
+  - [ ] Persistir progreso: si cierra la app, puede continuar donde se quedó
 
 - [ ] **DashboardScreen** (como `mockup-mobile-home.png`):
   - [ ] Header con logo + nombre de la app
@@ -3878,23 +4061,26 @@ desktop/
 - [ ] Enviar email de prueba al admin
 - [ ] Imprimir resumen de la instalación con URLs
 
-### 8.5 Gestión del Servidor — Scripts de Administración
+### 8.5 Gestión del Servidor — Binario `echosmart-server`
 
-- [ ] `echosmart-ctl status` — Estado de todos los servicios
-- [ ] `echosmart-ctl start` — Iniciar todos los servicios
-- [ ] `echosmart-ctl stop` — Detener todos los servicios
-- [ ] `echosmart-ctl restart` — Reiniciar todos los servicios
-- [ ] `echosmart-ctl logs [servicio]` — Ver logs (todos o uno específico)
-- [ ] `echosmart-ctl backup` — Ejecutar backup manual
-- [ ] `echosmart-ctl restore [archivo]` — Restaurar desde backup
-- [ ] `echosmart-ctl update` — Actualizar a la última versión (pull images + restart)
-- [ ] `echosmart-ctl reset-password [email]` — Resetear contraseña de usuario
-- [ ] `echosmart-ctl add-user [email] [role]` — Crear usuario
-- [ ] `echosmart-ctl ssl-renew` — Renovar certificado SSL
-- [ ] `echosmart-ctl health` — Verificación completa de salud del sistema
-- [ ] `echosmart-ctl config` — Re-ejecutar wizard de configuración
-- [ ] `echosmart-ctl diagnostics` — Generar reporte de diagnóstico (para soporte)
-- [ ] Instalar como servicio systemd: `echosmart.service`
+> 🖥️ El binario `echosmart-server` reemplaza a `echosmart-ctl` como herramienta unificada del servidor.
+
+- [ ] `echosmart-server status` — Estado de todos los servicios
+- [ ] `echosmart-server start` — Iniciar todos los servicios
+- [ ] `echosmart-server stop` — Detener todos los servicios
+- [ ] `echosmart-server logs [servicio]` — Ver logs (todos o uno específico)
+- [ ] `echosmart-server backup` — Ejecutar backup manual
+- [ ] `echosmart-server backup --restore=<file>` — Restaurar desde backup
+- [ ] `echosmart-server updates --component=system --publish=true` — Publicar actualización vía Cosmuodate
+- [ ] `echosmart-server users --email=admin@example.com --role=admin` — Gestionar usuarios
+- [ ] `echosmart-server serials generate --batch=100` — Generar seriales para kits
+- [ ] `echosmart-server echopy list` — Listar todos los EchoPys registrados
+- [ ] `echosmart-server echopy-remote <id> --ssh=true --sudo=true` — Conexión remota con sudo
+- [ ] `echosmart-server sales report --from=2026-01-01 --to=2026-03-31` — Reporte de ventas
+- [ ] `echosmart-server health` — Verificación completa de salud del sistema
+- [ ] `echosmart-server config --set=domain --value=echosmart.io` — Configuración del servidor
+- [ ] `echosmart-server setup` — Re-ejecutar wizard de configuración
+- [ ] Instalar como servicio systemd: `echosmart-server.service`
 - [ ] Auto-inicio al boot del servidor
 
 ### 8.6 Generación del ISO — Build System
@@ -3913,7 +4099,7 @@ desktop/
   - [ ] Instalar Docker, Docker Compose
   - [ ] Copiar archivos de EchoSmart a `/opt/echosmart/`
   - [ ] Cargar imágenes Docker pre-descargadas (`docker load`)
-  - [ ] Instalar `echosmart-ctl` en `/usr/local/bin/`
+  - [ ] Instalar `echosmart-server` en `/usr/local/bin/`
   - [ ] Configurar cron jobs
   - [ ] Configurar firewall (UFW)
   - [ ] Configurar fail2ban
@@ -3932,7 +4118,7 @@ desktop/
 ### 8.7 Actualización Remota del Servidor
 
 - [ ] Mecanismo de actualización Over-The-Air (OTA):
-  - [ ] `echosmart-ctl update` descarga nuevas imágenes Docker
+  - [ ] `echosmart-server updates --component=system --check=true` verifica si hay actualizaciones
   - [ ] Verificar compatibilidad de versiones antes de actualizar
   - [ ] Ejecutar migraciones de base de datos automáticamente
   - [ ] Rollback automático si health check falla post-update
@@ -3978,27 +4164,38 @@ desktop/
 
 ---
 
-## Fase 9: ISO Personalizado del Raspberry Pi Gateway (Semanas 26–28)
+## Fase 9: ISO Personalizado del Raspberry Pi Gateway — EchoPy (Semanas 26–28)
 
-> 💿 **El ISO del Raspberry Pi contiene el gateway pre-configurado.** El usuario final solo necesita flashear la microSD, conectar los sensores, encender el RPi, y el gateway se conecta automáticamente al servidor.
+> 💿 **El ISO del EchoPy contiene el gateway pre-configurado y listo para producción en masa.**
+> El usuario final solo necesita flashear la microSD, encender el EchoPy, y desde la app vincular su kit con el número de serie.
+> El ISO viene configurado para que al conectar el EchoPy por primera vez, este se conecte al servidor automáticamente y quede listo para ser vinculado por el usuario.
 
-### 9.1 Definición del ISO del Gateway
+### 9.1 Definición del ISO del EchoPy (Gateway)
 
 - [ ] Base: Raspberry Pi OS Lite 64-bit (Bookworm, sin desktop)
-- [ ] Nombre del ISO: `echosmart-gateway-v{VERSION}-arm64.img`
+- [ ] Nombre del ISO: `echopy-v{VERSION}-arm64.img`
 - [ ] Tamaño objetivo: < 2GB (comprimido .xz < 500MB)
 - [ ] Arquitectura: arm64 (aarch64) para RPi 3B+/4/5
 - [ ] Boot: automático, sin intervención del usuario
 - [ ] Filesystem: ext4, auto-expand en primer boot
+- [ ] **Producción en masa**: el mismo ISO sirve para todos los kits; cada unidad se individualiza en first-boot
 
-### 9.2 Software Pre-instalado en el Gateway
+### 9.2 Software Pre-instalado en el EchoPy
 
 - [ ] **Raspberry Pi OS Lite** con actualizaciones de seguridad
 - [ ] **Paquete .deb `echosmart-gateway`** pre-instalado con:
   - [ ] `/usr/bin/echosmart` — binario unificado (read, sysinfo, run, setup, status, etc.)
   - [ ] `/etc/echosmart/gateway.env` — configuración por defecto
   - [ ] `/etc/echosmart/sensors.json` — definición de sensores
+  - [ ] `/etc/echosmart/serial` — archivo donde se almacena el serial asignado (vacío inicialmente)
   - [ ] `/lib/systemd/system/echosmart-gateway.service` — unidad systemd (`ExecStart=/usr/bin/echosmart run`)
+- [ ] **Servicio BLE (Bluetooth Low Energy)** para pairing con app móvil:
+  - [ ] Exponer servicio BLE con UUID conocido del proyecto
+  - [ ] Aceptar configuración WiFi + serial desde la app durante pairing
+  - [ ] Desactivar BLE advertising después de pairing exitoso
+- [ ] **Servicio mDNS** para discovery por WiFi:
+  - [ ] Publicar `_echopy._tcp.local` con hostname del dispositivo
+  - [ ] Incluir metadata: versión, serial (si asignado), estado
 - [ ] **SQLite3** para almacenamiento local
 - [ ] **Mosquitto client** para MQTT
 - [ ] **Interfaces habilitadas**: I2C, 1-Wire, UART, SPI
@@ -4006,34 +4203,41 @@ desktop/
   - [ ] `dtoverlay=w1-gpio,gpiopin=4` (DS18B20)
   - [ ] `enable_uart=1` (MH-Z19C)
   - [ ] `dtparam=i2c_arm=on` (BH1750, ADS1115)
-  - [ ] `dtoverlay=disable-bt` (liberar UART principal)
   - [ ] `gpu_mem=16` (mínima GPU, es headless)
 - [ ] **Watchdog de hardware** habilitado (reinicio automático si se congela)
 - [ ] **Servicios systemd**:
   - [ ] `echosmart-gateway.service` — Servicio principal del gateway
+  - [ ] `echosmart-ble-pairing.service` — Servicio BLE para pairing (activo hasta que se vincule)
   - [ ] `echosmart-watchdog.service` — Monitor de salud
-  - [ ] `echosmart-updater.timer` — Actualización automática diaria
+  - [ ] `echosmart-updater.timer` — Actualización automática diaria vía Cosmuodate
+- [ ] **SSH habilitado** con usuario `echosmart` (contraseña temporal, se cambia en pairing)
+  - [ ] El admin puede conectarse remotamente con sudo
 
-### 9.3 Script de Configuración del Gateway — `echosmart setup`
+### 9.3 First-Boot del EchoPy — Listo para Vincular
 
-- [ ] Crear script de configuración de primer boot:
-  - [ ] **Paso 1: Nombre del gateway** — Identificador único (ej: `invernadero-norte-01`)
-  - [ ] **Paso 2: URL del servidor** — Dirección del servidor EchoSmart (ej: `https://api.echosmart.io`)
-  - [ ] **Paso 3: API Key** — Clave de autenticación del gateway (generada en el servidor)
-  - [ ] **Paso 4: WiFi** (opcional) — SSID y contraseña de la red WiFi
-  - [ ] **Paso 5: IP** — DHCP (default) o IP estática
-  - [ ] **Paso 6: Config CLI** — Ejecutar `echosmart config doctor --check=true`
-  - [ ] **Paso 7: Discover** — Ejecutar `echosmart discover sensors --timeout=3`
-- [ ] Auto-registro del gateway en el servidor:
-  - [ ] POST `/api/v1/gateways/register` con API key
-  - [ ] Recibir y guardar `gateway_id` y `mqtt_credentials`
-  - [ ] Configurar conexión MQTT con credenciales recibidas
-- [ ] Verificar conectividad con el servidor
-- [ ] Verificar que los sensores son detectados (I2C, 1-Wire, UART)
-- [ ] Iniciar servicio del gateway
-- [ ] Ejecutar `echosmart server provision --gateway-id=<id>` al finalizar setup
-- [ ] Ejecutar `echosmart web serve --port=8080` como consola local opcional
-- [ ] LED indicator (si RPi tiene LED): parpadeo lento = conectando, fijo = conectado
+> ⚡ **Al encender el EchoPy por primera vez, queda automáticamente en modo "esperando vinculación".**
+> No requiere intervención manual del usuario en la consola del RPi.
+
+- [ ] First-boot script (`/opt/echosmart/first-boot.sh`):
+  - [ ] Expandir filesystem a toda la SD
+  - [ ] Generar hostname único basado en MAC address (ej: `echopy-A1B2C3`)
+  - [ ] Generar SSH host keys únicos
+  - [ ] Verificar y habilitar interfaces de hardware (I2C, 1-Wire, UART)
+  - [ ] Iniciar servicio BLE para ser descubierto por la app móvil
+  - [ ] Iniciar servicio mDNS para ser descubierto por WiFi
+  - [ ] Conectar al servidor default pre-configurado en el ISO (URL en `/etc/echosmart/gateway.env`)
+  - [ ] Registrarse como EchoPy "pendiente de vinculación" en el servidor
+  - [ ] LED indicator: parpadeo rápido = esperando vinculación, parpadeo lento = conectando, fijo = vinculado y operativo
+  - [ ] Marcar first-boot como completado
+- [ ] Flujo de vinculación (iniciado desde la app del usuario):
+  - [ ] El usuario abre la app y busca EchoPys cercanos (BLE/WiFi)
+  - [ ] Selecciona su EchoPy y envía: serial del kit + credenciales WiFi
+  - [ ] El EchoPy recibe el serial y lo almacena en `/etc/echosmart/serial`
+  - [ ] El EchoPy se conecta al WiFi configurado
+  - [ ] El EchoPy notifica al servidor: `POST /api/v1/echopy/bind` con serial + MAC
+  - [ ] El servidor asigna permanentemente el serial al EchoPy y al usuario
+  - [ ] El EchoPy inicia el servicio principal del gateway
+  - [ ] El LED cambia a fijo: vinculado y operativo
 
 ### 9.4 Auto-Conexión al Servidor
 
@@ -4270,12 +4474,13 @@ desktop/
 ## Fase 12: Producción y Comercialización del Kit
 
 > 🏭 **El kit EchoSmart se comercializa como producto llave en mano.** Esta fase cubre
-> la producción en masa, control de calidad, empaque y canales de venta.
+> la producción en masa, control de calidad, empaque, sistema de números de serie y canales de venta.
+> Cada kit incluye una **etiqueta con número de serie único** que el usuario usa para registrarse.
 
 ### 12.1 BOM (Bill of Materials) por Kit
 
 - [ ] Definir BOM final con proveedores y costos unitarios:
-  - [ ] Raspberry Pi 4B 4 GB (~$55)
+  - [ ] Raspberry Pi 4B 4 GB (~$55) — "EchoPy"
   - [ ] Fuente USB-C 5V 3A (~$8)
   - [ ] microSD 32 GB con imagen pre-grabada (~$7)
   - [ ] DS18B20 encapsulado impermeable (~$2)
@@ -4286,10 +4491,29 @@ desktop/
   - [ ] MH-Z19C CO₂ NDIR (~$18)
   - [ ] Carcasa Raspberry Pi (~$5)
   - [ ] Protoboard + cables + resistencias 4.7kΩ/10kΩ (~$5)
+  - [ ] **Etiqueta con número de serie único** (formato `ES-YYYYMM-XXXX`) (~$0.50)
   - [ ] Caja del kit + manual impreso + sticker GPIO (~$8)
-  - [ ] **COGS total estimado: ~$118 USD**
+  - [ ] **COGS total estimado: ~$118.50 USD**
 - [ ] Negociar precios por volumen con proveedores (lotes de 100+)
 - [ ] Establecer proveedor de respaldo para cada componente crítico
+
+### 12.1b Sistema de Números de Serie
+
+> 🏷️ Cada kit incluye una etiqueta con un **código de serie único** que vincula el hardware con el usuario.
+
+- [ ] Formato del serial: `ES-YYYYMM-XXXX` (ej: `ES-202603-0001`)
+  - [ ] `ES` = EchoSmart
+  - [ ] `YYYYMM` = año y mes de producción
+  - [ ] `XXXX` = número secuencial (4 dígitos, 0001-9999 por mes)
+- [ ] Generación de seriales desde el panel admin: `echosmart-server serials generate --batch=100`
+- [ ] Base de datos de seriales con estados: `available`, `registered`, `revoked`
+- [ ] Etiqueta física:
+  - [ ] Material: etiqueta adhesiva resistente a la humedad
+  - [ ] Contenido: código de serie + QR code (enlace a app de registro)
+  - [ ] Ubicación: interior de la caja del kit (visible al abrir)
+  - [ ] También adherida al EchoPy (parte inferior de la carcasa)
+- [ ] El serial se usa UNA VEZ: al registrarse en la app, queda vinculado permanentemente al usuario y al EchoPy
+- [ ] Un serial revocado no puede reutilizarse (el admin puede generar uno nuevo de reemplazo)
 
 ### 12.2 Precios de Venta y Planes
 
@@ -4305,25 +4529,32 @@ desktop/
 
 - [ ] Definir línea de ensamblaje (objetivo: 10 unidades/hora)
 - [ ] Crear checklist de ensamblaje por unidad:
-  - [ ] Flashear microSD con imagen ISO (batch de 50)
-  - [ ] Insertar Raspberry Pi en carcasa
+  - [ ] Flashear microSD con imagen ISO del EchoPy (batch de 50 con duplicador)
+  - [ ] Insertar Raspberry Pi (EchoPy) en carcasa
+  - [ ] Adherir etiqueta de número de serie en la parte inferior de la carcasa
   - [ ] Empaquetar sensores en bolsa antiestática
   - [ ] Incluir protoboard, cables, resistencias
   - [ ] Incluir manual impreso y sticker GPIO
-  - [ ] Etiquetar con número de serie (formato: `ES-YYYYMM-XXXX`)
+  - [ ] Incluir etiqueta de número de serie dentro de la caja (visible al abrir)
   - [ ] Colocar todo en caja del kit
   - [ ] Sellar caja
 - [ ] Crear estación de flasheo de microSD (duplicador para lotes grandes)
+- [ ] **Generar batch de seriales** antes de la producción:
+  - [ ] `echosmart-server serials generate --batch=<cantidad>` en el servidor
+  - [ ] Exportar a CSV para imprimir etiquetas
+  - [ ] Imprimir etiquetas con impresora de etiquetas
 
 ### 12.4 Control de Calidad (QA) por Unidad
 
 - [ ] Crear procedimiento de QA por unidad antes de empaquetar:
-  - [ ] Encender Raspberry Pi → boot completo < 60 s
+  - [ ] Encender EchoPy → boot completo < 60 s
   - [ ] Ejecutar `echosmart sysinfo` → JSON válido con modelo y versión
   - [ ] Ejecutar `echosmart read ds18b20 --simulate=true` → JSON válido
   - [ ] Ejecutar `echosmart run --simulate=true --once=true` → ciclo completo OK
   - [ ] Verificar `systemctl status echosmart-gateway` → loaded
-  - [ ] Verificar wizard `echosmart setup` → escribe config
+  - [ ] Verificar servicio BLE activo (EchoPy visible para pairing)
+  - [ ] Verificar servicio mDNS activo (`_echopy._tcp.local` publicado)
+  - [ ] Verificar que `/etc/echosmart/serial` está vacío (listo para vincular)
 - [ ] Criterios de PASS/FAIL documentados
 - [ ] Registro de resultados QA por número de serie
 - [ ] Tasa de rechazo objetivo: < 2%
@@ -4410,41 +4641,42 @@ desktop/
 
 ## Resumen de Plataformas
 
-| Plataforma | Tecnología | Directorio | Estado |
-|------------|-----------|------------|--------|
-| **Backend (Cloud)** | FastAPI · PostgreSQL · InfluxDB · Redis | `backend/` | 🟡 Scaffolding completo |
-| **Frontend (Web)** | React 18 · Vite · Redux Toolkit · Recharts | `frontend/` | 🟡 Scaffolding completo |
-| **Gateway (Edge)** | C++17 · CMake · .deb · systemd · Raspberry Pi | `gateway/` | 🟡 Binarios C++ completos |
-| **Móvil (Android)** | React Native · Expo | `mobile/` | 🟠 Estructura inicial |
-| **Móvil (iOS)** | React Native · Expo | `mobile/` | 🟠 Estructura inicial |
-| **Escritorio (Windows)** | Electron · React | `desktop/` | 🟠 Estructura inicial |
-| **Escritorio (macOS)** | Electron · React | `desktop/` | 🟠 Estructura inicial |
-| **Escritorio (Linux)** | Electron · React | `desktop/` | 🟠 Estructura inicial |
-| **Infra Local (Dev)** | Docker Compose · Makefile · Scripts | `infra/` | 🟠 Pendiente |
-| **Infra Producción** | Docker · K8s · Nginx · Prometheus · Grafana | `infra/` | 🟡 Docker + K8s parcial |
-| **ISO Servidor** | Ubuntu 22.04 · Docker · echosmart-ctl | `infra/iso/server/` | 🟠 Pendiente |
-| **ISO Gateway RPi** | RPi OS Lite · .deb (C++) · pi-gen | `infra/iso/gateway/` | 🟠 Pendiente |
-| **Assets / Diseño** | SVG · PNG · JPG · ICO | `assets/` | 🟢 312 archivos generados |
-| **Documentación** | Markdown · SVG | `docs/` | 🟢 26+ documentos |
+| Plataforma | Tecnología | Binario | Directorio | Estado |
+|------------|-----------|---------|------------|--------|
+| **Backend (Cloud)** | FastAPI · PostgreSQL · InfluxDB · Redis | `echosmart-server` | `backend/` | 🟡 Scaffolding completo |
+| **Frontend (Web — Usuario)** | React 18 · Vite · Redux Toolkit · Recharts | — | `frontend/` | 🟡 Scaffolding completo |
+| **Frontend (Web — Admin)** | React 18 · Vite · Redux Toolkit · Recharts | — | `frontend/` | 🟠 Estructura inicial |
+| **Gateway / EchoPy (Edge)** | C++17 · CMake · .deb · systemd · Raspberry Pi | `echosmart` | `gateway/` | 🟡 Binarios C++ completos |
+| **Móvil (Android)** | React Native · Expo | — | `mobile/` | 🟠 Estructura inicial |
+| **Móvil (iOS)** | React Native · Expo | — | `mobile/` | 🟠 Estructura inicial |
+| **Escritorio (Windows)** | Electron · React | — | `desktop/` | 🟠 Estructura inicial |
+| **Escritorio (macOS)** | Electron · React | — | `desktop/` | 🟠 Estructura inicial |
+| **Escritorio (Linux)** | Electron · React | — | `desktop/` | 🟠 Estructura inicial |
+| **Infra Local (Dev)** | Docker Compose · Makefile · Scripts | — | `infra/` | 🟠 Pendiente |
+| **Infra Producción** | Docker · K8s · Nginx · Prometheus · Grafana | — | `infra/` | 🟡 Docker + K8s parcial |
+| **ISO Servidor** | Ubuntu 22.04 · Docker · `echosmart-server` | `echosmart-server` | `infra/iso/server/` | 🟠 Pendiente |
+| **ISO EchoPy (Gateway RPi)** | RPi OS Lite · .deb (C++) · pi-gen · BLE | `echosmart` | `infra/iso/gateway/` | 🟠 Pendiente |
+| **Assets / Diseño** | SVG · PNG · JPG · ICO | — | `assets/` | 🟢 312 archivos generados |
+| **Documentación** | Markdown · SVG | — | `docs/` | 🟢 26+ documentos |
 
 ## Resumen de Fases
 
 | Fase | Nombre | Semanas | Tareas | Estado |
 |------|--------|---------|--------|--------|
 | 0 | Estructura y Assets | — | ~130 | ✅ Completado |
-| 1 | Gateway C++ (Binarios + .deb) | 1–3 | ~180 | 🟡 Binarios completos |
-| 2 | Backend Cloud | 4–7 | ~300 | 🟡 Scaffolding |
-| 3 | Frontend Web | 8–10 | ~250 | 🟡 Scaffolding |
+| 1 | EchoPy Gateway C++ (Binarios + .deb) | 1–3 | ~180 | 🟡 Binarios completos |
+| 2 | Backend Cloud + `echosmart-server` | 4–7 | ~350 | 🟡 Scaffolding |
+| 3 | Frontend Web (Usuario + Admin) | 8–10 | ~300 | 🟡 Scaffolding |
 | 4 | Mobile (Android + iOS) | 11–16 | ~120 | 🟠 Estructura |
 | 5 | Desktop (Win/Mac/Linux) | 17–20 | ~70 | 🟠 Estructura |
 | 6 | **Infra Local + Emulador** | 17–18 | ~100 | 🟠 Pendiente |
 | 7 | **Infra Producción + DevOps** | 19–22 | ~150 | 🟠 Pendiente |
 | 8 | **ISO Servidor** | 23–25 | ~120 | 🟠 Pendiente |
-| 9 | **ISO Raspberry Pi Gateway** | 26–28 | ~100 | 🟠 Pendiente |
+| 9 | **ISO EchoPy (RPi Gateway)** | 26–28 | ~120 | 🟠 Pendiente |
 | 10 | Features Avanzadas | 29+ | ~80 | 🟠 Pendiente |
 | 11 | Testing con Hardware Real | Final | ~40 | 🟠 Pendiente |
-| 12 | **Producción y Comercialización** | Final | ~80 | 🟠 Pendiente |
-| | **TOTAL** | | **~1720+** | |
+| 12 | **Producción y Comercialización** | Final | ~100 | 🟠 Pendiente |
+| | **TOTAL** | | **~1900+** | |
 
 ## Resumen de Assets Generados
 
