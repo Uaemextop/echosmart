@@ -1,0 +1,9 @@
+echosmart-gateway (1.0.0-1) unstable; urgency=medium
+
+  * Initial .deb release of EchoSmart Gateway.
+  * CLI with run / status / test-sensors / version sub-commands.
+  * Systemd service for automatic startup.
+  * First-boot setup wizard (echosmart-gateway-setup).
+  * Five sensor drivers: DS18B20, DHT22, MH-Z19C, BH1750, SoilMoisture.
+
+ -- EchoSmart Team <soporte@echosmart.io>  Sat, 29 Mar 2026 00:00:00 +0000

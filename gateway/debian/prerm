@@ -1,0 +1,12 @@
+#!/bin/bash
+# prerm — runs before the .deb is removed
+set -e
+
+echo ">>> Stopping echosmart-gateway.service …"
+systemctl stop echosmart-gateway.service 2>/dev/null || true
+systemctl disable echosmart-gateway.service 2>/dev/null || true
+
+echo ">>> Removing virtual environment …"
+rm -rf /opt/echosmart/gateway/venv
+
+#DEBHELPER#

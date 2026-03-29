@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+# ──────────────────────────────────────────────────────────────
+# echosmart-gateway  —  CLI wrapper for the EchoSmart Gateway
+#
+# Installed by the echosmart-gateway .deb package to /usr/bin/.
+# Delegates to the Python CLI module.
+# ──────────────────────────────────────────────────────────────
+set -euo pipefail
+
+INSTALL_DIR="${ECHOSMART_HOME:-/opt/echosmart/gateway}"
+VENV_DIR="${INSTALL_DIR}/venv"
+PYTHON="${VENV_DIR}/bin/python"
+
+# Fall back to system python if the venv doesn't exist (dev mode)
+if [ ! -x "${PYTHON}" ]; then
+    PYTHON="$(command -v python3 || command -v python)"
+fi
+
+export PYTHONPATH="${INSTALL_DIR}:${PYTHONPATH:-}"
+
+exec "${PYTHON}" -m gateway.src.cli "$@"
