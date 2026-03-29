@@ -39,7 +39,7 @@ mcp-servers:
     command: mcp-language-server
     args:
       - --workspace
-      - /path/to/your/project
+      - "."
       - --lsp
       - typescript-language-server
       - --
