@@ -1,0 +1,12 @@
+echosmart-gateway (1.0.0-1) stable; urgency=medium
+
+  * Initial production release
+  * CLI with subcommands: run, status, test-sensors, version
+  * 5 sensor drivers: DS18B20, DHT22, BH1750, Soil Moisture, MH-Z19C
+  * Local SQLite cache for offline resilience
+  * MQTT publishing and cloud sync
+  * systemd service integration
+  * Setup wizard for first-run configuration
+  * Debian packaging for Raspberry Pi OS
+
+ -- EchoSmart Team <dev@echosmart.io>  Sat, 29 Mar 2026 00:00:00 +0000

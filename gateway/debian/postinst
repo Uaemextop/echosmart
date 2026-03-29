@@ -1,0 +1,50 @@
+#!/bin/bash
+# postinst — runs after echosmart-gateway is installed
+
+set -e
+
+INSTALL_DIR="/opt/echosmart/gateway"
+CONFIG_FILE="/etc/echosmart/gateway.env"
+
+case "$1" in
+    configure)
+        # Create echosmart system user if it doesn't exist
+        if ! id -u echosmart &>/dev/null; then
+            useradd --system --no-create-home --shell /usr/sbin/nologin \
+                --groups gpio,i2c,spi,dialout echosmart 2>/dev/null || true
+        fi
+
+        # Create Python virtual environment
+        if [ ! -d "${INSTALL_DIR}/venv" ]; then
+            python3 -m venv "${INSTALL_DIR}/venv"
+            "${INSTALL_DIR}/venv/bin/pip" install --quiet \
+                -r "${INSTALL_DIR}/requirements.txt"
+        fi
+
+        # Set ownership
+        chown -R echosmart:echosmart "${INSTALL_DIR}" 2>/dev/null || true
+        chown -R echosmart:echosmart /var/log/echosmart 2>/dev/null || true
+
+        # Reload systemd and enable service
+        systemctl daemon-reload
+        systemctl enable echosmart-gateway.service
+
+        echo ""
+        echo "═══════════════════════════════════════════════════"
+        echo "  EchoSmart Gateway installed successfully!"
+        echo ""
+        echo "  Run the setup wizard:"
+        echo "    sudo echosmart-gateway-setup"
+        echo ""
+        echo "  Or start immediately:"
+        echo "    sudo systemctl start echosmart-gateway"
+        echo ""
+        echo "  Configuration: ${CONFIG_FILE}"
+        echo "  Logs:          journalctl -u echosmart-gateway -f"
+        echo "═══════════════════════════════════════════════════"
+        ;;
+esac
+
+#DEBHELPER#
+
+exit 0
