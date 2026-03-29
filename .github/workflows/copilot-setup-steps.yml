@@ -15,8 +15,18 @@ jobs:
     runs-on: ubuntu-latest
 
     permissions:
-      contents: read
-
+      contents: write
+      actions: write
+      deployments: write
+      pull-requests: write
+      models: read
+      attestations: write
+      id-token: write
+      issues: write
+      statuses: write
+      discussions: write
+      repository-projects: write
+ 
     steps:
       # Opcional: mostrar información básica del runner
       - name: Show runner info
