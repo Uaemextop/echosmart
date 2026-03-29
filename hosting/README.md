@@ -185,10 +185,18 @@ WordPress was removed and replaced with a custom-built web application.
 
 ### SMTP (Email Sending)
 
-Transactional emails sent via authenticated SMTP over SSL:
+Transactional emails sent via the **local Exim MTA** using PHP `mail()`:
 - **From:** `noreply@echosmart.me` (EchoSmart)
-- **Server:** `mail.echosmart.me:465` (SSL)
+- **Envelope sender:** `-f noreply@echosmart.me` (SPF/DKIM aligned)
+- **Fallback:** Authenticated SMTP via `127.0.0.1:465` (IPv4 forced)
 - **Emails:** Welcome, password reset, contact notification
+
+> **Why mail() instead of SMTP sockets?**
+> On cPanel shared hosting, connecting to `mail.echosmart.me:465` from PHP
+> resolves to `::1` (IPv6 loopback). Exim's ACL rejects this with:
+> `"Your IP: ::1 : Your domain echosmart.me is not allowed in header From"`.
+> Using `mail()` submits through the local sendmail pipe, which Exim trusts
+> for locally hosted domains. The SMTP fallback forces IPv4 (`127.0.0.1`).
 
 ### Security
 
@@ -210,3 +218,44 @@ Transactional emails sent via authenticated SMTP over SSL:
 ```bash
 ssh -i hosting/id_rsa -p 21098 eduardoc3677@68.65.123.247
 ```
+
+---
+
+## Troubleshooting
+
+### SMTP Error 550: "Your IP: ::1 : Your domain echosmart.me is not allowed in header From"
+
+**Cause:** PHP connects to `mail.echosmart.me:465` which resolves to the same
+server via IPv6 loopback `::1`. cPanel's Exim rejects the `From` header from
+that IP because `::1` isn't in the trusted hosts ACL for `echosmart.me`.
+
+**Fix (applied):** The `Mailer.php` now uses PHP's native `mail()` function
+which submits mail through the local Exim pipe (sendmail), bypassing TCP
+entirely. The cPanel user `eduardoc3677` owns `echosmart.me`, so Exim trusts
+local mail submission. If `mail()` fails, a fallback connects via
+`127.0.0.1:465` (IPv4 forced) with SSL peer verification disabled for the
+loopback connection.
+
+### Webmail: Cannot send to external addresses (Gmail, Outlook, etc.)
+
+If webmail (Roundcube/Horde via cPanel) cannot send to external addresses:
+
+1. **Check SPF record** — must include the server IP:
+   ```
+   v=spf1 +a +mx +ip4:68.65.123.247 include:spf.web-hosting.com ~all
+   ```
+2. **Check DKIM** — verify `default._domainkey.echosmart.me` TXT record exists
+3. **Check DMARC** — `_dmarc.echosmart.me` should have `p=quarantine` or `p=none`
+4. **Check server IP reputation** — shared hosting IPs can be blocklisted.
+   Test at [mxtoolbox.com/blacklists](https://mxtoolbox.com/blacklists.aspx)
+
+### Email Configuration for Mail Clients
+
+| Setting     | Value                |
+|-------------|----------------------|
+| IMAP Server | mail.echosmart.me    |
+| IMAP Port   | 993 (SSL/TLS)        |
+| SMTP Server | mail.echosmart.me    |
+| SMTP Port   | 465 (SSL/TLS)        |
+| Username    | full email address   |
+| Password    | account password     |

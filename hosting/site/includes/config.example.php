@@ -16,6 +16,9 @@ define('DB_PASS', getenv('ES_DB_PASS') ?: 'your_db_password');
 define('DB_CHARSET', 'utf8mb4');
 
 // ─── SMTP ────────────────────────────────────────────────────────────
+// Primary delivery uses PHP mail() → local Exim MTA (no SMTP needed).
+// These settings are used by the SMTP fallback (127.0.0.1, IPv4 forced)
+// if mail() fails, and for webmail/client configuration.
 define('SMTP_HOST', 'mail.echosmart.me');
 define('SMTP_PORT', 465);
 define('SMTP_USER', getenv('ES_SMTP_USER') ?: 'noreply@echosmart.me');

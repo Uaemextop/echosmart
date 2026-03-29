@@ -1,8 +1,9 @@
 <?php
 /**
- * EchoSmart - SMTP Mailer (socket-based, no Composer required)
+ * EchoSmart - Mailer (local MTA + SMTP fallback)
  *
- * Sends emails via an SSL socket connection to the SMTP server.
+ * Primary: PHP mail() → local Exim (avoids IPv6 loopback ACL issues).
+ * Fallback: authenticated SMTP via 127.0.0.1:465 (IPv4 forced).
  *
  * @package EchoSmart
  */
@@ -100,23 +101,75 @@ class Mailer
         return self::sendEmail(ADMIN_EMAIL, "[EchoSmart] Contact: {$subject}", $body);
     }
 
-    // ─── Core SMTP sender ────────────────────────────────────────────
+    // ─── Core sender (local MTA via mail()) ─────────────────────────
 
     /**
-     * Send an email via raw SMTP over an SSL socket.
+     * Send an email through the local MTA (Exim/sendmail on cPanel).
+     *
+     * Uses PHP's mail() instead of raw SMTP sockets so the local Exim
+     * accepts the message without IPv6 loopback (::1) ACL issues.
+     * The -f flag sets the envelope sender for proper SPF alignment.
      */
     private static function sendEmail(string $to, string $subject, string $htmlBody): bool
     {
+        $from     = SMTP_USER;              // noreply@echosmart.me
+        $fromName = SMTP_FROM_NAME;         // EchoSmart
+
+        $boundary = bin2hex(random_bytes(16));
+
+        // ── Headers (everything except To / Subject — mail() adds those) ──
+        $headers  = "From: {$fromName} <{$from}>\r\n";
+        $headers .= "Reply-To: {$from}\r\n";
+        $headers .= "MIME-Version: 1.0\r\n";
+        $headers .= "Date: " . date('r') . "\r\n";
+        $headers .= "Message-ID: <" . bin2hex(random_bytes(16)) . "@echosmart.me>\r\n";
+        $headers .= "Content-Type: multipart/alternative; boundary=\"{$boundary}\"\r\n";
+        $headers .= "X-Mailer: EchoSmart/1.0\r\n";
+
+        // ── MIME body ──
+        $plainText = strip_tags(str_replace(['<br>', '<br/>', '<br />'], "\n", $htmlBody));
+
+        $body  = "--{$boundary}\r\n";
+        $body .= "Content-Type: text/plain; charset=UTF-8\r\n";
+        $body .= "Content-Transfer-Encoding: 8bit\r\n\r\n";
+        $body .= $plainText . "\r\n\r\n";
+        $body .= "--{$boundary}\r\n";
+        $body .= "Content-Type: text/html; charset=UTF-8\r\n";
+        $body .= "Content-Transfer-Encoding: 8bit\r\n\r\n";
+        $body .= $htmlBody . "\r\n\r\n";
+        $body .= "--{$boundary}--\r\n";
+
+        // ── Send via local MTA ──
+        // -f sets the envelope sender (Return-Path) for SPF/DKIM alignment
+        $sent = @mail($to, $subject, $body, $headers, "-f {$from}");
+
+        if (!$sent) {
+            error_log("Mailer: mail() failed for recipient {$to}");
+
+            // Fallback: try SMTP socket via 127.0.0.1 (IPv4 only)
+            return self::sendViaSmtp($to, $subject, $htmlBody);
+        }
+
+        return true;
+    }
+
+    // ─── Fallback: authenticated SMTP via IPv4 loopback ──────────────
+
+    /**
+     * Fallback sender via authenticated SMTP over 127.0.0.1.
+     * Forces IPv4 to avoid cPanel Exim "::1 not allowed" ACL issue.
+     */
+    private static function sendViaSmtp(string $to, string $subject, string $htmlBody): bool
+    {
         $from     = SMTP_USER;
         $fromName = SMTP_FROM_NAME;
-        $host     = SMTP_HOST;
         $port     = SMTP_PORT;
         $user     = SMTP_USER;
         $pass     = SMTP_PASS;
 
         $boundary = bin2hex(random_bytes(16));
 
-        // Build MIME message
+        // Build full MIME message for DATA command
         $headers  = "MIME-Version: 1.0\r\n";
         $headers .= "From: {$fromName} <{$from}>\r\n";
         $headers .= "To: {$to}\r\n";
@@ -141,41 +194,43 @@ class Mailer
         $message = $headers . $body;
 
         try {
-            $socket = @fsockopen("ssl://{$host}", $port, $errno, $errstr, 30);
+            // Force IPv4 (127.0.0.1) to prevent ::1 ACL rejection
+            $ctx = stream_context_create([
+                'ssl' => [
+                    'verify_peer'      => false,
+                    'verify_peer_name' => false,
+                    'allow_self_signed' => true,
+                ],
+            ]);
+            $socket = @stream_socket_client(
+                "ssl://127.0.0.1:{$port}",
+                $errno, $errstr, 30,
+                STREAM_CLIENT_CONNECT,
+                $ctx
+            );
             if (!$socket) {
-                error_log("Mailer: could not connect to {$host}:{$port} – {$errstr} ({$errno})");
+                error_log("Mailer SMTP fallback: could not connect to 127.0.0.1:{$port} – {$errstr} ({$errno})");
                 return false;
             }
 
             stream_set_timeout($socket, 30);
 
-            // Read greeting
             self::smtpRead($socket);
-
-            // EHLO
             self::smtpCommand($socket, "EHLO echosmart.me", 250);
-
-            // AUTH LOGIN
             self::smtpCommand($socket, "AUTH LOGIN", 334);
             self::smtpCommand($socket, base64_encode($user), 334);
             self::smtpCommand($socket, base64_encode($pass), 235);
-
-            // Envelope
             self::smtpCommand($socket, "MAIL FROM:<{$from}>", 250);
             self::smtpCommand($socket, "RCPT TO:<{$to}>", 250);
-
-            // DATA
             self::smtpCommand($socket, "DATA", 354);
             fwrite($socket, $message . "\r\n.\r\n");
             self::smtpExpect($socket, 250);
-
-            // QUIT
             fwrite($socket, "QUIT\r\n");
             fclose($socket);
 
             return true;
         } catch (\Exception $e) {
-            error_log("Mailer: " . $e->getMessage());
+            error_log("Mailer SMTP fallback: " . $e->getMessage());
             if (isset($socket) && is_resource($socket)) {
                 fclose($socket);
             }
@@ -190,7 +245,6 @@ class Mailer
         $response = '';
         while ($line = fgets($socket, 512)) {
             $response .= $line;
-            // A space at position 3 means this is the last line of the response
             if (isset($line[3]) && $line[3] === ' ') {
                 break;
             }
