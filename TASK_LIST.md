@@ -542,178 +542,178 @@ gateway/src/
 └── tests/                      # Tests unitarios e integración
 ```
 
-- [ ] Crear directorio `domain/entities/` con dataclasses puras
-  - [ ] `sensor_reading.py` — `SensorReading(sensor_id, sensor_type, value, unit, timestamp, is_valid)`
-  - [ ] `alert.py` — `Alert(id, sensor_id, type, severity, message, threshold, value, created_at)`
-  - [ ] `gateway_config.py` — `GatewayConfig(id, name, sensors, polling_interval, cloud_url)`
-- [ ] Crear directorio `domain/interfaces/` con ABCs (Abstract Base Classes)
-  - [ ] `sensor_driver.py` — `BaseSensorDriver(ABC)` con métodos `read()`, `initialize()`, `shutdown()`, `get_info()`
-  - [ ] `storage.py` — `IStorageRepository(ABC)` con `save_reading()`, `get_readings()`, `get_unsynced()`
-  - [ ] `publisher.py` — `IMessagePublisher(ABC)` con `publish()`, `connect()`, `disconnect()`
-  - [ ] `sync_client.py` — `ISyncClient(ABC)` con `sync_readings()`, `sync_alerts()`, `register_gateway()`
-- [ ] Crear `domain/constants.py` con constantes de negocio (rangos, umbrales, timeouts)
-- [ ] Migrar `sensor_manager.py` a `application/sensor_manager.py` usando interfaces
-- [ ] Migrar `alert_engine.py` a `application/alert_engine.py` usando interfaces
-- [ ] Migrar `cloud_sync.py` a `application/cloud_sync.py` usando interfaces
-- [ ] Migrar drivers existentes a `infrastructure/drivers/` implementando `BaseSensorDriver`
-- [ ] Migrar `local_db.py` a `infrastructure/sqlite_storage.py` implementando `IStorageRepository`
-- [ ] Migrar `mqtt_publisher.py` a `infrastructure/mqtt_publisher.py` implementando `IMessagePublisher`
+- [x] Crear directorio `domain/entities/` con dataclasses puras
+  - [x] `sensor_reading.py` — `SensorReading(sensor_id, sensor_type, value, unit, timestamp, is_valid)`
+  - [x] `alert.py` — `Alert(id, sensor_id, type, severity, message, threshold, value, created_at)`
+  - [x] `gateway_config.py` — `GatewayConfig(id, name, sensors, polling_interval, cloud_url)`
+- [x] Crear directorio `domain/interfaces/` con ABCs (Abstract Base Classes)
+  - [x] `sensor_driver.py` — `BaseSensorDriver(ABC)` con métodos `read()`, `initialize()`, `shutdown()`, `get_info()`
+  - [x] `storage.py` — `IStorageRepository(ABC)` con `save_reading()`, `get_readings()`, `get_unsynced()`
+  - [x] `publisher.py` — `IMessagePublisher(ABC)` con `publish()`, `connect()`, `disconnect()`
+  - [x] `sync_client.py` — `ISyncClient(ABC)` con `sync_readings()`, `sync_alerts()`, `register_gateway()`
+- [x] Crear `domain/constants.py` con constantes de negocio (rangos, umbrales, timeouts)
+- [x] Migrar `sensor_manager.py` a `application/sensor_manager.py` usando interfaces
+- [x] Migrar `alert_engine.py` a `application/alert_engine.py` usando interfaces
+- [x] Migrar `cloud_sync.py` a `application/cloud_sync.py` usando interfaces
+- [x] Migrar drivers existentes a `infrastructure/drivers/` implementando `BaseSensorDriver`
+- [x] Migrar `local_db.py` a `infrastructure/sqlite_storage.py` implementando `IStorageRepository`
+- [x] Migrar `mqtt_publisher.py` a `infrastructure/mqtt_publisher.py` implementando `IMessagePublisher`
 
 ### 1.3 Software del Gateway — Drivers de Sensores (Modo Simulación)
 
 > 🖥️ **Todo el desarrollo de esta sección se realiza SIN hardware físico.** Los drivers operan en `simulation=True` por defecto, generando datos realistas para pruebas. La implementación de lectura real del hardware (GPIO, I2C, 1-Wire, UART) queda como `TODO` para completar en la Fase 8.
 
 #### 1.3.1 Interfaz Base de Drivers (Clean Code: Polimorfismo)
-- [ ] Crear `BaseSensorDriver(ABC)` con interfaz estándar:
-  - [ ] Método `read() -> SensorReading` — Lectura del sensor (simulada o real)
-  - [ ] Método `initialize() -> bool` — Inicialización del hardware/simulación
-  - [ ] Método `shutdown() -> None` — Apagado limpio del sensor
-  - [ ] Método `get_info() -> dict` — Metadatos del sensor (tipo, protocolo, estado)
-  - [ ] Método `is_healthy() -> bool` — Health check del sensor
-  - [ ] Método `calibrate(reference_value) -> None` — Calibración con valor de referencia
-  - [ ] Propiedad `sensor_type: str` — Tipo de sensor (temperature, humidity, etc.)
-  - [ ] Propiedad `protocol: str` — Protocolo (1-wire, gpio, i2c, uart)
-  - [ ] Propiedad `is_simulation: bool` — Si está en modo simulación
+- [x] Crear `BaseSensorDriver(ABC)` con interfaz estándar:
+  - [x] Método `read() -> SensorReading` — Lectura del sensor (simulada o real)
+  - [x] Método `initialize() -> bool` — Inicialización del hardware/simulación
+  - [x] Método `shutdown() -> None` — Apagado limpio del sensor
+  - [x] Método `get_info() -> dict` — Metadatos del sensor (tipo, protocolo, estado)
+  - [x] Método `is_healthy() -> bool` — Health check del sensor
+  - [x] Método `calibrate(reference_value) -> None` — Calibración con valor de referencia
+  - [x] Propiedad `sensor_type: str` — Tipo de sensor (temperature, humidity, etc.)
+  - [x] Propiedad `protocol: str` — Protocolo (1-wire, gpio, i2c, uart)
+  - [x] Propiedad `is_simulation: bool` — Si está en modo simulación
 
 #### 1.3.2 Driver Factory (Patrón Factory)
-- [ ] Crear `SensorDriverFactory` en `infrastructure/driver_factory.py`
-  - [ ] Método `create(sensor_type: str, config: dict) -> BaseSensorDriver`
-  - [ ] Registro dinámico de drivers disponibles
-  - [ ] Validación de configuración antes de crear instancia
-  - [ ] Tests: factory crea el driver correcto para cada tipo
+- [x] Crear `SensorDriverFactory` en `infrastructure/driver_factory.py`
+  - [x] Método `create(sensor_type: str, config: dict) -> BaseSensorDriver`
+  - [x] Registro dinámico de drivers disponibles
+  - [x] Validación de configuración antes de crear instancia
+  - [x] Tests: factory crea el driver correcto para cada tipo
 
 #### 1.3.3 Driver DS18B20 — Temperatura (1-Wire)
 - [x] Implementar clase `DS18B20Driver(BaseSensorDriver)` con modo simulación
-- [ ] Agregar validación de rangos: rechazar lecturas fuera de -55°C a +125°C
-- [ ] Agregar filtro de outliers: descartar lecturas que varíen >5°C entre muestras consecutivas
+- [x] Agregar validación de rangos: rechazar lecturas fuera de -55°C a +125°C
+- [x] Agregar filtro de outliers: descartar lecturas que varíen >5°C entre muestras consecutivas
 - [ ] Agregar soporte para múltiples sensores DS18B20 en el mismo bus (por device_id)
 - [ ] Agregar método `get_resolution()` / `set_resolution(bits: int)` — Configurar resolución 9-12 bits
-- [ ] Implementar caché: no leer más de 1 vez por segundo (time-based debounce)
-- [ ] Agregar retry con backoff exponencial en caso de error de lectura
-- [ ] Agregar logging estructurado en cada operación
-- [ ] Implementar `__repr__` y `__str__` descriptivos para debugging
-- [ ] Tests unitarios: lectura válida, lectura fuera de rango, sensor desconectado, timeout, múltiples sensores
+- [x] Implementar caché: no leer más de 1 vez por segundo (time-based debounce)
+- [x] Agregar retry con backoff exponencial en caso de error de lectura
+- [x] Agregar logging estructurado en cada operación
+- [x] Implementar `__repr__` y `__str__` descriptivos para debugging
+- [x] Tests unitarios: lectura válida, lectura fuera de rango, sensor desconectado, timeout, múltiples sensores
 
 #### 1.3.4 Driver DHT22 — Temperatura + Humedad (GPIO)
 - [x] Implementar clase `DHT22Driver(BaseSensorDriver)` con modo simulación
-- [ ] Agregar validación de rangos: temp -40°C–80°C, humedad 0%–100%
-- [ ] Agregar rate limiting: no leer más de 1 vez cada 2 segundos (limitación del sensor)
+- [x] Agregar validación de rangos: temp -40°C–80°C, humedad 0%–100%
+- [x] Agregar rate limiting: no leer más de 1 vez cada 2 segundos (limitación del sensor)
 - [ ] Agregar checksum validation (CRC8) para verificar integridad de datos
-- [ ] Agregar filtro de lecturas espurias: descartar si humedad = 0% o > 100%
-- [ ] Agregar retry (máx 3 intentos) en caso de CRC error
-- [ ] Devolver `SensorReading` con ambos valores: temperatura y humedad separados
-- [ ] Agregar logging con nivel y timestamp
-- [ ] Tests unitarios: lectura normal, CRC error, rate limit excedido, valores fuera de rango
+- [x] Agregar filtro de lecturas espurias: descartar si humedad = 0% o > 100%
+- [x] Agregar retry (máx 3 intentos) en caso de CRC error
+- [x] Devolver `SensorReading` con ambos valores: temperatura y humedad separados
+- [x] Agregar logging con nivel y timestamp
+- [x] Tests unitarios: lectura normal, CRC error, rate limit excedido, valores fuera de rango
 
 #### 1.3.5 Driver BH1750 — Luminosidad (I2C)
 - [x] Implementar clase `BH1750Driver(BaseSensorDriver)` con modo simulación
-- [ ] Agregar modos de medición: `CONTINUOUS_HIGH_RES`, `CONTINUOUS_HIGH_RES2`, `ONE_TIME`
-- [ ] Agregar configuración de dirección I2C (0x23 por defecto, 0x5C alternativa)
-- [ ] Agregar validación: descartar lecturas > 65535 lux (overflow del sensor)
+- [x] Agregar modos de medición: `CONTINUOUS_HIGH_RES`, `CONTINUOUS_HIGH_RES2`, `ONE_TIME`
+- [x] Agregar configuración de dirección I2C (0x23 por defecto, 0x5C alternativa)
+- [x] Agregar validación: descartar lecturas > 65535 lux (overflow del sensor)
 - [ ] Agregar suavizado: promedio móvil de las últimas N lecturas
 - [ ] Implementar `power_on()` / `power_off()` para ahorro de energía
-- [ ] Tests unitarios: lectura normal, cambio de modo, dirección I2C alternativa, power management
+- [x] Tests unitarios: lectura normal, cambio de modo, dirección I2C alternativa, power management
 
 #### 1.3.6 Driver Soil Moisture + ADS1115 — Humedad de Suelo (ADC)
 - [x] Implementar clase `SoilMoistureDriver(BaseSensorDriver)` con modo simulación
-- [ ] Agregar calibración: mapear voltaje crudo a porcentaje (dry_value, wet_value)
-- [ ] Agregar selección de canal ADC (A0-A3 del ADS1115)
+- [x] Agregar calibración: mapear voltaje crudo a porcentaje (dry_value, wet_value)
+- [x] Agregar selección de canal ADC (A0-A3 del ADS1115)
 - [ ] Agregar configuración de ganancia del ADS1115 (2/3, 1, 2, 4, 8, 16)
-- [ ] Agregar filtro de ruido: mediana de 5 lecturas consecutivas
-- [ ] Agregar validación: descartar si porcentaje < 0% o > 100%
-- [ ] Implementar método `auto_calibrate(dry_reading, wet_reading)`
-- [ ] Tests unitarios: calibración, canal correcto, rango de ganancia, filtro de mediana
+- [x] Agregar filtro de ruido: mediana de 5 lecturas consecutivas
+- [x] Agregar validación: descartar si porcentaje < 0% o > 100%
+- [x] Implementar método `auto_calibrate(dry_reading, wet_reading)`
+- [x] Tests unitarios: calibración, canal correcto, rango de ganancia, filtro de mediana
 
 #### 1.3.7 Driver MH-Z19C — CO₂ (UART)
 - [x] Implementar clase `MHZ19CDriver(BaseSensorDriver)` con modo simulación
-- [ ] Agregar envío de comando UART para lectura (9 bytes: 0xFF 0x01 0x86 ...)
-- [ ] Agregar parsing de respuesta UART (extraer ppm de bytes 2-3)
-- [ ] Agregar checksum validation en la respuesta
+- [x] Agregar envío de comando UART para lectura (9 bytes: 0xFF 0x01 0x86 ...)
+- [x] Agregar parsing de respuesta UART (extraer ppm de bytes 2-3)
+- [x] Agregar checksum validation en la respuesta
 - [ ] Agregar comando de auto-calibración (ABC enable/disable)
 - [ ] Agregar comando de calibración a punto cero (Zero Point Calibration)
-- [ ] Agregar warmup tracking: ignorar lecturas durante los primeros 3 minutos
-- [ ] Agregar timeout de comunicación UART (default: 5 segundos)
-- [ ] Tests unitarios: lectura normal, checksum inválido, timeout, warmup, calibración
+- [x] Agregar warmup tracking: ignorar lecturas durante los primeros 3 minutos
+- [x] Agregar timeout de comunicación UART (default: 5 segundos)
+- [x] Tests unitarios: lectura normal, checksum inválido, timeout, warmup, calibración
 
 ### 1.4 Hardware Abstraction Layer (HAL)
 
 - [x] Implementar clase `HAL` con abstracción de hardware
-- [ ] Refactorizar HAL como interfaz abstracta + implementaciones:
-  - [ ] `IHardwareInterface(ABC)` — Interfaz abstracta
-  - [ ] `SimulatedHAL(IHardwareInterface)` — Para desarrollo sin hardware
-  - [ ] `RaspberryPiHAL(IHardwareInterface)` — Para hardware real (Fase 8)
-- [ ] Agregar health check de bus I2C (`scan()` devuelve dispositivos detectados)
-- [ ] Agregar health check de bus 1-Wire (`list_devices()` devuelve IDs)
+- [x] Refactorizar HAL como interfaz abstracta + implementaciones:
+  - [x] `IHardwareInterface(ABC)` — Interfaz abstracta
+  - [x] `SimulatedHAL(IHardwareInterface)` — Para desarrollo sin hardware
+  - [x] `RaspberryPiHAL(IHardwareInterface)` — Para hardware real (Fase 8)
+- [x] Agregar health check de bus I2C (`scan()` devuelve dispositivos detectados)
+- [x] Agregar health check de bus 1-Wire (`list_devices()` devuelve IDs)
 - [ ] Agregar health check de UART (`ping()` verifica conexión serial)
 - [ ] Agregar manejo de errores con excepciones específicas: `I2CError`, `GPIOError`, `UARTError`
 - [ ] Implementar `__enter__` / `__exit__` para context managers (limpieza automática de GPIO)
-- [ ] Tests: cada método del HAL simulado devuelve datos consistentes
+- [x] Tests: cada método del HAL simulado devuelve datos consistentes
 
 ### 1.5 Sensor Manager (Orquestador)
 
 - [x] Implementar `SensorManager` con polling configurable
-- [ ] Refactorizar para inyección de dependencias (recibir interfaces, no implementaciones)
-- [ ] Implementar registro dinámico de sensores via configuración JSON
+- [x] Refactorizar para inyección de dependencias (recibir interfaces, no implementaciones)
+- [x] Implementar registro dinámico de sensores via configuración JSON
 - [ ] Implementar polling asíncrono con `asyncio` (no bloquear entre lecturas)
 - [ ] Implementar prioridad de sensores (los críticos se leen con más frecuencia)
-- [ ] Implementar circuit breaker: deshabilitar sensor temporalmente si falla N veces seguidas
-- [ ] Implementar métricas internas: lecturas/minuto, errores/minuto, latencia promedio
-- [ ] Implementar graceful shutdown: detener polling y cerrar todos los drivers
-- [ ] Implementar hot-reload de configuración (agregar/quitar sensores sin reiniciar)
-- [ ] Agregar eventos/callbacks: `on_reading`, `on_error`, `on_sensor_offline`
-- [ ] Tests: polling correcto, circuit breaker, graceful shutdown, hot-reload
+- [x] Implementar circuit breaker: deshabilitar sensor temporalmente si falla N veces seguidas
+- [x] Implementar métricas internas: lecturas/minuto, errores/minuto, latencia promedio
+- [x] Implementar graceful shutdown: detener polling y cerrar todos los drivers
+- [x] Implementar hot-reload de configuración (agregar/quitar sensores sin reiniciar)
+- [x] Agregar eventos/callbacks: `on_reading`, `on_error`, `on_sensor_offline`
+- [x] Tests: polling correcto, circuit breaker, graceful shutdown, hot-reload
 
 ### 1.6 Almacenamiento Local (SQLite)
 
 - [x] Implementar `local_db.py` con SQLite
-- [ ] Refactorizar como `SqliteStorageRepository` implementando `IStorageRepository`
-- [ ] Diseñar esquema de tablas:
-  - [ ] `readings(id, sensor_id, sensor_type, value, unit, timestamp, synced)`
-  - [ ] `alerts(id, sensor_id, type, severity, message, timestamp, synced)`
-  - [ ] `sync_log(id, batch_id, records_sent, records_failed, timestamp)`
-- [ ] Implementar índices para queries frecuentes (por sensor_id, por timestamp, por synced)
-- [ ] Implementar retención de datos: auto-delete lecturas mayores a 7 días (configurable)
-- [ ] Implementar vacuum automático para compactar la base de datos
-- [ ] Implementar método `get_unsynced_readings(limit=100)` para sincronización batch
-- [ ] Implementar método `mark_as_synced(reading_ids)` después de sync exitosa
-- [ ] Implementar método `get_stats()` — conteo de lecturas, espacio usado, lecturas pendientes
-- [ ] Agregar WAL mode para evitar bloqueos en lectura/escritura concurrente
-- [ ] Tests: CRUD, retención, vacuum, concurrencia, stats
+- [x] Refactorizar como `SqliteStorageRepository` implementando `IStorageRepository`
+- [x] Diseñar esquema de tablas:
+  - [x] `readings(id, sensor_id, sensor_type, value, unit, timestamp, synced)`
+  - [x] `alerts(id, sensor_id, type, severity, message, timestamp, synced)`
+  - [x] `sync_log(id, batch_id, records_sent, records_failed, timestamp)`
+- [x] Implementar índices para queries frecuentes (por sensor_id, por timestamp, por synced)
+- [x] Implementar retención de datos: auto-delete lecturas mayores a 7 días (configurable)
+- [x] Implementar vacuum automático para compactar la base de datos
+- [x] Implementar método `get_unsynced_readings(limit=100)` para sincronización batch
+- [x] Implementar método `mark_as_synced(reading_ids)` después de sync exitosa
+- [x] Implementar método `get_stats()` — conteo de lecturas, espacio usado, lecturas pendientes
+- [x] Agregar WAL mode para evitar bloqueos en lectura/escritura concurrente
+- [x] Tests: CRUD, retención, vacuum, concurrencia, stats
 
 ### 1.7 Motor de Alertas Local
 
 - [x] Implementar `alert_engine.py`
 - [ ] Refactorizar para usar reglas configurables desde JSON/YAML
-- [ ] Implementar tipos de reglas:
-  - [ ] `ThresholdRule` — Valor excede umbral (ej: temp > 35°C)
-  - [ ] `RangeRule` — Valor fuera de rango (ej: humedad < 40% o > 90%)
-  - [ ] `RateOfChangeRule` — Cambio rápido (ej: temp sube >2°C en 5 min)
-  - [ ] `StaleDataRule` — Sin datos por N minutos (sensor offline)
+- [x] Implementar tipos de reglas:
+  - [x] `ThresholdRule` — Valor excede umbral (ej: temp > 35°C)
+  - [x] `RangeRule` — Valor fuera de rango (ej: humedad < 40% o > 90%)
+  - [x] `RateOfChangeRule` — Cambio rápido (ej: temp sube >2°C en 5 min)
+  - [x] `StaleDataRule` — Sin datos por N minutos (sensor offline)
   - [ ] `CompoundRule` — Combinación de reglas (ej: temp alta Y humedad baja)
-- [ ] Implementar severidades: `INFO`, `WARNING`, `CRITICAL`
-- [ ] Implementar cooldown: no repetir la misma alerta en N minutos
+- [x] Implementar severidades: `INFO`, `WARNING`, `CRITICAL`
+- [x] Implementar cooldown: no repetir la misma alerta en N minutos
 - [ ] Implementar escalamiento: si alerta no se atiende en N min, subir severidad
 - [ ] Implementar acciones locales: log, LED indicador (GPIO), buzzer
-- [ ] Implementar historial de alertas en SQLite
-- [ ] Tests: cada tipo de regla, cooldown, escalamiento, persistencia
+- [x] Implementar historial de alertas en SQLite
+- [x] Tests: cada tipo de regla, cooldown, escalamiento, persistencia
 
 ### 1.8 Comunicaciones (MQTT + Sync)
 
 - [x] Implementar `mqtt_publisher.py`
 - [x] Implementar `cloud_sync.py`
-- [ ] Refactorizar MQTT publisher como `MqttPublisher(IMessagePublisher)`
-- [ ] Implementar reconexión automática MQTT con backoff exponencial
-- [ ] Implementar Quality of Service (QoS) configurable: 0 (at most once), 1 (at least once), 2 (exactly once)
-- [ ] Implementar topics MQTT estructurados: `echosmart/{gateway_id}/sensors/{sensor_type}/reading`
-- [ ] Implementar payload JSON estandarizado con schema versioning
-- [ ] Implementar Last Will and Testament (LWT) para detectar gateway offline
+- [x] Refactorizar MQTT publisher como `MqttPublisher(IMessagePublisher)`
+- [x] Implementar reconexión automática MQTT con backoff exponencial
+- [x] Implementar Quality of Service (QoS) configurable: 0 (at most once), 1 (at least once), 2 (exactly once)
+- [x] Implementar topics MQTT estructurados: `echosmart/{gateway_id}/sensors/{sensor_type}/reading`
+- [x] Implementar payload JSON estandarizado con schema versioning
+- [x] Implementar Last Will and Testament (LWT) para detectar gateway offline
 - [ ] Implementar TLS/SSL para comunicación MQTT segura
-- [ ] Refactorizar cloud_sync como `HttpSyncClient(ISyncClient)`
-- [ ] Implementar batch sync: enviar N lecturas por request (reducir llamadas HTTP)
-- [ ] Implementar retry con backoff exponencial y jitter
-- [ ] Implementar offline queue: almacenar datos en SQLite si no hay conexión
+- [x] Refactorizar cloud_sync como `HttpSyncClient(ISyncClient)`
+- [x] Implementar batch sync: enviar N lecturas por request (reducir llamadas HTTP)
+- [x] Implementar retry con backoff exponencial y jitter
+- [x] Implementar offline queue: almacenar datos en SQLite si no hay conexión
 - [ ] Implementar compresión gzip para payloads grandes
-- [ ] Implementar health check endpoint: verificar conectividad con cloud
+- [x] Implementar health check endpoint: verificar conectividad con cloud
 - [ ] Tests: reconexión MQTT, batch sync, offline queue, retry, compresión
 
 ### 1.9 Auto-descubrimiento y Configuración
@@ -732,13 +732,13 @@ gateway/src/
 ### 1.10 Gateway — Tests Completos
 
 - [x] Tests básicos unitarios
-- [ ] Tests para CADA driver individual con mocking del HAL
-- [ ] Tests para SensorManager con drivers mockeados
-- [ ] Tests para AlertEngine con reglas predefinidas
-- [ ] Tests para SqliteStorage (CRUD, retención, concurrencia)
+- [x] Tests para CADA driver individual con mocking del HAL
+- [x] Tests para SensorManager con drivers mockeados
+- [x] Tests para AlertEngine con reglas predefinidas
+- [x] Tests para SqliteStorage (CRUD, retención, concurrencia)
 - [ ] Tests para MqttPublisher con broker mockeado
-- [ ] Tests para CloudSync con HTTP mockeado (responses library)
-- [ ] Tests de integración: flujo completo sensor → storage → mqtt → sync
+- [x] Tests para CloudSync con HTTP mockeado (responses library)
+- [x] Tests de integración: flujo completo sensor → storage → mqtt → sync
 - [ ] Tests de configuración: carga de JSON, validación, defaults
 - [ ] Tests de error handling: sensor offline, DB corrupta, red caída
 - [ ] Verificar cobertura ≥ 80% con `pytest --cov`
@@ -751,10 +751,10 @@ gateway/src/
 - [ ] Configurar `flake8` o `ruff` para linting
 - [ ] Configurar `mypy` para type checking
 - [ ] Agregar `pre-commit` hooks: black + isort + flake8 + mypy
-- [ ] Agregar type hints a TODAS las funciones públicas
-- [ ] Agregar docstrings Google-style a TODAS las clases y funciones públicas
-- [ ] Crear `gateway/README.md` con instrucciones de desarrollo y testing
-- [ ] Crear `gateway/Makefile` con targets: `lint`, `format`, `test`, `coverage`, `run`
+- [x] Agregar type hints a TODAS las funciones públicas
+- [x] Agregar docstrings Google-style a TODAS las clases y funciones públicas
+- [x] Crear `gateway/README.md` con instrucciones de desarrollo y testing
+- [x] Crear `gateway/Makefile` con targets: `lint`, `format`, `test`, `coverage`, `run`
 
 ---
 
