@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <title>EchoSmart — Monitoreo IoT para Agricultura de Precisión</title>
+  <meta name="description" content="Monitoreo inteligente en tiempo real para invernaderos y agricultura de precisión. Sensores IoT, alertas y dashboard interactivo.">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="icon" type="image/svg+xml" href="assets/img/logo/echosmart-icon.svg">
+</head>
+<body>
+
+<!-- ===== NAVBAR ===== -->
+<nav class="navbar">
+  <div class="container navbar-inner">
+    <a href="index.html" class="navbar-brand">
+      <svg class="brand-icon" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="16" cy="16" r="6" fill="#00E676"/>
+        <path d="M16 4a12 12 0 0 1 12 12" stroke="#00E676" stroke-width="2" stroke-linecap="round" opacity=".7"/>
+        <path d="M16 8a8 8 0 0 1 8 8" stroke="#00E676" stroke-width="2" stroke-linecap="round" opacity=".5"/>
+        <path d="M16 24a12 12 0 0 1-12-12" stroke="#00E676" stroke-width="2" stroke-linecap="round" opacity=".3"/>
+      </svg>
+      <span>EchoSmart</span>
+    </a>
+
+    <div class="navbar-links" id="navbar-links">
+      <a href="#inicio">Inicio</a>
+      <a href="#features">Características</a>
+      <a href="#pricing">Precios</a>
+      <a href="#contact">Contacto</a>
+    </div>
+
+    <div class="navbar-actions" id="navbar-actions">
+      <a href="login.html" class="btn btn-outline btn-sm">Iniciar Sesión</a>
+      <a href="register.html" class="btn btn-primary btn-sm">Registrarse</a>
+    </div>
+
+    <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Menú" aria-expanded="false">
+      <svg class="icon-menu" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      <svg class="icon-close" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="display:none"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+</nav>
+
+<!-- Mobile menu overlay -->
+<div class="mobile-menu" id="mobile-menu">
+  <div class="mobile-menu-inner">
+    <a href="#inicio" class="mobile-link">Inicio</a>
+    <a href="#features" class="mobile-link">Características</a>
+    <a href="#pricing" class="mobile-link">Precios</a>
+    <a href="#contact" class="mobile-link">Contacto</a>
+    <div class="mobile-menu-actions">
+      <a href="login.html" class="btn btn-outline w-full">Iniciar Sesión</a>
+      <a href="register.html" class="btn btn-primary w-full">Registrarse</a>
+    </div>
+  </div>
+</div>
+
+<!-- ===== HERO ===== -->
+<section class="hero" id="inicio">
+  <div class="hero-bg"></div>
+  <div class="hero-glow"></div>
+  <div class="hero-content">
+    <div class="hero-badge">🌱 Plataforma IoT para Agricultura</div>
+    <h1>Monitoreo IoT Inteligente para <span class="highlight">Agricultura de Precisión</span></h1>
+    <p class="hero-subtitle">Controla temperatura, humedad, luminosidad, CO₂ y humedad del suelo en tiempo real. Recibe alertas inteligentes y toma decisiones basadas en datos para optimizar tu producción agrícola.</p>
+    <div class="hero-actions">
+      <a href="dashboard.html" class="btn btn-primary btn-lg">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>
+        Ver Demo
+      </a>
+      <a href="#contact" class="btn btn-outline-cyan btn-lg">Contactar</a>
+    </div>
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <span class="hero-stat-value">500+</span>
+        <span class="hero-stat-label">Sensores activos</span>
+      </div>
+      <div class="hero-stat-divider"></div>
+      <div class="hero-stat">
+        <span class="hero-stat-value">99.9%</span>
+        <span class="hero-stat-label">Uptime</span>
+      </div>
+      <div class="hero-stat-divider"></div>
+      <div class="hero-stat">
+        <span class="hero-stat-value">24/7</span>
+        <span class="hero-stat-label">Monitoreo</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FEATURES ===== -->
+<section class="section" id="features">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-tag">Características</span>
+      <h2>Todo lo que necesitas para tus invernaderos</h2>
+      <p>Monitorea y controla tus cultivos de forma inteligente con nuestra plataforma completa</p>
+    </div>
+
+    <div class="features-grid">
+      <div class="card feature-card">
+        <div class="feature-icon icon-red">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/>
+          </svg>
+        </div>
+        <h3>Sensores en Tiempo Real</h3>
+        <p>Monitoreo continuo de temperatura, humedad relativa, luminosidad, humedad del suelo y CO₂ con actualizaciones cada minuto.</p>
+      </div>
+
+      <div class="card feature-card">
+        <div class="feature-icon icon-orange">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+          </svg>
+        </div>
+        <h3>Alertas Inteligentes</h3>
+        <p>Umbrales configurables por sensor con notificaciones por email y SMS. Niveles crítico, alto, medio y bajo personalizables.</p>
+      </div>
+
+      <div class="card feature-card">
+        <div class="feature-icon icon-cyan">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/>
+          </svg>
+        </div>
+        <h3>Dashboard Interactivo</h3>
+        <p>Visualiza tus datos con gráficas en tiempo real, KPIs resumidos y vista panorámica de todos tus sensores y gateways.</p>
+      </div>
+
+      <div class="card feature-card">
+        <div class="feature-icon icon-yellow">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/>
+          </svg>
+        </div>
+        <h3>Reportes Automatizados</h3>
+        <p>Genera reportes en PDF y Excel con datos históricos, tendencias y análisis. Programa envíos automáticos periódicos.</p>
+      </div>
+
+      <div class="card feature-card">
+        <div class="feature-icon icon-green">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>
+          </svg>
+        </div>
+        <h3>Control Remoto</h3>
+        <p>Administra tus gateways desde cualquier lugar. Configura sensores, actualiza firmware y monitorea la conectividad remotamente.</p>
+      </div>
+
+      <div class="card feature-card">
+        <div class="feature-icon icon-blue">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+        </div>
+        <h3>Multi&#x2011;Tenant</h3>
+        <p>Cada cliente tiene sus datos completamente aislados. Gestión de usuarios con roles y permisos para equipos de trabajo.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== PRICING ===== -->
+<section class="section section-alt" id="pricing">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-tag">Precios</span>
+      <h2>Planes y Precios</h2>
+      <p>Elige el kit ideal para tu operación agrícola</p>
+    </div>
+
+    <div class="pricing-grid">
+      <!-- Starter -->
+      <div class="card pricing-card">
+        <div class="plan-name">Kit Starter</div>
+        <div class="price">$2,499<span class="currency">MXN</span></div>
+        <div class="period">Pago único + $299/mes servicio</div>
+        <ul class="pricing-features">
+          <li>3 sensores incluidos</li>
+          <li>1 gateway WiFi</li>
+          <li>Dashboard básico</li>
+          <li>Alertas por email</li>
+          <li>Historial 30 días</li>
+          <li>Soporte por email</li>
+        </ul>
+        <a href="#contact" class="btn btn-outline btn-block">Comenzar</a>
+      </div>
+
+      <!-- Pro -->
+      <div class="card pricing-card popular">
+        <div class="popular-badge">Popular</div>
+        <div class="plan-name">Kit Pro</div>
+        <div class="price">$4,999<span class="currency">MXN</span></div>
+        <div class="period">Pago único + $499/mes servicio</div>
+        <ul class="pricing-features">
+          <li>5 sensores incluidos</li>
+          <li>1 gateway WiFi/4G</li>
+          <li>Dashboard completo</li>
+          <li>Alertas email + SMS</li>
+          <li>Historial 1 año</li>
+          <li>Reportes PDF/Excel</li>
+          <li>Soporte prioritario</li>
+          <li>API de acceso</li>
+        </ul>
+        <a href="#contact" class="btn btn-primary btn-block">Elegir Pro</a>
+      </div>
+
+      <!-- Enterprise -->
+      <div class="card pricing-card">
+        <div class="plan-name">Enterprise</div>
+        <div class="price price-contact">Contactar</div>
+        <div class="period">Solución personalizada</div>
+        <ul class="pricing-features">
+          <li>Sensores ilimitados</li>
+          <li>Gateways múltiples</li>
+          <li>Integraciones personalizadas</li>
+          <li>SLA garantizado</li>
+          <li>Historial ilimitado</li>
+          <li>White-label disponible</li>
+          <li>Soporte 24/7</li>
+          <li>Onboarding dedicado</li>
+        </ul>
+        <a href="#contact" class="btn btn-outline-cyan btn-block">Contactar Ventas</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== CONTACT ===== -->
+<section class="section" id="contact">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-tag">Contacto</span>
+      <h2>Contáctanos</h2>
+      <p>¿Tienes preguntas? Escríbenos y te responderemos a la brevedad</p>
+    </div>
+
+    <div class="contact-grid">
+      <form class="contact-form" id="contact-form">
+        <div class="input-group">
+          <label for="contact-name">Nombre completo *</label>
+          <input type="text" id="contact-name" name="name" class="input" placeholder="Tu nombre" required>
+        </div>
+        <div class="input-group">
+          <label for="contact-email">Correo electrónico *</label>
+          <input type="email" id="contact-email" name="email" class="input" placeholder="tu@correo.com" required>
+        </div>
+        <div class="input-group">
+          <label for="contact-subject">Asunto</label>
+          <input type="text" id="contact-subject" name="subject" class="input" placeholder="¿En qué podemos ayudarte?">
+        </div>
+        <div class="input-group">
+          <label for="contact-message">Mensaje *</label>
+          <textarea id="contact-message" name="message" class="input" placeholder="Cuéntanos más sobre tu proyecto..." rows="5" required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          Enviar Mensaje
+        </button>
+      </form>
+
+      <div class="contact-info">
+        <div class="card contact-info-card">
+          <div class="info-icon icon-green">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>
+            </svg>
+          </div>
+          <div>
+            <h4>Email General</h4>
+            <p>info@echosmart.me</p>
+          </div>
+        </div>
+        <div class="card contact-info-card">
+          <div class="info-icon icon-cyan">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+            </svg>
+          </div>
+          <div>
+            <h4>Soporte Técnico</h4>
+            <p>support@echosmart.me</p>
+          </div>
+        </div>
+        <div class="card contact-info-card">
+          <div class="info-icon icon-orange">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
+            </svg>
+          </div>
+          <div>
+            <h4>Ubicación</h4>
+            <p>Querétaro, México</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer class="footer">
+  <div class="container footer-inner">
+    <div class="footer-brand">
+      <svg viewBox="0 0 32 32" fill="none" width="22" height="22">
+        <circle cx="16" cy="16" r="6" fill="#00E676"/>
+        <path d="M16 4a12 12 0 0 1 12 12" stroke="#00E676" stroke-width="2" stroke-linecap="round" opacity=".7"/>
+      </svg>
+      <span>EchoSmart</span>
+    </div>
+    <p class="footer-copy">&copy; 2026 EchoSmart. Todos los derechos reservados.</p>
+    <div class="footer-links">
+      <a href="#">Twitter</a>
+      <a href="#">LinkedIn</a>
+      <a href="#">GitHub</a>
+    </div>
+  </div>
+</footer>
+
+<script src="assets/js/app.js"></script>
+</body>
+</html>

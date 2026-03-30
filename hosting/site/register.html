@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <title>Crear Cuenta — EchoSmart</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="icon" type="image/svg+xml" href="assets/img/logo/echosmart-icon.svg">
+</head>
+<body>
+
+<div class="auth-page">
+  <div class="card auth-card" style="max-width:480px">
+    <a href="index.html" class="auth-logo">
+      <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="16" cy="16" r="6" fill="#00E676"/>
+        <path d="M16 4a12 12 0 0 1 12 12" stroke="#00E676" stroke-width="2" stroke-linecap="round" opacity=".7"/>
+        <path d="M16 8a8 8 0 0 1 8 8" stroke="#00E676" stroke-width="2" stroke-linecap="round" opacity=".5"/>
+        <path d="M16 24a12 12 0 0 1-12-12" stroke="#00E676" stroke-width="2" stroke-linecap="round" opacity=".3"/>
+      </svg>
+      EchoSmart
+    </a>
+    <p class="auth-subtitle">Crea tu cuenta de monitoreo</p>
+
+    <!-- Step dots -->
+    <div class="steps">
+      <div class="step-dot active"></div>
+      <div class="step-dot"></div>
+      <div class="step-dot"></div>
+    </div>
+
+    <form id="register-form" novalidate>
+      <!-- Step 1: Serial -->
+      <div class="step-content active">
+        <div class="input-group" style="margin-bottom:16px">
+          <label for="reg-serial">Número de Serie del Kit</label>
+          <input type="text" id="reg-serial" name="serial_number" class="input" placeholder="ES-202601-A1B2" autocomplete="off">
+          <div class="form-error" data-error="serial_number"></div>
+          <p style="font-size:.8rem;color:var(--text-muted);margin-top:6px">
+            Formato: ES-YYYYMM-XXXX donde X es letra o número (ej: ES-202601-A1B2)
+          </p>
+        </div>
+        <button type="button" class="btn btn-primary btn-block" onclick="nextStep()">Continuar</button>
+        <div class="auth-divider" style="margin-top:16px">¿Ya tienes cuenta?</div>
+        <a href="login.html" style="display:block;text-align:center;font-size:.9rem">Iniciar Sesión</a>
+      </div>
+
+      <!-- Step 2: Account info -->
+      <div class="step-content">
+        <div class="input-group">
+          <label for="reg-name">Nombre completo</label>
+          <input type="text" id="reg-name" name="name" class="input" placeholder="Tu nombre completo" autocomplete="name">
+          <div class="form-error" data-error="name"></div>
+        </div>
+
+        <div class="input-group">
+          <label for="reg-email">Correo electrónico</label>
+          <input type="email" id="reg-email" name="email" class="input" placeholder="tu@correo.com" autocomplete="email">
+          <div class="form-error" data-error="email"></div>
+        </div>
+
+        <div class="input-group">
+          <label for="reg-password">Contraseña</label>
+          <div class="input-wrapper">
+            <input type="password" id="reg-password" name="password" class="input" placeholder="Mínimo 8 caracteres" autocomplete="new-password">
+            <button type="button" class="toggle-password" aria-label="Mostrar contraseña">👁</button>
+          </div>
+          <div class="password-strength"><div class="bar"></div></div>
+          <div class="strength-text"></div>
+          <div class="form-error" data-error="password"></div>
+        </div>
+
+        <div class="input-group">
+          <label for="reg-confirm">Confirmar contraseña</label>
+          <div class="input-wrapper">
+            <input type="password" id="reg-confirm" name="password_confirm" class="input" placeholder="Repite tu contraseña" autocomplete="new-password">
+            <button type="button" class="toggle-password" aria-label="Mostrar contraseña">👁</button>
+          </div>
+          <div class="form-error" data-error="password_confirm"></div>
+        </div>
+
+        <div class="flex gap-2" style="margin-top:8px">
+          <button type="button" class="btn btn-ghost" onclick="prevStep()" style="flex:1">Atrás</button>
+          <button type="button" class="btn btn-primary" onclick="nextStep()" style="flex:2">Crear Cuenta</button>
+        </div>
+      </div>
+
+      <!-- Step 3: Success -->
+      <div class="step-content" style="text-align:center">
+        <div class="success-check">✓</div>
+        <h3 style="margin-bottom:12px">¡Cuenta creada!</h3>
+        <p style="color:var(--text-secondary);margin-bottom:28px">Tu cuenta ha sido registrada exitosamente. Ya puedes acceder a tu dashboard de monitoreo.</p>
+        <a href="dashboard.html" class="btn btn-primary btn-block">Ir al Dashboard</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="assets/js/app.js"></script>
+</body>
+</html>
