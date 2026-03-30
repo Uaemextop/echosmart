@@ -355,6 +355,36 @@ See [FakeNTP Subdomain Setup](#fakentp-subdomain-ntpechosmart) below.
 
 HTTP-based time server for IoT devices at `https://ntp.echosmart.me`.
 
+### Architecture
+
+FakeNTP runs as a **Flask web application** on cPanel with CloudLinux Passenger.
+It provides NTP-like time synchronization over HTTPS (not UDP port 123).
+
+> **Important:** On shared hosting, Passenger manages process lifecycle — no
+> persistent UDP server is possible. The "running" state is a flag persisted
+> in `fakentp_config.json`. The actual time is served via HTTP endpoints.
+
+| Component                   | Description                                      |
+|-----------------------------|--------------------------------------------------|
+| Web Framework               | Flask 3.x + CloudLinux Passenger (lswsgi)        |
+| Python Version              | 3.12 (virtualenv at `~/virtualenv/.../3.12/`)    |
+| Config Storage              | `~/ntp.echosmart.me/fakentp/fakentp/fakentp_config.json` |
+| Activity Logs               | `~/ntp.echosmart.me/fakentp/fakentp/fakentp_activity.log` |
+| WSGI Entry Point            | `~/ntp.echosmart.me/fakentp/passenger_wsgi.py`   |
+| Document Root               | `~/ntp.echosmart.me/`                            |
+
+### Why No UDP Server?
+
+Shared hosting (Namecheap cPanel) cannot run persistent background processes:
+
+- Passenger spawns multiple worker processes → port binding conflicts
+- Workers are recycled on idle → UDP threads die
+- Ports < 1024 (like NTP port 123) require root access
+- Even ports > 1024 (e.g. 8123) fail with "Address already in use"
+
+**Solution:** Pure HTTP time service. IoT devices query `https://ntp.echosmart.me/time`
+instead of using NTP protocol.
+
 ### Subdomain Setup (cPanel)
 
 1. **Create subdomain** in cPanel → Domains → Subdomains:
@@ -373,10 +403,12 @@ HTTP-based time server for IoT devices at `https://ntp.echosmart.me`.
      add='{"dname":"ntp","ttl":14400,"record_type":"A","data":["68.65.123.247"]}'
    ```
 
-3. **Deploy PHP files** to the subdomain directory:
-   ```bash
-   scp -P 21098 hosting/ntp/* eduardoc3677@68.65.123.247:~/public_html/ntp.echosmart.me/
-   ```
+3. **Create Python app** via cPanel → Setup Python App:
+   - Python version: 3.12
+   - App root: `ntp.echosmart.me/fakentp`
+   - App URL: `/`
+   - Startup file: `passenger_wsgi.py`
+   - Entry point: `application`
 
 4. **SSL** is automatically covered by the wildcard certificate (`*.echosmart.me`).
 
@@ -384,11 +416,15 @@ HTTP-based time server for IoT devices at `https://ntp.echosmart.me`.
 
 | Endpoint               | Response     | Description                            |
 |------------------------|-------------|----------------------------------------|
-| `GET /`                | HTML         | Web UI with live clock                 |
+| `GET /`                | HTML         | Dashboard with live clock + controls   |
 | `GET /time`            | JSON         | Full time data (unix + iso + date)     |
 | `GET /time?fmt=unix`   | text/plain   | Unix timestamp (e.g. `1711756800.123`) |
 | `GET /time?fmt=iso`    | text/plain   | ISO 8601 (e.g. `2026-03-30T00:00:00Z`)|
-| `GET /health`          | JSON         | Health check (`{"status":"ok"}`)       |
+| `GET /health`          | JSON         | Health check + running status          |
+| `GET /api/config`      | JSON         | Full config + current time + state     |
+| `POST /api/config`     | JSON         | Save config / start / stop / toggle    |
+| `GET /api/logs`        | JSON         | Activity log entries                   |
+| `GET /api/timezones`   | JSON         | Available timezone list                |
 
 ### IoT Device Usage (ESP32)
 
@@ -407,7 +443,7 @@ http.end();
 
 | File                        | Description                              |
 |-----------------------------|------------------------------------------|
-| `hosting/ntp/index.php`     | PHP time server (shared hosting)         |
+| `hosting/ntp/index.php`     | PHP time server (standalone fallback)    |
 | `hosting/ntp/.htaccess`     | URL routing + security headers           |
 | `gateway/fakentp/fakentp.py`| Python standalone server (VPS/dev)       |
 | `gateway/fakentp/README.md` | FakeNTP documentation                    |
