@@ -121,7 +121,7 @@ sudo apt install htpdate
 sudo htpdate -s ntp.echosmart.me
 
 # Add to cron (every 15 min)
-echo '*/15 * * * * root htpdate -s ntp.echosmart.me' | sudo tee /etc/cron.d/echosmart-htpdate
+printf '*/15 * * * * root htpdate -s ntp.echosmart.me\n' | sudo tee /etc/cron.d/echosmart-htpdate
 ```
 
 ### Option 3: Manual curl + date
@@ -131,7 +131,7 @@ echo '*/15 * * * * root htpdate -s ntp.echosmart.me' | sudo tee /etc/cron.d/echo
 sudo date -s "@$(curl -s https://ntp.echosmart.me/time?fmt=unix | cut -d. -f1)"
 
 # Crontab entry (every 15 min)
-*/15 * * * * root date -s "@$(curl -s https://ntp.echosmart.me/time?fmt=unix | cut -d. -f1)" 2>/dev/null
+*/15 * * * * root date -s "@$(curl -s https://ntp.echosmart.me/time?fmt=unix | cut -d. -f1)" 2>>/var/log/echosmart-timesync.log
 ```
 
 ### Important Notes

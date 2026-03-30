@@ -48,7 +48,7 @@ fetch_server_time() {
         --retry 2 --retry-delay 1 \
         "$TIMESYNC_URL" 2>/dev/null)
 
-    if [[ -z "$unix_ts" ]] || ! echo "$unix_ts" | grep -qE '^[0-9]+\.[0-9]+$'; then
+    if [[ -z "$unix_ts" ]] || [[ ! "$unix_ts" =~ ^[0-9]+\.[0-9]+$ ]]; then
         log_error "Failed to fetch time from $TIMESYNC_URL"
         log_error "Response: ${unix_ts:-<empty>}"
         return 1
@@ -140,9 +140,9 @@ do_check() {
     abs_drift=${abs_drift%%.*}  # integer part
     abs_drift=${abs_drift:-0}
 
-    if [[ "$abs_drift" -lt 2 ]]; then
+    if (( abs_drift < 2 )); then
         log_info "${GREEN}Clock is synchronized (drift < 2s)${NC}"
-    elif [[ "$abs_drift" -lt 60 ]]; then
+    elif (( abs_drift < 60 )); then
         log_warn "Clock drift is ${drift}s — consider syncing."
     else
         log_error "Clock drift is ${drift}s — sync recommended!"
@@ -163,7 +163,7 @@ do_install() {
 
     # Copy script to system location
     local install_path="/usr/local/bin/echosmart-timesync"
-    cp "$SCRIPT_DIR/$SCRIPT_NAME" "$install_path"
+    cp "$(readlink -f "$0")" "$install_path"
     chmod +x "$install_path"
     log_info "Script installed: $install_path"
 
