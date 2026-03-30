@@ -70,6 +70,7 @@
 |--------|--------------------|--------------------------------------------------------------------------------|
 | A      | echosmart.me       | 68.65.123.247                                                                  |
 | A      | mail               | 68.65.123.247                                                                  |
+| A      | ntp                | 68.65.123.247                                                                  |
 | A      | ftp                | 68.65.123.247                                                                  |
 | A      | cpanel             | 68.65.123.247                                                                  |
 | A      | webmail            | 68.65.123.247                                                                  |
@@ -88,6 +89,14 @@
 | TXT    | default._domainkey | DKIM RSA 2048-bit public key                                                  |
 | NS     | echosmart.me       | dns1.namecheaphosting.com                                                      |
 | NS     | echosmart.me       | dns2.namecheaphosting.com                                                      |
+
+### DNS Zone Setup Commands (cPanel UAPI)
+
+```bash
+# Add A record for ntp subdomain (if wildcard doesn't cover it)
+uapi DNS mass_edit_zone zone=echosmart.me serial=XXXXXXXXXX \
+  add='{"dname":"ntp","ttl":14400,"record_type":"A","data":["68.65.123.247"]}'
+```
 
 ---
 
@@ -264,33 +273,24 @@ ssh -i hosting/id_rsa -p 21098 eduardoc3677@68.65.123.247
 
 ### Emails going to Spam (Gmail, Outlook, etc.)
 
-**Root causes:**
+**Root causes (identified across multiple rounds):**
 1. SPF used `~all` (softfail) — receivers treat this as "suspicious"
 2. DMARC used `p=quarantine` — tells receivers to put emails in spam
-3. Missing `List-Unsubscribe` header — required by Gmail for bulk/transactional email
-4. Missing proper `Precedence` and `Organization` headers
+3. `mail()` caused Exim to add mismatched `Sender:` header
+4. `mail()` didn't trigger DKIM signing
+5. `List-Unsubscribe` on transactional emails signaled marketing/bulk
+6. EHLO hostname didn't match server rDNS
 
-**Fixes applied (2026-03-29 via SSH):**
-1. Updated SPF to use `-all` (hardfail):
-   ```bash
-   uapi DNS mass_edit_zone zone=echosmart.me serial=XXXXXXXXXX \
-     edit='{"dname":"echosmart.me.","ttl":14400,"record_type":"TXT",
-           "data":["v=spf1 +a +mx +ip4:68.65.123.247 ... -all"],"line_index":13}'
-   ```
-2. Updated DMARC to `p=none` with monitoring:
-   ```bash
-   uapi DNS mass_edit_zone zone=echosmart.me serial=XXXXXXXXXX \
-     edit='{"dname":"_dmarc","ttl":14400,"record_type":"TXT",
-           "data":["v=DMARC1; p=none; sp=none; adkim=r; aspf=r; rua=mailto:admin@echosmart.me; ruf=mailto:admin@echosmart.me; pct=100; fo=1;"],"line_index":23}'
-   ```
-3. Added anti-spam headers to Mailer.php:
-   - `List-Unsubscribe` + `List-Unsubscribe-Post` (RFC 8058)
-   - `Precedence: bulk`
-   - `Organization: EchoSmart`
-   - `X-Priority: 3` (normal)
-   - `Return-Path` header
-4. Changed `Content-Transfer-Encoding` from `8bit` to `quoted-printable`
-5. Enabled DKIM signing: `uapi EmailAuth enable_dkim domain=echosmart.me`
+**All fixes applied (see Spam fix history above in SMTP section):**
+1. SPF changed to `-all` (hardfail)
+2. DMARC changed to `p=none` (reputation building)
+3. Switched from `mail()` to authenticated SMTP as primary
+4. EHLO uses `gethostname()` to match server rDNS
+5. Removed `List-Unsubscribe` / `Precedence:bulk` (transactional, not marketing)
+6. Added `Auto-Submitted: auto-generated` (RFC 3834) for transactional marker
+7. Added clean human-readable plain-text alternatives
+8. Changed encoding to `quoted-printable`
+9. Enabled DKIM signing: `uapi EmailAuth enable_dkim domain=echosmart.me`
 
 ### Webmail: Cannot send to external addresses (Gmail, Outlook, etc.)
 
@@ -331,8 +331,83 @@ Port 123 (NTP, UDP) **cannot be opened** on this shared hosting plan:
 server. Only the hosting provider (root) can open system ports. Port 123 is a
 privileged port (< 1024) requiring root access.
 
-**Alternatives:**
-- The server already gets time from the host's NTP service (system clock is accurate)
-- Applications can use PHP's `date()` / `time()` functions normally
-- For IoT gateways that need NTP, use a public NTP pool directly from the device
-- If a custom NTP server is needed, upgrade to a **VPS or dedicated server**
+**Solution: FakeNTP (HTTP-based time server)**
+
+Instead of port 123/UDP, EchoSmart uses **FakeNTP** — an HTTP-based time server
+at `ntp.echosmart.me` that IoT devices can query over HTTPS (port 443):
+
+```bash
+# Get time as JSON
+curl https://ntp.echosmart.me/time
+
+# Get Unix timestamp only
+curl https://ntp.echosmart.me/time?fmt=unix
+
+# Get ISO 8601 only
+curl https://ntp.echosmart.me/time?fmt=iso
+```
+
+See [FakeNTP Subdomain Setup](#fakentp-subdomain-ntpechosmart) below.
+
+---
+
+## FakeNTP Subdomain (ntp.echosmart.me)
+
+HTTP-based time server for IoT devices at `https://ntp.echosmart.me`.
+
+### Subdomain Setup (cPanel)
+
+1. **Create subdomain** in cPanel → Domains → Subdomains:
+   - Subdomain: `ntp`
+   - Domain: `echosmart.me`
+   - Document Root: `public_html/ntp.echosmart.me`
+
+   Or via SSH:
+   ```bash
+   uapi SubDomain addsubdomain domain=ntp rootdomain=echosmart.me dir=public_html/ntp.echosmart.me
+   ```
+
+2. **Add DNS A record** (if wildcard `*` doesn't already cover it):
+   ```bash
+   uapi DNS mass_edit_zone zone=echosmart.me serial=XXXXXXXXXX \
+     add='{"dname":"ntp","ttl":14400,"record_type":"A","data":["68.65.123.247"]}'
+   ```
+
+3. **Deploy PHP files** to the subdomain directory:
+   ```bash
+   scp -P 21098 hosting/ntp/* eduardoc3677@68.65.123.247:~/public_html/ntp.echosmart.me/
+   ```
+
+4. **SSL** is automatically covered by the wildcard certificate (`*.echosmart.me`).
+
+### API Endpoints
+
+| Endpoint               | Response     | Description                            |
+|------------------------|-------------|----------------------------------------|
+| `GET /`                | HTML         | Web UI with live clock                 |
+| `GET /time`            | JSON         | Full time data (unix + iso + date)     |
+| `GET /time?fmt=unix`   | text/plain   | Unix timestamp (e.g. `1711756800.123`) |
+| `GET /time?fmt=iso`    | text/plain   | ISO 8601 (e.g. `2026-03-30T00:00:00Z`)|
+| `GET /health`          | JSON         | Health check (`{"status":"ok"}`)       |
+
+### IoT Device Usage (ESP32)
+
+```cpp
+// Arduino / ESP32
+HTTPClient http;
+http.begin("https://ntp.echosmart.me/time?fmt=unix");
+if (http.GET() == 200) {
+    unsigned long epoch = http.getString().toFloat();
+    // Set RTC with epoch
+}
+http.end();
+```
+
+### Files
+
+| File                        | Description                              |
+|-----------------------------|------------------------------------------|
+| `hosting/ntp/index.php`     | PHP time server (shared hosting)         |
+| `hosting/ntp/.htaccess`     | URL routing + security headers           |
+| `gateway/fakentp/fakentp.py`| Python standalone server (VPS/dev)       |
+| `gateway/fakentp/README.md` | FakeNTP documentation                    |

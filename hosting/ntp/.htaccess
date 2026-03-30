@@ -1,0 +1,33 @@
+# ─── EchoSmart FakeNTP .htaccess ─────────────────────────────────────
+# Subdomain: ntp.echosmart.me
+# Document root: public_html/ntp.echosmart.me/
+
+# ─── Rewrite Engine ───────────────────────────────────────────────────
+RewriteEngine On
+
+# ─── Force HTTPS ──────────────────────────────────────────────────────
+RewriteCond %{HTTPS} !=on
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# ─── Route all requests through index.php ─────────────────────────────
+# (except existing files/directories)
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ index.php [QSA,L]
+
+# ─── Security Headers ────────────────────────────────────────────────
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-Frame-Options "DENY"
+    Header always set Access-Control-Allow-Origin "*"
+    Header always set Access-Control-Allow-Methods "GET, HEAD, OPTIONS"
+</IfModule>
+
+# ─── Block Directory Listing ─────────────────────────────────────────
+Options -Indexes
+
+# ─── PHP Settings ────────────────────────────────────────────────────
+<IfModule mod_php.c>
+    php_flag display_errors Off
+    php_value max_execution_time 10
+</IfModule>
