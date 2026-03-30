@@ -439,11 +439,32 @@ if (http.GET() == 200) {
 http.end();
 ```
 
+### Ubuntu / Linux Time Sync
+
+FakeNTP serves time over HTTPS — standard NTP clients (ntpd, chrony) cannot
+use it directly because NTP uses UDP port 123. Use the included script or
+`htpdate` instead:
+
+```bash
+# Option 1: EchoSmart sync script (see gateway/fakentp/echosmart-timesync.sh)
+sudo ./echosmart-timesync.sh --install    # systemd timer, every 15 min
+
+# Option 2: htpdate
+sudo apt install htpdate
+sudo htpdate -s ntp.echosmart.me
+
+# Option 3: Manual
+sudo date -s "@$(curl -s https://ntp.echosmart.me/time?fmt=unix | cut -d. -f1)"
+```
+
+> **Note:** All `/time` responses are **always UTC** — standard NTP behavior.
+
 ### Files
 
-| File                        | Description                              |
-|-----------------------------|------------------------------------------|
-| `hosting/ntp/index.php`     | PHP time server (standalone fallback)    |
-| `hosting/ntp/.htaccess`     | URL routing + security headers           |
-| `gateway/fakentp/fakentp.py`| Python standalone server (VPS/dev)       |
-| `gateway/fakentp/README.md` | FakeNTP documentation                    |
+| File                                  | Description                              |
+|---------------------------------------|------------------------------------------|
+| `hosting/ntp/index.php`               | PHP time server (standalone fallback)    |
+| `hosting/ntp/.htaccess`               | URL routing + security headers           |
+| `gateway/fakentp/fakentp.py`          | Python standalone server (VPS/dev)       |
+| `gateway/fakentp/echosmart-timesync.sh` | Ubuntu/Linux time sync script          |
+| `gateway/fakentp/README.md`           | FakeNTP documentation                    |

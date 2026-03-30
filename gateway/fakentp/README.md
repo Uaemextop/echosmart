@@ -89,6 +89,58 @@ curl https://ntp.echosmart.me/time?fmt=unix
 curl https://ntp.echosmart.me/time?fmt=iso
 ```
 
+## Ubuntu / Linux Time Sync
+
+FakeNTP serves time over HTTPS — standard NTP clients (ntpd, chrony) cannot
+use it directly because NTP uses UDP port 123 with a binary protocol. Instead,
+use the included `echosmart-timesync.sh` script or `htpdate`.
+
+### Option 1: echosmart-timesync.sh (recommended)
+
+```bash
+# Check clock drift (no changes)
+./echosmart-timesync.sh --check
+
+# Sync once (requires sudo)
+sudo ./echosmart-timesync.sh
+
+# Install as systemd timer (syncs every 15 minutes)
+sudo ./echosmart-timesync.sh --install
+
+# Uninstall
+sudo ./echosmart-timesync.sh --uninstall
+```
+
+### Option 2: htpdate
+
+```bash
+# Install htpdate
+sudo apt install htpdate
+
+# Sync once
+sudo htpdate -s ntp.echosmart.me
+
+# Add to cron (every 15 min)
+echo '*/15 * * * * root htpdate -s ntp.echosmart.me' | sudo tee /etc/cron.d/echosmart-htpdate
+```
+
+### Option 3: Manual curl + date
+
+```bash
+# One-liner: fetch epoch and set clock
+sudo date -s "@$(curl -s https://ntp.echosmart.me/time?fmt=unix | cut -d. -f1)"
+
+# Crontab entry (every 15 min)
+*/15 * * * * root date -s "@$(curl -s https://ntp.echosmart.me/time?fmt=unix | cut -d. -f1)" 2>/dev/null
+```
+
+### Important Notes
+
+- **All time responses are UTC** — this is standard NTP behavior
+- The `unix` timestamp is always UTC-based regardless of display timezone
+- `/time?fmt=unix` returns a plain float (e.g. `1711756800.123456`)
+- Accuracy depends on HTTPS latency (~50-200ms typical)
+
 ## Deployment
 
 ### Shared Hosting (cPanel) — PHP version
@@ -113,6 +165,17 @@ python fakentp.py --port 8123
 # location / { proxy_pass http://127.0.0.1:8123; }
 ```
 
+## Files
+
+| File                        | Description                              |
+|-----------------------------|------------------------------------------|
+| `fakentp.py`                | Python standalone HTTP time server       |
+| `echosmart-timesync.sh`     | Ubuntu/Linux time sync script            |
+| `README.md`                 | This documentation                       |
+| `hosting/ntp/index.php`     | PHP time server (shared hosting)         |
+| `hosting/ntp/.htaccess`     | URL routing + security headers           |
+
 ## Requirements
 
 - Python 3.7+ (stdlib only, no external dependencies)
+- For time sync: `curl` and `bash` (included in all Linux distributions)
